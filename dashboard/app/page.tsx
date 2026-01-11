@@ -18,7 +18,6 @@ export default function Home() {
       {/* Floating HUD Status - Top Right */}
       <div className="fixed flex items-center gap-2 z-[100]" style={{ top: '2rem', right: '2rem' }}>
         <div className="glass-panel px-3 py-1.5 rounded-full border border-emerald-500/20 bg-black/80 backdrop-blur-md flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-          <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">STATUS</span>
           <div className="text-emerald-500 font-bold text-xs flex items-center gap-2">
             SYSTEM ONLINE <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
