@@ -162,17 +162,7 @@ export default function Home() {
 
 
 
-            {/* Hype Metric (Market Cap) - Placeholder for now */}
-            <motion.div
-              whileHover={{ scale: 1.01 }}
-              className="glass-panel p-6 flex flex-col justify-center items-center text-center gap-2 border-t-4 border-t-emerald-500 rounded-xl"
-            >
-              <span className="text-[10px] text-zinc-500 uppercase tracking-widest">Projected Market Cap</span>
-              <div className="text-4xl font-bold text-white tracking-tighter text-glow">$1.2M</div>
-              <span className="text-xs text-emerald-500 flex items-center gap-1">
-                ▲ 12.5% <span className="text-zinc-600">24h</span>
-              </span>
-            </motion.div>
+
 
             <div className="p-4 rounded border border-zinc-800 bg-zinc-900/20 text-center">
               <p className="text-xs text-zinc-600">

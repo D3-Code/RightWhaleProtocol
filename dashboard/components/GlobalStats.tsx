@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Flame, Droplets, Trophy } from "lucide-react";
+import { Flame, Droplets, Trophy, BarChart3 } from "lucide-react";
 
 type Stats = {
     totalBurned: number;
@@ -50,6 +50,17 @@ export const GlobalStats = () => {
 
     const items = [
         {
+            label: "MARKET CAP",
+            value: 1200000, // Static $1.2M for now as per design
+            unit: "USD",
+            usd: 1200000,
+            icon: BarChart3,
+            color: "text-emerald-500",
+            bg: "bg-emerald-500/10",
+            border: "border-emerald-500/30",
+            glow: "shadow-[0_0_30px_-5px_rgba(16,185,129,0.3)]"
+        },
+        {
             label: "TOTAL BURNED",
             value: stats.totalBurned,
             unit: "$RightWhale",
@@ -85,7 +96,7 @@ export const GlobalStats = () => {
     ];
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {items.map((item, index) => (
                 <motion.div
                     key={item.label}
