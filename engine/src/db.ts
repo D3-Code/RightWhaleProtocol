@@ -40,7 +40,10 @@ export const addLog = async (type: string, amount: number, txHash?: string) => {
     }
 };
 
-export const getLogs = async (limit = 50) => {
+export const getLogs = async (limit = 50, type?: string) => {
     if (!db) return [];
+    if (type) {
+        return await db.all('SELECT * FROM activity_logs WHERE type = ? ORDER BY id DESC LIMIT ?', type, limit);
+    }
     return await db.all('SELECT * FROM activity_logs ORDER BY id DESC LIMIT ?', limit);
 };

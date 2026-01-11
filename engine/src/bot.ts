@@ -1,5 +1,8 @@
 import { Telegraf } from 'telegraf';
 import dotenv from 'dotenv';
+import { claimFees } from './harvester';
+import { getLogs } from './db';
+
 dotenv.config();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -9,7 +12,6 @@ export const bot = token ? new Telegraf(token) : null;
 
 export const broadcastToChannel = async (message: string) => {
     if (!bot || !CHANNEL_ID) {
-        // Silent fail or log if needed, avoid spamming logs in dev if not set
         if (!CHANNEL_ID) console.log('⚠️ Broadcast skipped: No Channel ID.');
         return;
     }
@@ -34,6 +36,7 @@ export const setupBot = () => {
             'ℹ️ /info - Protocol Strategy breakdown\n' +
             '🔄 /flywheel - Verify the Flywheel Logic\n' +
             '📊 /status - System Status\n' +
+            '🌾 /harvest - Trigger Fee Harvester\n' +
             '📜 /history - Recent Actions (Menu)\n' +
             '   ├ 🔥 /burns\n' +
             '   ├ 💧 /lps\n' +
@@ -60,18 +63,34 @@ export const setupBot = () => {
     bot.help(welcomeMessage);
 
     bot.command('status', (ctx) => {
-        ctx.reply('RightWhale System: ONLINE 🟢\n\nMonitor: Active\nStrategy: 30/30/30/10');
+        const timestamp = new Date().toISOString();
+        ctx.reply(`RightWhale System: ONLINE 🟢\n\nMonitor: Active\nStrategy: 30/30/30/10\nTime: ${timestamp}`);
     });
 
-    bot.command('harvest', (ctx) => {
-        ctx.reply('Harvest command received. (Mock)');
+    bot.command('harvest', async (ctx) => {
+        ctx.reply('🌾 *Harvesting Fees...* \nAttempting to withdraw from Pump.fun...', { parse_mode: 'Markdown' });
+        await claimFees();
+        // claimFees handles the broadcast and logging.
     });
 
-    bot.command('history', (ctx) => {
+    bot.command('history', async (ctx) => {
         const wallet = process.env.FEE_WALLET_ADDRESS || '...';
+        const logs = await getLogs(5);
+
+        let logText = '';
+        if (logs.length > 0) {
+            logText = logs.map((l: any) => {
+                const link = l.txHash && l.txHash.length > 10 ? `[Tx](${'https://solscan.io/tx/' + l.txHash})` : 'Simulated';
+                return `• ${l.type}: ${l.amount ? l.amount.toFixed(4) : '0'} SOL - ${link}`;
+            }).join('\n');
+        } else {
+            logText = '_No recent actions recorded._';
+        }
+
         ctx.reply(
             '📜 *Protocol History* 📜\n\n' +
-            'Select a category to view specific transactions:\n\n' +
+            '**Recent Executions**:\n' + logText + '\n\n' +
+            'Select a category to view more:\n' +
             '🔥 /burns - Buy & Burn Log\n' +
             '💧 /lps - Auto-LP Log\n' +
             '🛡️ /payouts - RevShare Log\n\n' +
@@ -80,34 +99,53 @@ export const setupBot = () => {
         );
     });
 
-    bot.command('burns', (ctx) => {
+    bot.command('burns', async (ctx) => {
+        const logs = await getLogs(5, 'BURN');
+        let lines = '_No burns recorded yet._';
+        if (logs.length > 0) {
+            lines = logs.map((l: any) => {
+                const link = l.txHash && l.txHash.length > 10 ? `[Tx](${'https://solscan.io/tx/' + l.txHash})` : 'Simulated';
+                return `🔥 ${l.amount.toFixed(4)} SOL - ${link}`;
+            }).join('\n');
+        }
+
         ctx.reply(
-            '🔥 *Recent Burns* 🔥\n\n' +
-            '1. `0.09 SOL` - [Tx Link](https://solscan.io/tx/...)\n' +
-            '2. `0.21 SOL` - [Tx Link](https://solscan.io/tx/...)\n' +
-            '3. `0.05 SOL` - [Tx Link](https://solscan.io/tx/...)\n\n' +
+            '🔥 *Recent Burns* 🔥\n\n' + lines + '\n\n' +
             '_Deflation reduces supply and increases scarcity._',
             { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } }
         );
     });
 
-    bot.command('lps', (ctx) => {
+    bot.command('lps', async (ctx) => {
+        const logs = await getLogs(5, 'LP_ZAP');
+        let lines = '_No LP Injections recorded yet._';
+        if (logs.length > 0) {
+            lines = logs.map((l: any) => {
+                const link = l.txHash && l.txHash.length > 10 ? `[Tx](${'https://solscan.io/tx/' + l.txHash})` : 'Simulated';
+                return `💧 ${l.amount.toFixed(4)} SOL - ${link}`;
+            }).join('\n');
+        }
+
         ctx.reply(
-            '💧 *Liquidity Injections* 💧\n\n' +
-            '1. `0.09 SOL` - [Tx Link](https://solscan.io/tx/...)\n' +
-            '2. `0.21 SOL` - [Tx Link](https://solscan.io/tx/...)\n' +
-            '3. `0.05 SOL` - [Tx Link](https://solscan.io/tx/...)\n\n' +
+            '💧 *Liquidity Injections* 💧\n\n' + lines + '\n\n' +
             '_LP Injections raise the price floor permanently._',
             { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } }
         );
     });
 
-    bot.command('payouts', (ctx) => {
+    bot.command('payouts', async (ctx) => {
+        const logs = await getLogs(5, 'REVSHARE');
+        let lines = '_No RevShare payouts recorded yet._';
+        if (logs.length > 0) {
+            lines = logs.map((l: any) => {
+                const link = l.txHash && l.txHash.length > 10 ? `[Tx](${'https://solscan.io/tx/' + l.txHash})` : 'Simulated';
+                return `🛡️ ${l.amount.toFixed(4)} SOL - ${link}`;
+            }).join('\n');
+        }
+
         ctx.reply(
-            '🛡️ *RevShare Payouts* 🛡️\n\n' +
-            '1. `0.09 SOL` (Distro to 4500 holders) - [Tx Link](https://solscan.io/tx/...)\n' +
-            '2. `0.21 SOL` (Distro to 4200 holders) - [Tx Link](https://solscan.io/tx/...)\n\n' +
-            '_Rewards are distributed proportionally to your holdings._',
+            '🛡️ *RevShare Payouts* 🛡️\n\n' + lines + '\n\n' +
+            '_Rewards are distributed proportionally to holdings._',
             { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } }
         );
     });
