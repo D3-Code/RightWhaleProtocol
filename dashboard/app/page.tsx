@@ -61,9 +61,8 @@ export default function Home() {
             {/* Right: Status (Hidden on Mobile, Visible on Desktop) */}
             <div className="flex items-center gap-4 hidden md:flex">
               <div className="text-end">
-                <div className="text-[10px] text-zinc-500 uppercase tracking-widest">System Status</div>
                 <div className="text-emerald-500 font-bold text-sm flex items-center justify-end gap-2">
-                  OPERATIONAL <span className="relative flex h-2 w-2">
+                  SYSTEM ONLINE <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
