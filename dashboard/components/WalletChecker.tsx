@@ -26,7 +26,7 @@ export const WalletChecker = () => {
     return (
         <div className="flex flex-col gap-4 p-6">
             <h2 className="text-sm text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2 flex justify-between items-center">
-                <span className="flex items-center gap-2"><Wallet className="w-4 h-4 text-emerald-500" /> CHECK YOUR WALLET // PORTFOLIO</span>
+                <span className="flex items-center gap-2"><Wallet className="w-4 h-4 text-emerald-500" /> PROTOCOL REWARDS SCANNER</span>
 
             </h2>
 
