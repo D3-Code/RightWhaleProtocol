@@ -13,7 +13,20 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black bg-grid-pattern p-4 md:p-6 text-zinc-100 font-mono-tech selection:bg-orange-500/30">
+    <main className="min-h-screen bg-black bg-grid-pattern p-4 md:p-6 text-zinc-100 font-mono-tech selection:bg-orange-500/30 relative">
+
+      {/* Floating HUD Status - Top Right */}
+      <div className="fixed top-8 right-8 flex items-center gap-2 z-[100]">
+        <div className="glass-panel px-3 py-1.5 rounded-full border border-emerald-500/20 bg-black/80 backdrop-blur-md flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+          <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">STATUS</span>
+          <div className="text-emerald-500 font-bold text-xs flex items-center gap-2">
+            SYSTEM ONLINE <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+          </div>
+        </div>
+      </div>
 
       <div className="mx-auto max-w-7xl space-y-6">
 
@@ -58,17 +71,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Status (Hidden on Mobile, Visible on Desktop) */}
-            <div className="flex items-center gap-4 hidden md:flex">
-              <div className="text-end">
-                <div className="text-emerald-500 font-bold text-sm flex items-center justify-end gap-2">
-                  SYSTEM ONLINE <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                </div>
-              </div>
-            </div>
+            {/* Right: Status (Removed - Moved to Absolute Top Right) */}
+            <div className="hidden md:flex w-24"></div>
           </header>
         </div>
 
