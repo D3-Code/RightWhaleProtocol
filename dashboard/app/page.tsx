@@ -167,7 +167,7 @@ export default function Home() {
             <div className="p-4 rounded border border-zinc-800 bg-zinc-900/20 text-center">
               <p className="text-xs text-zinc-600">
                 RightWhale Protocol &copy; 2026 <br />
-                <span className="opacity-50">System ID: RW-8821</span>
+                <span className="opacity-50">System ID: RW V1.0</span>
               </p>
             </div>
           </div>
