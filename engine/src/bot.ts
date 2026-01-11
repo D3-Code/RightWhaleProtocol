@@ -34,6 +34,7 @@ export const setupBot = () => {
             'I manage the deployed strategy for the $RightWhale ecosystem.\n\n' +
             '*Available Commands:*\n' +
             'ℹ️ /info - Protocol Strategy breakdown\n' +
+            '📢 /channel - Official Updates\n' +
             '🔄 /flywheel - Verify the Flywheel Logic\n' +
             '📊 /status - System Status\n' +
             '🌾 /harvest - Trigger Fee Harvester\n' +
@@ -61,6 +62,15 @@ export const setupBot = () => {
 
     bot.start(welcomeMessage);
     bot.help(welcomeMessage);
+
+    bot.command('channel', (ctx) => {
+        ctx.reply(
+            '📢 *Official Channel* 📢\n\n' +
+            'Join for updates and automated engine logs:\n' +
+            'https://t.me/RightWhaleBotChannel',
+            { parse_mode: 'Markdown' }
+        );
+    });
 
     bot.command('status', (ctx) => {
         const timestamp = new Date().toISOString();
