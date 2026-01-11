@@ -14,13 +14,9 @@ export const WalletChecker = () => {
         setLoading(true);
         setResult(null);
 
-        // Simulate API delay
-        // Simulate API delay
-        setTimeout(() => {
-            setLoading(false);
-            // Mock Data Response
-            setResult(null);
-        }, 1000);
+        // Real API integration pending
+        setLoading(false);
+        setResult(null);
     };
 
     return (

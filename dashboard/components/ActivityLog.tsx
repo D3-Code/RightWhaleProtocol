@@ -73,13 +73,19 @@ export const ActivityLog = () => {
                                     <span className="text-zinc-300">
                                         Process Executed {`>>`} Amount: <span className="text-white">{log.amount} SOL</span>
                                     </span>
-                                    <a
-                                        href={`https://solscan.io/tx/${log.txHash || 'mock-tx'}`}
-                                        target="_blank"
-                                        className="ml-auto text-[10px] text-zinc-600 hover:text-orange-500 underline decoration-dotted transition-colors"
-                                    >
-                                        [VIEW TX]
-                                    </a>
+                                    {log.txHash ? (
+                                        <a
+                                            href={`https://solscan.io/tx/${log.txHash}`}
+                                            target="_blank"
+                                            className="ml-auto text-[10px] text-zinc-600 hover:text-orange-500 underline decoration-dotted transition-colors"
+                                        >
+                                            [VIEW TX]
+                                        </a>
+                                    ) : (
+                                        <span className="ml-auto text-[10px] text-zinc-800 cursor-not-allowed">
+                                            [PENDING]
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         ))}

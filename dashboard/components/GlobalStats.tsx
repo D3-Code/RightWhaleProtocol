@@ -44,16 +44,16 @@ export const GlobalStats = () => {
 
     if (!stats) return <div className="h-24 w-full bg-zinc-900/50 animate-pulse rounded-xl"></div>;
 
-    // Mock Prices for USD conversion
-    const PRICE_RW = 0.045; // $0.045 per RightWhale
-    const PRICE_SOL = 145.50; // $145.50 per SOL
+    // Real prices to be fetched in future
+    const PRICE_RW = 0;
+    const PRICE_SOL = 0;
 
     const items = [
         {
             label: "MARKET CAP",
-            value: 1200000, // Static $1.2M for now as per design
+            value: 0, // Placeholder until Coingecko/DexScreener integration
             unit: "USD",
-            usd: 1200000,
+            usd: 0,
             icon: BarChart3,
             color: "text-emerald-500",
             bg: "bg-emerald-500/10",
