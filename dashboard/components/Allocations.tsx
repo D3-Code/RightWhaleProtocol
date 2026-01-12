@@ -23,8 +23,7 @@ export const Allocations = () => {
                     {/* Progress Bar Container */}
                     <div className="relative h-3 w-full bg-zinc-900 border border-zinc-700/50 overflow-hidden skew-x-[-10deg]">
                         {/* Grid Lines in background */}
-                        {/* Grid Lines in background - Removed */}
-                        <div className="absolute inset-0 z-0 opacity-20 bg-zinc-800"></div>
+                        <div className="absolute inset-0 z-0 opacity-20 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==')]"></div>
 
                         <motion.div
                             initial={{ width: 0 }}
