@@ -16,7 +16,7 @@ export default function Home() {
     <main className="min-h-screen bg-black bg-grid-pattern p-4 md:p-6 text-zinc-100 font-mono-tech selection:bg-orange-500/30 relative">
 
       {/* Floating HUD Status - Top Right */}
-      <div className="fixed flex items-center gap-2 z-[100]" style={{ top: '2rem', right: '2rem' }}>
+      <div className="fixed flex flex-col items-end gap-2 z-[100]" style={{ top: '2rem', right: '2rem' }}>
         <div className="glass-panel px-3 py-1.5 rounded-full border border-emerald-500/20 bg-black/80 backdrop-blur-md flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
           <div className="text-emerald-500 font-bold text-xs flex items-center gap-2">
             SYSTEM ONLINE <span className="relative flex h-2 w-2">
@@ -24,6 +24,10 @@ export default function Home() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
           </div>
+        </div>
+        {/* Pump.fun Icon Pill */}
+        <div className="bg-[#8be92f] text-black px-2 py-0.5 rounded-full text-[10px] font-bold tracking-tight shadow-[0_0_10px_rgba(139,233,47,0.4)] opacity-80 hover:opacity-100 transition-opacity cursor-not-allowed">
+          💊 pump.fun
         </div>
       </div>
 
