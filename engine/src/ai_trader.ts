@@ -4,7 +4,7 @@ import fetch from 'cross-fetch';
 interface MarketData {
     price: number;
     volume24h: number;
-    priceChange1h: number;
+    priceChange5m: number; // Switched to 5m for Pump.fun speed
     lastCandles: { close: number, volume: number }[]; // Simplified OHLCV
 }
 
@@ -25,7 +25,7 @@ export async function fetchMarketData(tokenAddress: string): Promise<MarketData>
     return {
         price: 0.0045,
         volume24h: 150000,
-        priceChange1h: -5.2, // Pumping down
+        priceChange5m: -5.2, // Pumping down FAST
         lastCandles: [
             { close: 0.0048, volume: 100 },
             { close: 0.0047, volume: 120 },
@@ -42,33 +42,44 @@ export async function getAiDecision(data: MarketData): Promise<AiDecision> {
     // const prompt = `Price: ${data.price}, Change: ${data.priceChange1h}%... Decide!`;
 
     // STRATEGY: "The Elastic Floor" (Algorithmic Market Making)
+    // TIMEFRAME: 5 Minutes (m5) - Optimized for High Volatility (Pump.fun)
 
     // 1. FLOOR DEFENDER (Buy + LP)
-    // If Price is dumping (< -3%) or volatility is high downside
-    if (data.priceChange1h < -3) {
+    // If Price is dumping fast (< -5% in 5m) - Panic selling detected
+    if (data.priceChange5m < -5) {
         return {
             action: 'ADD_LP',
-            reason: `📉 DUMP DETECTED (${data.priceChange1h}%). \nStrategy: HARDEN THE FLOOR.\nAction: Injecting Liquidity to absorb sell pressure and stabilize price support.`,
-            confidence: 0.95 // High confidence because rule-based
+            reason: `📉 FLASH DUMP DETECTED (${data.priceChange5m}% in 5m). \nStrategy: HARDEN THE FLOOR.\nAction: Injecting Liquidity immediately to stop the panic bleed.`,
+            confidence: 0.98
         };
     }
 
     // 2. MOMENTUM ACCELERATOR (Buy + Burn)
-    // If Price is pumping (> +3%)
-    else if (data.priceChange1h > 3) {
+    // If Price is pumping fast (> +5% in 5m) - Breakout detected
+    else if (data.priceChange5m > 5) {
         return {
             action: 'BUY_BURN',
-            reason: `📈 PUMP DETECTED (+${data.priceChange1h}%). \nStrategy: ACCELERATE MOMENTUM.\nAction: Buyback & Burn to create a green god candle and trigger FOMO.`,
-            confidence: 0.95
+            reason: `📈 BREAKOUT DETECTED (+${data.priceChange5m}% in 5m). \nStrategy: ACCELERATE MOMENTUM.\nAction: Buyback & Burn now to turn a breakout into a moonshot.`,
+            confidence: 0.98
         };
     }
 
-    // 3. ACCUMULATION ZONE (Wait)
+    // 3. STALE MARKET SPARK (Boredom Breaker)
+    // If we have cash (implied by execution) and price is flat (-2% to +2%)
+    else if (data.priceChange5m > -2 && data.priceChange5m < 2) {
+        return {
+            action: 'BUY_BURN',
+            reason: `😴 STAGNATION DETECTED (${data.priceChange5m}% in 5m). \nStrategy: BOREDOM BREAKER.\nAction: Executing Buyback to create a volatility spark and wake up the chart.`,
+            confidence: 0.75
+        };
+    }
+
+    // 4. ACCUMULATION ZONE (Wait - Low confidence fallback)
     else {
         return {
             action: 'WAIT',
-            reason: `😴 CHOP DETECTED (${data.priceChange1h}%).\nStrategy: CONSERVE CAPITAL.\nAction: Waiting for a clear trend signal (> 3% move) to deploy resources effectively.`,
-            confidence: 0.80
+            reason: `🤔 INDECISION (${data.priceChange5m}%). \nStrategy: HOLD.\nAction: No clear signal. Better to wait for a sharper move before deploying.`,
+            confidence: 0.50
         };
     }
 }
