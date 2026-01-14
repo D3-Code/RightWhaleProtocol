@@ -10,14 +10,15 @@ export const globalStats = {
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
-import { startMarketMonitor } from './market';
+import { marketMonitor } from './market_monitor'; // Correct import
+import { lastAiDecision } from './ai_trader';
 
 import { initDB, getLogs } from './db';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -30,9 +31,19 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.get('/history', async (req, res) => {
-    const logs = await getLogs();
-    res.json(logs);
+app.get('/logs', async (req, res) => {
+    try {
+        const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+        const type = req.query.type as string | undefined;
+        const logs = await getLogs(limit, type); // Pass type filter
+        res.json(logs);
+    } catch (err) {
+        res.status(500).send('Error fetching logs');
+    }
+});
+
+app.get('/ai-status', (req, res) => {
+    res.json(lastAiDecision || { action: 'WAIT', reason: 'System Initializing...', confidence: 0, timestamp: new Date().toISOString() });
 });
 
 app.get('/stats', (req, res) => {
@@ -40,7 +51,7 @@ app.get('/stats', (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
+app.listen(port, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 

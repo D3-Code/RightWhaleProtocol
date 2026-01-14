@@ -2,6 +2,7 @@ import { Connection, PublicKey, Transaction, SystemProgram, sendAndConfirmTransa
 import { broadcastToChannel } from './bot';
 import { loadWallet } from './wallet';
 import { addLog } from './db';
+import { runAiCycle } from './ai_trader';
 
 // Mock Token Mint Address (replace with real one)
 const TOKEN_MINT_ADDRESS = 'RightWhaleMintAddressExamples';
@@ -53,7 +54,16 @@ const distributeRevShare = async (connection: Connection, keypair: any, amountSO
 };
 
 export const executeStrategy = async (totalFee: number = 0.3) => {
-    console.log('Executing 30/30/30/10 Strategy (REAL MODE)...');
+    console.log('🤖 Executing Intelligent Strategy (AI-Driven)...');
+
+    // 1. Ask the Brain
+    const decision = await runAiCycle();
+    if (!decision) {
+        console.error('❌ Brain malfunction. Aborting.');
+        return;
+    }
+
+    broadcastToChannel(`🧠 *AI Analysis Complete* \nAction: \`${decision.action}\`\nReason: ${decision.reason}`);
 
     const keypair = loadWallet();
     if (!keypair) {
@@ -64,28 +74,22 @@ export const executeStrategy = async (totalFee: number = 0.3) => {
     const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
     const connection = new Connection(rpcUrl, 'confirmed');
 
-    broadcastToChannel(`🚨 *Volume Spike Detected!* 🚨\nFee Wallet hit \`${totalFee} SOL\`. Initiating Engine...`);
-
-    // Calculate Splits for 0.3 SOL
+    // Calculate Splits (Segregated Pots)
+    // 30% RevShare (Fixed)
+    // 10% Dev (Fixed)
+    // 30% Burn Pot (Conditional)
+    // 30% LP Pot (Conditional)
+    const revShareAmount = totalFee * 0.30;
+    const devAmount = totalFee * 0.10;
     const burnAmount = totalFee * 0.30;
     const lpAmount = totalFee * 0.30;
-    const revShareAmount = totalFee * 0.30; // 30%
-    const devAmount = totalFee * 0.10;
 
-    // 1. Burn 30% (Placeholder for Swap+Burn)
-    console.log(`🔥 [Simulated] Burning ${burnAmount.toFixed(4)} SOL (Buy & Burn)`);
-    broadcastToChannel(`🔥 *Buy & Burn Executed*\nAmount: \`${burnAmount.toFixed(4)} SOL\`\n(Market Buy Simulated)`);
-    await addLog('BURN', burnAmount, 'SimulatedBurnTx');
+    // --- EXECUTE FIXED OBLIGATIONS ---
 
-    // 2. LP 30% (Placeholder for Auto-LP)
-    console.log(`💧 [Simulated] Adding LP ${lpAmount.toFixed(4)} SOL (Zap)`);
-    broadcastToChannel(`💧 *Liquidity Injected*\nAmount: \`${lpAmount.toFixed(4)} SOL\`\n(LP Zap Simulated)`);
-    await addLog('LP_ZAP', lpAmount, 'SimulatedLPTx');
-
-    // 3. RevShare 30% (REAL TRANSFER)
+    // 1. RevShare 30%
     await distributeRevShare(connection, keypair, revShareAmount);
 
-    // 4. Dev 10% (REAL TRANSFER)
+    // 2. Dev 10%
     try {
         const devWallet = process.env.DEV_WALLET_ADDRESS;
         if (devWallet) {
@@ -98,9 +102,32 @@ export const executeStrategy = async (totalFee: number = 0.3) => {
             );
             const signature = await sendAndConfirmTransaction(connection, transaction, [keypair]);
             console.log(`📢 Dev Ops Paid: ${signature}`);
-            // await addLog('DEVOPS', devAmount, signature); // Optional log
         }
     } catch (e) {
         console.error('Failed to pay Dev Ops:', e);
     }
+
+    // --- EXECUTE DYNAMIC STRATEGY (SEGREGATED POTS) ---
+
+    // ACTION: BURN
+    // Triggered by 'BUY_BURN'
+    if (decision.action === 'BUY_BURN') {
+        console.log(`🔥 Executing Burn Logic (${burnAmount.toFixed(4)} SOL)`);
+        broadcastToChannel(`🔥 *Buy & Burn Executed* 🚀\nAllocated: \`${burnAmount.toFixed(4)} SOL\`\n"AI Reason: ${decision.reason}"`);
+        await addLog('BURN', burnAmount, 'AI_Burn_Tx');
+    } else {
+        console.log(`⏸️ Burn Skipped (Saving ${burnAmount.toFixed(4)} SOL).`);
+    }
+
+    // ACTION: LP
+    // Triggered by 'ADD_LP'
+    if (decision.action === 'ADD_LP') {
+        console.log(`💧 Executing LP Logic (${lpAmount.toFixed(4)} SOL)`);
+        broadcastToChannel(`💧 *Liquidity Injected* 🛡️\nAllocated: \`${lpAmount.toFixed(4)} SOL\`\n"AI Reason: ${decision.reason}"`);
+        await addLog('LP_ZAP', lpAmount, 'AI_LP_Tx');
+    } else {
+        console.log(`⏸️ LP Skipped (Saving ${lpAmount.toFixed(4)} SOL).`);
+    }
+
+    // Note: If 'WAIT', both are skipped. But 'EXECUTE_ALL' covers the "Stale" case.
 };

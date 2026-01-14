@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { PulseIndicator } from "@/components/PulseIndicator";
 import { WalletChecker } from "@/components/WalletChecker";
 import { GlobalStats } from "@/components/GlobalStats";
+import Link from 'next/link'
+import AiStatusWidget from '@/components/AiStatusWidget'
 import { Wallet, Globe, Terminal, Activity, Zap, BarChart3, Droplets, Send, Bot, Github } from "lucide-react";
 import Image from "next/image";
 

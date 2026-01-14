@@ -84,7 +84,10 @@ export const setupBot = () => {
 
         try {
             const decision = await runAiCycle();
-            const emoji = decision.action === 'BUY_BURN' ? '🔥' : decision.action === 'ADD_LP' ? '💧' : '😴';
+
+            let emoji = '😴';
+            if (decision.action === 'BUY_BURN') emoji = '🔥';
+            if (decision.action === 'ADD_LP') emoji = '💧';
 
             ctx.reply(
                 `*Analysis Complete* ${emoji}\n\n` +

@@ -12,7 +12,11 @@ interface AiDecision {
     action: 'BUY_BURN' | 'ADD_LP' | 'WAIT';
     reason: string;
     confidence: number;
+    timestamp?: string; // Added timestamp
 }
+
+// Global state to store the last decision for the API
+export let lastAiDecision: AiDecision | null = null;
 
 // 1. The Eyes: Fetch Data (Mock for now, ready for DexScreener)
 export async function fetchMarketData(tokenAddress: string): Promise<MarketData> {
@@ -64,22 +68,23 @@ export async function getAiDecision(data: MarketData): Promise<AiDecision> {
         };
     }
 
-    // 3. STALE MARKET SPARK (Boredom Breaker)
-    // If we have cash (implied by execution) and price is flat (-2% to +2%)
-    else if (data.priceChange5m > -2 && data.priceChange5m < 2) {
+    // 3. CONSOLIDATION (High Volume + Flat Price)
+    // Market is coiling up. We burn to trigger the breakout.
+    else if (data.volume24h > 100000) {
         return {
             action: 'BUY_BURN',
-            reason: `😴 STAGNATION DETECTED (${data.priceChange5m}% in 5m). \nStrategy: BOREDOM BREAKER.\nAction: Executing Buyback to create a volatility spark and wake up the chart.`,
-            confidence: 0.75
+            reason: `🔋 CONSOLIDATION DETECTED (Vol High, Price Flat). \nStrategy: BREAKOUT TRIGGER.\nAction: Burn squeeze initiated to force the breakout.`,
+            confidence: 0.85
         };
     }
 
-    // 4. ACCUMULATION ZONE (Wait - Low confidence fallback)
+    // 4. ACCUMULATION (Low Volume + Flat Price)
+    // Market is dead. We add LP to strengthen the pool for the next leg up.
     else {
         return {
-            action: 'WAIT',
-            reason: `🤔 INDECISION (${data.priceChange5m}%). \nStrategy: HOLD.\nAction: No clear signal. Better to wait for a sharper move before deploying.`,
-            confidence: 0.50
+            action: 'ADD_LP',
+            reason: `🧱 ACCUMULATION DETECTED (Vol Low). \nStrategy: LIQUIDITY BUILD.\nAction: Adding LP while demand is low to prepare deep support for next rally.`,
+            confidence: 0.80
         };
     }
 }
@@ -90,6 +95,11 @@ export async function runAiCycle() {
 
     const data = await fetchMarketData(token);
     const decision = await getAiDecision(data);
+
+    const decisionWithTime = { ...decision, timestamp: new Date().toISOString() };
+
+    // Save to global state
+    lastAiDecision = decisionWithTime;
 
     console.log(`\n🤖 AI DECISION FINALIZED:`);
     console.log(`➤ Action: ${decision.action}`);
