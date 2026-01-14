@@ -2,6 +2,7 @@ import { Telegraf } from 'telegraf';
 import dotenv from 'dotenv';
 import { claimFees } from './harvester';
 import { getLogs } from './db';
+import { runAiCycle } from './ai_trader';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ export const setupBot = () => {
             '*Available Commands:*\n' +
             'ℹ️ /info - Protocol Strategy breakdown\n' +
             '📢 /channel - Official Updates\n' +
+            '🧠 /analyze - Run Market Algorithmic Analysis\n' +
             '🔄 /flywheel - Verify the Flywheel Logic\n' +
             '📊 /status - System Status\n' +
             '🌾 /harvest - Trigger Fee Harvester\n' +
@@ -75,6 +77,26 @@ export const setupBot = () => {
     bot.command('status', (ctx) => {
         const timestamp = new Date().toISOString();
         ctx.reply(`RightWhale System: ONLINE 🟢\n\nMonitor: Active\nStrategy: 30/30/30/10\nTime: ${timestamp}`);
+    });
+
+    bot.command('analyze', async (ctx) => {
+        ctx.reply('🧠 *Running Algorithmic Market Analysis...*', { parse_mode: 'Markdown' });
+
+        try {
+            const decision = await runAiCycle();
+            const emoji = decision.action === 'BUY_BURN' ? '🔥' : decision.action === 'ADD_LP' ? '💧' : '😴';
+
+            ctx.reply(
+                `*Analysis Complete* ${emoji}\n\n` +
+                `**Recommendation**: \`${decision.action}\`\n` +
+                `**Confidence**: ${decision.confidence * 100}%\n\n` +
+                `**Reasoning**:\n${decision.reason}`,
+                { parse_mode: 'Markdown' }
+            );
+        } catch (error) {
+            console.error('Analyze Error:', error);
+            ctx.reply('❌ Error running analysis logic.');
+        }
     });
 
     bot.command('harvest', async (ctx) => {
