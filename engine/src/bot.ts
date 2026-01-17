@@ -229,9 +229,10 @@ export const setupBot = () => {
             '*How it Works:*\n' +
             '1. 🌾 *Harvest*: The bot autonomously collects fees from Pump.fun creator rewards.\n' +
             '2. 🧠 *Analyze*: Our AI Engine monitors market structure, volume, and volatility in real-time.\n' +
-            '3. ⚡ *Execute*: Based on market conditions, the bot triggers one of two strategies:\n' +
+            '3. ⚡ *Execute*: Based on market conditions, the bot triggers one of three strategies:\n' +
             '   • 🔥 *Buy & Burn*: For momentum and scarcity.\n' +
             '   • 💧 *Auto-LP*: For stability and price floor support.\n' +
+            '   • 🐳 *Strategic Reserve*: Capital is saved for future high-impact deployment.\n' +
             '   • 🛡️ *RevShare*: (Always Active) Distributing rewards to holders.\n\n' +
             '*Features:*\n' +
             '• *Real-time Analysis*: See what the AI sees with /analysis.\n' +
