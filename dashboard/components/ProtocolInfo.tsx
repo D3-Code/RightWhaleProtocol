@@ -35,7 +35,7 @@ export const ProtocolInfo = () => {
     }, []);
 
     return (
-        <div className="relative w-full h-full flex flex-col items-center p-4">
+        <div className="relative w-full h-full flex flex-col items-center p-2 md:p-4">
             {/* Background Grid Accent */}
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 

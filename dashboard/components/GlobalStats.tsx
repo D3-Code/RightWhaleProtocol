@@ -95,13 +95,7 @@ export const GlobalStats = () => {
             {items.map((item, index) => (
                 <motion.div
                     key={item.label}
-                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{
-                        duration: 0.5,
-                        delay: index * 0.1,
-                        ease: [0.23, 1, 0.32, 1]
-                    }}
+                    whileHover={{ scale: 1.01 }}
                     className={`glass-panel p-6 flex flex-col gap-3 ${item.border} border-2 relative overflow-hidden group hover:bg-zinc-900/60 transition-all ${item.glow} ${item.displayValue.includes("PENDING") || item.displayValue.includes("SYSTEM") ? "animate-shimmer" : ""}`}
                 >
                     <div className="flex items-center gap-3 mb-2 relative z-10">
