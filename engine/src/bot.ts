@@ -196,7 +196,7 @@ export const setupBot = () => {
             '🐋 *RightWhale Protocol Engine* 🐋\n' +
             '_Automated. Intelligent. Deflationary._\n\n' +
             '*How it Works:*\n' +
-            '1. 🌾 *Harvest*: The bot autonomously collects trading fees from Pump.fun and DEXs.\n' +
+            '1. 🌾 *Harvest*: The bot autonomously collects fees from Pump.fun creator rewards.\n' +
             '2. 🧠 *Analyze*: Our AI Engine monitors market structure, volume, and volatility in real-time.\n' +
             '3. ⚡ *Execute*: Based on market conditions, the bot triggers one of two strategies:\n' +
             '   • 🔥 *Buy & Burn*: For momentum and scarcity.\n' +
