@@ -1,4 +1,6 @@
 import { Telegraf, Context } from 'telegraf';
+import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { loadWallet } from './wallet';
 import { bot, broadcastToChannel } from './telegram';
 import dotenv from 'dotenv';
 import { claimFees } from './harvester';
@@ -30,7 +32,8 @@ export const setupBot = () => {
             '*📜 Protocol Logs*\n' +
             '/harvest - Fee Collection Ledger\n' +
             '/burns - Buyback & Burn History\n' +
-            '/lps - Liquidity Injection Log\n\n' +
+            '/lps - Liquidity Injection Log\n' +
+            '/reserves - Strategic Wallet Balance\n\n' +
             '*ℹ️ Information*\n' +
             '/info - Strategy & Tokenomics\n' +
             '/channel - Official Updates\n',
@@ -131,6 +134,7 @@ export const setupBot = () => {
             '**Recent Executions**:\n' + logText + '\n\n' +
             'Select a category to view more:\n' +
             '🔥 /burns - Buy & Burn Log\n' +
+            '💰 /reserves - Strategic Reserves\n' +
             '💧 /lps - Auto-LP Log\n' +
             '🛡️ /payouts - RevShare Log\n\n' +
             '🔍 *Global View*: [Solscan Fee Wallet](https://solscan.io/account/' + wallet + ')',
@@ -191,6 +195,33 @@ export const setupBot = () => {
         );
     });
 
+    bot.command('reserves', async (ctx) => {
+        const keypair = loadWallet();
+        if (!keypair) {
+            ctx.reply('❌ Error: Wallet not loaded.');
+            return;
+        }
+
+        try {
+            const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
+            const connection = new Connection(rpcUrl, 'confirmed');
+            const balance = await connection.getBalance(keypair.publicKey);
+            const solBalance = (balance / LAMPORTS_PER_SOL).toFixed(4);
+
+            ctx.reply(
+                '💰 *Strategic Reserve Audit* 💰\n\n' +
+                `**Total Balance**: \`${solBalance} SOL\`\n\n` +
+                '*Composition:*\n' +
+                '• 🐳 **Strategic Reserves**: Accumulated capital from "Neutral" AI decisions.\n' +
+                '• ⛽ **Gas Tank**: Operational fees for transactions.\n\n' +
+                `_Address: \`${keypair.publicKey.toBase58()}\`_`,
+                { parse_mode: 'Markdown' }
+            );
+        } catch (error) {
+            ctx.reply('⚠️ Failed to fetch reserve balance.');
+        }
+    });
+
     bot.command('info', (ctx) => {
         ctx.reply(
             '🐋 *RightWhale Protocol Engine* 🐋\n' +
@@ -228,7 +259,7 @@ export const setupBot = () => {
             'The AI analyzes market structure to deploy the remaining capital intelligently:\n' +
             '• 🔥 **Bullish?** Triggers **Buyback & Burn** to drive scarcity.\n' +
             '• 💧 **Bearish?** Triggers **Auto-LP** to harden the price floor.\n' +
-            '• 😴 **Neutral?** Capital is preserved for a higher-impact opportunity.\n\n' +
+            '• 😴 **Neutral?** Capital is **SAVED** in the Strategic Reserve for future deployment.\n\n' +
             '💡 *The Result:* \n' +
             'A self-optimizing system that rewards holders constantly while autonomously defending the chart.',
             { parse_mode: 'Markdown' }
