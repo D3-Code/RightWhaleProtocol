@@ -35,12 +35,12 @@ export const ProtocolInfo = () => {
     }, []);
 
     return (
-        <div className="relative w-full h-full flex flex-col items-center p-2 md:p-4">
+        <div className="relative w-full h-full flex flex-col items-center">
             {/* Background Grid Accent */}
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 
             {/* 3. MODULES ROW (Bottom) */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 mt-2 w-full md:w-auto">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 mt-2 w-full md:w-auto px-2">
                 {/* Module A */}
                 <motion.div
                     whileHover={{ scale: 1.05 }}
@@ -95,14 +95,23 @@ export const ProtocolInfo = () => {
                 </motion.div>
             </div>
 
-            {/* Technical Overlay */}
-            <div className="absolute top-1/2 right-4 transform -translate-y-1/2 text-[9px] text-zinc-600 font-mono-tech text-right hidden lg:block border-l border-zinc-900 pl-4 py-2">
-                <div className="flex items-center gap-1 justify-end font-bold text-zinc-400">
+            {/* Technical Footer */}
+            <div className="w-full mt-6 pt-4 border-t border-white/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-0 text-[9px] text-zinc-600 font-mono-tech">
+                <div className="flex items-center gap-2">
                     <Database className="w-2 h-2 text-orange-500" />
-                    RESERVES: <span className="text-white">{reserves ? `${reserves.total.toFixed(4)} SOL` : "---"}</span>
+                    <span className="text-zinc-500">RESERVES:</span>
+                    <span className="text-white font-bold">{reserves ? `${reserves.total.toFixed(4)} SOL` : "---"}</span>
                 </div>
-                <div className="text-emerald-500 uppercase tracking-tighter mt-1">Status: Fully Automated</div>
-                <div className="text-[7px] opacity-30 mt-1 uppercase">Node: RW-V1-ALPHA</div>
+
+                <div className="flex items-center gap-4">
+                    <div className="text-emerald-500 uppercase tracking-tighter flex items-center gap-1">
+                        <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>
+                        Fully Automated
+                    </div>
+                    <div className="text-[7px] opacity-30 uppercase border-l border-white/10 pl-4">
+                        RW-V1-ALPHA
+                    </div>
+                </div>
             </div>
         </div>
     );
