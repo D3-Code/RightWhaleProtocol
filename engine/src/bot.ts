@@ -192,23 +192,16 @@ export const setupBot = () => {
     bot.command('info', (ctx) => {
         ctx.reply(
             '🐋 *RightWhale Protocol Engine* 🐋\n' +
-            '_Automated. Intelligent. Deflationary._\n\n' +
-            '*How it Works:*\n' +
-            '1. 🌾 *Harvest*: The bot autonomously collects trading fees from Pump.fun and DEXs.\n' +
-            '2. 🧠 *Analyze*: Our AI Engine monitors market structure, volume, and volatility in real-time.\n' +
-            '3. ⚡ *Execute*: Based on market conditions, the bot triggers one of two strategies:\n' +
-            '   • 🔥 *Buy & Burn*: For momentum and scarcity.\n' +
-            '   • 💧 *Auto-LP*: For stability and price floor support.\n' +
-            '   • 🛡️ *RevShare*: (Always Active) Distributing rewards to holders.\n\n' +
-            '*Features:*\n' +
-            '• *Real-time Analysis*: See what the AI sees with /analysis.\n' +
-            '• *Transparent Logs*: Track every fee claim with /harvest.\n' +
-            '• *Live Updates*: All actions are broadcast here instantly.\n\n' +
-            '*Commands:*\n' +
-            '• /analysis - AI Market Status\n' +
-            '• /status - System Health\n' +
-            '• /harvest - Fee Collection Logs\n' +
-            '• /history - Transaction Ledger',
+            '_Status: SYSTEM STANDBY (Pre-Launch)_\n\n' +
+            '*Overview:*\n' +
+            'RightWhale is a fully autonomous liquidity management system designed to optimize the $RW token ecosystem.\n\n' +
+            '*Core Mechanics:*\n' +
+            '1. 🌾 *Harvest*: Fees are collected from DEX volume.\n' +
+            '2. 🧠 *Analysis*: The AI Core analyzes market structure in real-time.\n' +
+            '3. ⚡ *Execution*: The engine executes 30% Burn, 30% Auto-LP, and 30% RevShare distributions.\n\n' +
+            '*Current State:*\n' +
+            'The system is currently in **Standby Mode**, waiting for the Token Generation Event (TGE) to commence active trading operations.\n\n' +
+            'Use /status to check system health or /analysis to view the AI logic.',
             { parse_mode: 'Markdown' }
         );
     });
