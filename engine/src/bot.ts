@@ -1,33 +1,20 @@
-import { Telegraf } from 'telegraf';
+import { Telegraf, Context } from 'telegraf';
+import { bot, broadcastToChannel } from './telegram';
 import dotenv from 'dotenv';
 import { claimFees } from './harvester';
 import { getLogs } from './db';
-import { runAiCycle } from './ai_trader';
+import { lastAiDecision } from './ai_trader';
 
 dotenv.config();
 
-const token = process.env.TELEGRAM_BOT_TOKEN;
-const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID;
 
-export const bot = token ? new Telegraf(token) : null;
-
-export const broadcastToChannel = async (message: string) => {
-    if (!bot || !CHANNEL_ID) {
-        if (!CHANNEL_ID) console.log('⚠️ Broadcast skipped: No Channel ID.');
-        return;
-    }
-    try {
-        await bot.telegram.sendMessage(CHANNEL_ID, message, { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } });
-    } catch (e) {
-        console.error('Failed to broadcast message:', e);
-    }
-};
 
 export const setupBot = () => {
     if (!bot) {
         console.warn('TELEGRAM_BOT_TOKEN not set. Bot will not start.');
         return;
     }
+    console.log('Attempting to launch Telegram Bot...');
 
     const welcomeMessage = (ctx: any) => {
         ctx.reply(
@@ -80,32 +67,46 @@ export const setupBot = () => {
     });
 
     bot.command('analyze', async (ctx) => {
-        ctx.reply('🧠 *Running Algorithmic Market Analysis...*', { parse_mode: 'Markdown' });
-
-        try {
-            const decision = await runAiCycle();
-
-            let emoji = '😴';
-            if (decision.action === 'BUY_BURN') emoji = '🔥';
-            if (decision.action === 'ADD_LP') emoji = '💧';
-
-            ctx.reply(
-                `*Analysis Complete* ${emoji}\n\n` +
-                `**Recommendation**: \`${decision.action}\`\n` +
-                `**Confidence**: ${decision.confidence * 100}%\n\n` +
-                `**Reasoning**:\n${decision.reason}`,
-                { parse_mode: 'Markdown' }
-            );
-        } catch (error) {
-            console.error('Analyze Error:', error);
-            ctx.reply('❌ Error running analysis logic.');
+        if (!lastAiDecision) {
+            ctx.reply('🧠 *AI Model Initializing...* \nPlease wait for the next cycle.', { parse_mode: 'Markdown' });
+            return;
         }
+
+        const decision = lastAiDecision;
+        let emoji = '😴';
+        if (decision.action === 'BUY_BURN') emoji = '🔥';
+        if (decision.action === 'ADD_LP') emoji = '💧';
+
+        ctx.reply(
+            `*Latest Market Analysis* ${emoji}\n` +
+            `_Automated Cycle Result_\n\n` +
+            `**Decision**: \`${decision.action}\`\n` +
+            `**Confidence**: ${decision.confidence * 100}%\n\n` +
+            `**Reasoning**:\n${decision.reason}\n\n` +
+            `_Last Updated: ${decision.timestamp || 'Just now'}_`,
+            { parse_mode: 'Markdown' }
+        );
     });
 
     bot.command('harvest', async (ctx) => {
-        ctx.reply('🌾 *Harvesting Fees...* \nAttempting to withdraw from Pump.fun...', { parse_mode: 'Markdown' });
-        await claimFees();
-        // claimFees handles the broadcast and logging.
+        const logs = await getLogs(5, 'FEE_CLAIM');
+        let lines = '_No recent harvests recorded._';
+
+        if (logs.length > 0) {
+            lines = logs.map((l: any) => {
+                const link = l.txHash && l.txHash.length > 10 ? `[Tx](${'https://solscan.io/tx/' + l.txHash})` : 'Simulated';
+                // Timestamp handling
+                const time = l.timestamp ? new Date(l.timestamp).toLocaleTimeString() : '';
+                return `🌾 *Harvest*: ${link} (${time})`;
+            }).join('\n');
+        }
+
+        ctx.reply(
+            '🌾 *Harvest Log* 🌾\n' +
+            '_Displaying recent automated collections_\n\n' +
+            lines,
+            { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } }
+        );
     });
 
     bot.command('history', async (ctx) => {
@@ -187,12 +188,24 @@ export const setupBot = () => {
 
     bot.command('info', (ctx) => {
         ctx.reply(
-            '*RightWhale Protocol Strategy* 🐋\n\n' +
-            'The Engine triggers when Fee Wallet hits *0.3 SOL*.\n\n' +
-            '🔥 *30% Burn*: Auto Market Buy & Burn.\n' +
-            '💧 *30% Auto-LP*: Swap 50% -> Pair -> Inject Liquidity.\n' +
-            '🛡️ *30% RevShare*: Rewards distributed to holders.\n' +
-            '📢 *10% Dev Ops*: Operations & Development wallet.',
+            '🐋 *RightWhale Protocol Engine* 🐋\n' +
+            '_Automated. Intelligent. Deflationary._\n\n' +
+            '*How it Works:*\n' +
+            '1. 🌾 *Harvest*: The bot autonomously collects trading fees from Pump.fun and DEXs.\n' +
+            '2. 🧠 *Analyze*: Our AI Engine monitors market structure, volume, and volatility in real-time.\n' +
+            '3. ⚡ *Execute*: Based on market conditions, the bot triggers one of two strategies:\n' +
+            '   • 🔥 *Buy & Burn*: For momentum and scarcity.\n' +
+            '   • 💧 *Auto-LP*: For stability and price floor support.\n' +
+            '   • 🛡️ *RevShare*: (Always Active) Distributing rewards to holders.\n\n' +
+            '*Features:*\n' +
+            '• *Real-time Analysis*: See what the AI sees with /analyze.\n' +
+            '• *Transparent Logs*: Track every fee claim with /harvest.\n' +
+            '• *Live Updates*: All actions are broadcast here instantly.\n\n' +
+            '*Commands:*\n' +
+            '• /analyze - AI Market Status\n' +
+            '• /status - System Health\n' +
+            '• /harvest - Fee Collection Logs\n' +
+            '• /history - Transaction Ledger',
             { parse_mode: 'Markdown' }
         );
     });
@@ -221,13 +234,13 @@ export const setupBot = () => {
         );
     });
 
-    bot.launch().then(() => {
+    bot.launch({ dropPendingUpdates: true }).then(() => {
         console.log('Telegram Bot started');
     }).catch((err) => {
         console.error('Failed to start Telegram Bot:', err);
     });
 
     // Enable graceful stop
-    process.once('SIGINT', () => bot.stop('SIGINT'));
-    process.once('SIGTERM', () => bot.stop('SIGTERM'));
+    process.once('SIGINT', () => bot?.stop('SIGINT'));
+    process.once('SIGTERM', () => bot?.stop('SIGTERM'));
 };

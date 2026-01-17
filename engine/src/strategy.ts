@@ -1,5 +1,5 @@
 import { Connection, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { broadcastToChannel } from './bot';
+import { broadcastToChannel } from './telegram';
 import { loadWallet } from './wallet';
 import { addLog } from './db';
 import { runAiCycle } from './ai_trader';
@@ -15,10 +15,7 @@ interface Holder {
 // Mock function to fetch holders (In production, use DAS API or snapshot)
 const getHolders = async (connection: Connection): Promise<Holder[]> => {
     // This is still a placeholder until we integrate a real Snapshot API
-    return [
-        { address: 'Holder1Placeholder...', balance: 50 },
-        { address: 'Holder2Placeholder...', balance: 30 },
-    ];
+    return [];
 };
 
 const distributeRevShare = async (connection: Connection, keypair: any, amountSOL: number) => {
@@ -63,7 +60,8 @@ export const executeStrategy = async (totalFee: number = 0.3) => {
         return;
     }
 
-    broadcastToChannel(`🧠 *AI Analysis Complete* \nAction: \`${decision.action}\`\nReason: ${decision.reason}`);
+    // Broadcast handled by ai_trader.ts now
+    // broadcastToChannel(`🧠 *AI Analysis Complete* \nAction: \`${decision.action}\`\nReason: ${decision.reason}`);
 
     const keypair = loadWallet();
     if (!keypair) {

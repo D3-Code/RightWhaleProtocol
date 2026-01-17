@@ -1,4 +1,4 @@
-import { broadcastToChannel } from './bot';
+import { broadcastToChannel } from './telegram';
 
 // Placeholder for Token Mint - In prod, use real mint
 // We will use a popular token like BONK or WIF for testing if needed, or the placeholder

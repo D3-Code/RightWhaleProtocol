@@ -1,6 +1,44 @@
-import fetch from 'cross-fetch';
+import { broadcastToChannel } from './telegram';
+import { addLog } from './db';
 
-// Types for our "Brain"
+// ... imports ...
+
+// ... (keep existing code) ...
+
+// ... imports ...
+
+// ... (keep existing code) ...
+
+// 3. The Hands: Execution Loop
+export async function runAiCycle(readOnly: boolean = false) {
+    const token = process.env.TOKEN_MINT_ADDRESS || "mock-token";
+
+    const data = await fetchMarketData(token);
+    const decision = await getAiDecision(data);
+
+    const decisionWithTime = { ...decision, timestamp: new Date().toISOString() };
+
+    // Save to global state
+    lastAiDecision = decisionWithTime;
+
+    console.log(`\n🤖 AI DECISION FINALIZED:`);
+    console.log(`➤ Action: ${decision.action}`);
+    console.log(`➤ Confidence: ${decision.confidence * 100}%`);
+    console.log(`➤ Reasoning: "${decision.reason}"`);
+
+    // Broadcast Real-time Decision (Only if NOT read-only)
+    if (!readOnly) {
+        const emoji = decision.action === 'BUY_BURN' ? '🔥' : (decision.action === 'ADD_LP' ? '💧' : '😴');
+        broadcastToChannel(
+            `🤖 *AI Market Analysis* ${emoji}\n` +
+            `**Action**: \`${decision.action}\`\n` +
+            `**Confidence**: ${decision.confidence * 100}%\n` +
+            `_Reasoning_: ${decision.reason}`
+        );
+    }
+
+    return decision;
+}
 interface MarketData {
     price: number;
     volume24h: number;
@@ -18,32 +56,59 @@ interface AiDecision {
 // Global state to store the last decision for the API
 export let lastAiDecision: AiDecision | null = null;
 
-// 1. The Eyes: Fetch Data (Mock for now, ready for DexScreener)
-export async function fetchMarketData(tokenAddress: string): Promise<MarketData> {
+// 1. The Eyes: Fetch Data (Real DexScreener)
+export async function fetchMarketData(tokenAddress: string): Promise<MarketData | null> {
+
+    // --- TEMP: VISUALIZATION MOCK DATA ---
+    // Remove this block to go back to real mode
+    if (tokenAddress === 'mock-token' || !tokenAddress) {
+        return {
+            price: 0.0045,
+            volume24h: 250000,
+            priceChange5m: 12.5, // Pumping!
+            lastCandles: []
+        };
+    }
+    // -------------------------------------
+
     console.log(`👀 AICore: Watching chart for ${tokenAddress}...`);
 
-    // TODO: Replace with real DexScreener API call
-    // const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`);
+    if (tokenAddress === 'mock-token' || !tokenAddress) {
+        console.log('   -> No valid token address set. Waiting...');
+        return null;
+    }
 
-    // Mocking "Dumping" scenario
-    return {
-        price: 0.0045,
-        volume24h: 150000,
-        priceChange5m: -5.2, // Pumping down FAST
-        lastCandles: [
-            { close: 0.0048, volume: 100 },
-            { close: 0.0047, volume: 120 },
-            { close: 0.0045, volume: 500 } // High volume sell off
-        ]
-    };
+    try {
+        const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`);
+        const data = await res.json();
+        const pair = data.pairs ? data.pairs[0] : null;
+
+        if (!pair) return null;
+
+        return {
+            price: parseFloat(pair.priceUsd),
+            volume24h: pair.volume.h24,
+            priceChange5m: pair.priceChange.m5,
+            lastCandles: [] // DexScreener basic API doesn't give candles easily, we rely on priceChange5m
+        };
+    } catch (e) {
+        console.error('Error fetching market data:', e);
+        return null;
+    }
 }
 
-// 2. The Brain: Analyze and Decide (Mock LLM)
-export async function getAiDecision(data: MarketData): Promise<AiDecision> {
+// 2. The Brain: Analyze and Decide
+export async function getAiDecision(data: MarketData | null): Promise<AiDecision> {
     console.log(`🧠 AICore: Analyzing market structure...`);
 
-    // This is where we would call OpenAI/Claude
-    // const prompt = `Price: ${data.price}, Change: ${data.priceChange1h}%... Decide!`;
+    // Default to WAIT if no data (Token not launched or API error)
+    if (!data) {
+        return {
+            action: 'WAIT',
+            reason: `⏳ WAITING FOR DATA. \nStatus: Token not active or API unavailable.\nAction: Standing by for launch.`,
+            confidence: 1.0
+        };
+    }
 
     // STRATEGY: "The Elastic Floor" (Algorithmic Market Making)
     // TIMEFRAME: 5 Minutes (m5) - Optimized for High Volatility (Pump.fun)
@@ -53,8 +118,8 @@ export async function getAiDecision(data: MarketData): Promise<AiDecision> {
     if (data.priceChange5m < -5) {
         return {
             action: 'ADD_LP',
-            reason: `📉 FLASH DUMP DETECTED (${data.priceChange5m}% in 5m). \nStrategy: HARDEN THE FLOOR.\nAction: Injecting Liquidity immediately to stop the panic bleed.`,
-            confidence: 0.98
+            reason: `🛡️ SUPPORT ZONE ACTIVE (${data.priceChange5m}%). \nStrategy: FLOOR DEFENSE.\nAction: Injecting liquidity to harden support and capitalize on discounted volatility.`,
+            confidence: 0.90
         };
     }
 
@@ -83,28 +148,10 @@ export async function getAiDecision(data: MarketData): Promise<AiDecision> {
     else {
         return {
             action: 'ADD_LP',
-            reason: `🧱 ACCUMULATION DETECTED (Vol Low). \nStrategy: LIQUIDITY BUILD.\nAction: Adding LP while demand is low to prepare deep support for next rally.`,
+            reason: `🧱 BASE BUILDING ACTIVE (Vol Low). \nStrategy: LIQUIDITY EXPANSION.\nAction: Deepening pool depth to prepare robust infrastructure for future growth.`,
             confidence: 0.80
         };
     }
 }
 
-// 3. The Hands: Execution Loop
-export async function runAiCycle() {
-    const token = process.env.TOKEN_MINT_ADDRESS || "mock-token";
 
-    const data = await fetchMarketData(token);
-    const decision = await getAiDecision(data);
-
-    const decisionWithTime = { ...decision, timestamp: new Date().toISOString() };
-
-    // Save to global state
-    lastAiDecision = decisionWithTime;
-
-    console.log(`\n🤖 AI DECISION FINALIZED:`);
-    console.log(`➤ Action: ${decision.action}`);
-    console.log(`➤ Confidence: ${decision.confidence * 100}%`);
-    console.log(`➤ Reasoning: "${decision.reason}"`);
-
-    return decision;
-}

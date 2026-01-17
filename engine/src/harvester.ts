@@ -1,7 +1,7 @@
 import { Connection, PublicKey, VersionedTransaction } from '@solana/web3.js';
 import fetch from 'cross-fetch';
 import { loadWallet } from './wallet';
-import { broadcastToChannel } from './bot';
+import { broadcastToChannel } from './telegram';
 import { addLog } from './db';
 
 const PUMP_PORTAL_API = 'https://pumpportal.fun/api/trade';

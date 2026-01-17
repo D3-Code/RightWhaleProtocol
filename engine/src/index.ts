@@ -10,7 +10,7 @@ export const globalStats = {
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
-import { marketMonitor } from './market_monitor'; // Correct import
+import { startMarketMonitor } from './market';
 import { lastAiDecision } from './ai_trader';
 
 import { initDB, getLogs } from './db';
@@ -42,6 +42,16 @@ app.get('/logs', async (req, res) => {
     }
 });
 
+app.get('/history', async (req, res) => {
+    try {
+        const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+        const logs = await getLogs(limit);
+        res.json(logs);
+    } catch (err) {
+        res.status(500).send('Error fetching history');
+    }
+});
+
 app.get('/ai-status', (req, res) => {
     res.json(lastAiDecision || { action: 'WAIT', reason: 'System Initializing...', confidence: 0, timestamp: new Date().toISOString() });
 });
@@ -52,11 +62,21 @@ app.get('/stats', (req, res) => {
 
 // Start Server
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${port}`);
 });
 
 // Start Services
 setupBot();
 startMonitor();
 startMarketMonitor();
-startMonitor();
+
+// Initial AI Cycle to populate dashboard
+import { runAiCycle } from './ai_trader';
+
+// Run immediately on start
+runAiCycle(true);
+
+// Loop every 15 seconds to update "Neural Feed" (ReadOnly = true)
+setInterval(() => {
+    runAiCycle(true);
+}, 15000);

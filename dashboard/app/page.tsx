@@ -81,56 +81,12 @@ export default function Home() {
         <GlobalStats />
 
         {/* 2. Main Bento Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
 
-          {/* LEFT COLUMN (8 cols) */}
-          <div className="lg:col-span-8 flex flex-col gap-3">
+          {/* LEFT COLUMN (Main Operations) - 8 Cols */}
+          <div className="md:col-span-8 flex flex-col gap-6">
 
-            {/* Protocol Schematic */}
-            <motion.div
-              whileHover={{ scale: 1.01 }}
-              className="glass-panel p-6 relative overflow-hidden group rounded-xl"
-            >
-              <h2 className="text-sm text-zinc-500 uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center">
-                <span className="flex items-center gap-2"><Terminal className="w-4 h-4 text-orange-500" /> SCHEMATIC // ENGINE FLOW</span>
-
-              </h2>
-              <ProtocolInfo />
-            </motion.div>
-
-            {/* Resource Allocation - Moved Here */}
-            <motion.div
-              whileHover={{ scale: 1.01 }}
-              className="glass-panel p-6 relative rounded-xl"
-            >
-              <h2 className="text-sm text-zinc-500 uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center">
-                <span className="flex items-center gap-2"><Droplets className="w-4 h-4 text-blue-500" /> RESOURCE ALLOCATION</span>
-
-              </h2>
-              <Allocations />
-            </motion.div>
-
-            {/* Wallet Checker - Moved Here */}
-            {/* Community Uplink (Socials) - Moved Here */}
-            <motion.div
-              whileHover={{ scale: 1.01 }}
-              className="glass-panel p-6 flex flex-col gap-4 rounded-xl"
-            >
-
-              <div className="grid grid-cols-2 gap-3">
-                <a href="https://t.me/RightWhaleBotChannel" target="_blank" className="bg-[#229ED9]/10 hover:bg-[#229ED9] border border-[#229ED9]/50 hover:border-[#229ED9] text-[#229ED9] hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
-                  <Send className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Channel</span>
-                </a>
-                <a href="https://t.me/RightWhaleBot" target="_blank" className="bg-[#2AABEE]/10 hover:bg-[#2AABEE] border border-[#2AABEE]/50 hover:border-[#2AABEE] text-[#2AABEE] hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
-                  <Bot className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Start Bot</span>
-                </a>
-              </div>
-            </motion.div>
-
-            {/* Community Uplink (Socials) - Moved Here */}
-            {/* Wallet Checker - Moved Here */}
+            {/* 1. Protocol Rewards Scanner */}
             <motion.div
               whileHover={{ scale: 1.01 }}
               className="glass-panel p-0 rounded-xl overflow-hidden"
@@ -138,7 +94,16 @@ export default function Home() {
               <WalletChecker />
             </motion.div>
 
-            {/* Terminal Activity Log */}
+            {/* 2. AI Neural Core */}
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              className="glass-panel p-0 rounded-xl overflow-hidden relative group"
+            >
+              <div className="absolute inset-0 bg-orange-500/5 group-hover:bg-orange-500/10 transition-colors pointer-events-none"></div>
+              <AiStatusWidget />
+            </motion.div>
+
+            {/* 3. System Console */}
             <motion.div
               className="glass-panel p-0 overflow-hidden flex flex-col h-[500px] rounded-xl"
             >
@@ -157,21 +122,58 @@ export default function Home() {
                 <ActivityLog />
               </div>
             </motion.div>
+
           </div>
 
-          {/* RIGHT COLUMN (4 cols) */}
+          {/* RIGHT COLUMN (Info & Status) - 4 Cols */}
           <div className="lg:col-span-4 flex flex-col gap-6">
 
+            {/* A. Protocol Schematic */}
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              className="glass-panel p-6 relative overflow-hidden group rounded-xl"
+            >
+              <h2 className="text-sm text-zinc-500 uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center">
+                <span className="flex items-center gap-2"><Terminal className="w-4 h-4 text-orange-500" /> SCHEMATIC</span>
+              </h2>
+              <ProtocolInfo />
+            </motion.div>
 
+            {/* B. Resource Allocation */}
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              className="glass-panel p-6 relative rounded-xl"
+            >
+              <h2 className="text-sm text-zinc-500 uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center">
+                <span className="flex items-center gap-2"><Droplets className="w-4 h-4 text-blue-500" /> ALLOCATIONS</span>
+              </h2>
+              <Allocations />
+            </motion.div>
 
+            {/* C. Community Uplink */}
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              className="glass-panel p-6 flex flex-col gap-4 rounded-xl"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <a href="https://t.me/RightWhaleBotChannel" target="_blank" className="bg-[#229ED9]/10 hover:bg-[#229ED9] border border-[#229ED9]/50 hover:border-[#229ED9] text-[#229ED9] hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
+                  <Send className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold uppercase tracking-wider">Channel</span>
+                </a>
+                <a href="https://t.me/RightWhaleBot" target="_blank" className="bg-[#2AABEE]/10 hover:bg-[#2AABEE] border border-[#2AABEE]/50 hover:border-[#2AABEE] text-[#2AABEE] hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
+                  <Bot className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold uppercase tracking-wider">Start Bot</span>
+                </a>
+              </div>
+            </motion.div>
 
-
-            <div className="p-4 rounded border border-zinc-800 bg-zinc-900/20 text-center">
+            <div className="p-4 rounded border border-zinc-800 bg-zinc-900/20 text-center mt-auto">
               <p className="text-xs text-zinc-600">
                 RightWhale Protocol &copy; 2026 <br />
                 <span className="opacity-50">System ID: RW V1.0</span>
               </p>
             </div>
+
           </div>
 
         </div>

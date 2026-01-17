@@ -44,7 +44,7 @@ export const ActivityLog = () => {
         <div className="font-mono-tech text-xs h-full bg-black/80 backdrop-blur-sm flex flex-col overflow-hidden relative">
             {/* Filter Bar */}
             <div className="p-2 border-b border-zinc-800 flex gap-2 overflow-x-auto custom-scrollbar sticky top-0 bg-black/90 z-10 shrink-0">
-                {['ALL', 'BURN', 'LP_ZAP', 'REVSHARE'].map((f) => (
+                {['ALL', 'BURN', 'LP_ZAP', 'REVSHARE', 'HARVEST', 'ANALYSIS'].map((f) => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
@@ -63,32 +63,52 @@ export const ActivityLog = () => {
                     <div className="text-zinc-600 animate-pulse">Waiting for signals...</div>
                 ) : (
                     <div className="flex flex-col-reverse gap-1">
-                        {filteredLogs.slice().reverse().map((log) => (
-                            <div key={log.id} className="flex gap-4 border-l-2 border-zinc-800 pl-2 hover:border-orange-500 hover:bg-white/5 transition-colors p-1 group">
-                                <span className="text-zinc-500 opacity-50">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
-                                <div className="flex items-center gap-2">
-                                    <span className={log.type === 'BURN' ? 'text-red-500 font-bold' : log.type === 'LP_ZAP' ? 'text-blue-400 font-bold' : 'text-emerald-500 font-bold'}>
-                                        {log.type === 'LP_ZAP' ? 'LP' : log.type}
-                                    </span>
-                                    <span className="text-zinc-300">
-                                        Process Executed {`>>`} Amount: <span className="text-white">{log.amount} SOL</span>
-                                    </span>
-                                    {log.txHash ? (
-                                        <a
-                                            href={`https://solscan.io/tx/${log.txHash}`}
-                                            target="_blank"
-                                            className="ml-auto text-[10px] text-zinc-600 hover:text-orange-500 underline decoration-dotted transition-colors"
-                                        >
-                                            [VIEW TX]
-                                        </a>
-                                    ) : (
-                                        <span className="ml-auto text-[10px] text-zinc-800 cursor-not-allowed">
-                                            [PENDING]
+                        {filteredLogs.slice().reverse().map((log) => {
+                            let typeColor = 'text-emerald-500 font-bold';
+                            let actionText = `Process Executed >> Amount: <span class="text-white">${log.amount} SOL</span>`;
+                            let isTx = true;
+
+                            if (log.type === 'BURN') typeColor = 'text-red-500 font-bold';
+                            if (log.type === 'LP_ZAP') typeColor = 'text-blue-400 font-bold';
+                            if (log.type === 'HARVEST' || log.type === 'FEE_CLAIM') {
+                                typeColor = 'text-yellow-500 font-bold';
+                                actionText = `Fees Collected >> Amount: <span class="text-white">${log.amount} SOL</span>`;
+                            }
+                            if (log.type === 'ANALYSIS') {
+                                typeColor = 'text-purple-400 font-bold';
+                                isTx = false;
+                                // For Analyze, amount is confidence, txHash is Action
+                                actionText = `AI Decision >> Action: <span class="text-white">${log.txHash}</span> (${(log.amount * 100).toFixed(0)}%)`;
+                            }
+
+                            return (
+                                <div key={log.id} className="flex gap-4 border-l-2 border-zinc-800 pl-2 hover:border-orange-500 hover:bg-white/5 transition-colors p-1 group items-start">
+                                    <span className="text-zinc-500 opacity-50 whitespace-nowrap">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full">
+                                        <span className={typeColor}>
+                                            {log.type === 'LP_ZAP' ? 'LP' : log.type === 'FEE_CLAIM' ? 'HARVEST' : log.type}
                                         </span>
-                                    )}
+                                        <span className="text-zinc-300 flex-1" dangerouslySetInnerHTML={{ __html: actionText }} />
+
+                                        {isTx && (
+                                            log.txHash ? (
+                                                <a
+                                                    href={`https://solscan.io/tx/${log.txHash}`}
+                                                    target="_blank"
+                                                    className="ml-auto text-[10px] text-zinc-600 hover:text-orange-500 underline decoration-dotted transition-colors whitespace-nowrap"
+                                                >
+                                                    [VIEW TX]
+                                                </a>
+                                            ) : (
+                                                <span className="ml-auto text-[10px] text-zinc-800 cursor-not-allowed whitespace-nowrap">
+                                                    [PENDING]
+                                                </span>
+                                            )
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
                 {/* Blinking Cursor at bottom (or top if reversed) */}
