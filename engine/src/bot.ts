@@ -209,23 +209,19 @@ export const setupBot = () => {
     bot.command('flywheel', (ctx) => {
         ctx.reply(
             '🔄 *The RightWhale Infinite Flywheel* 🔄\n\n' +
-            '1. **Volume** generates Fees (0.3 SOL Trigger).\n' +
-            '2. **Engine Wakes Up**:\n' +
-            '   🔥 **Burn (30%)**: Scarcity goes UP.\n' +
-            '   💧 **LP (30%)**: Floor Price goes UP.\n' +
-            '   🛡️ **RevShare (30%)**: Holders earn SOL.\n' +
-            '3. **Result**: Higher Price + Rewards = More FOMO.\n' +
-            '4. **More FOMO** = More Volume.\n' +
-            '5. **Repeat** ♾️\n\n' +
-            '*Execution Sequence* ⚡\n' +
-            'When triggered, the Engine executes in this exact order:\n' +
-            '1️⃣ **Burn** (Instant Impact)\n' +
-            '2️⃣ **LP Injection** (Instant Impact)\n' +
-            '3️⃣ **Dev Ops** (Instant)\n' +
-            '4️⃣ **RevShare** (Batched Distribution)\n\n' +
-            '💡 *Why this order?*\n' +
-            'We execute the **Burn** and **LP** first so that the chart affects the price immediately. Then, while the green candle is printing, the **RevShare** starts hitting people\'s wallets.\n\n' +
-            'It feels basically simultaneous to the user, effectively "**Simultaneous execution**."',
+            '*1. Accumulation* 📥\n' +
+            'Trading volume generates fees which accumulate in the Protocol Engine.\n\n' +
+            '*2. Fixed Distribution (40%)* 💸\n' +
+            'Every cycle, the engine immediately distributes:\n' +
+            '• 🛡️ **RevShare (30%)**: Sent directly to holders.\n' +
+            '• 🏗️ **Operations (10%)**: Development & Infrastructure.\n\n' +
+            '*3. AI Dynamic Execution (60%)* 🧠\n' +
+            'The AI analyzes market structure to deploy the remaining capital intelligently:\n' +
+            '• 🔥 **Bullish?** Triggers **Buyback & Burn** to drive scarcity.\n' +
+            '• 💧 **Bearish?** Triggers **Auto-LP** to harden the price floor.\n' +
+            '• 😴 **Neutral?** Capital is preserved for a higher-impact opportunity.\n\n' +
+            '💡 *The Result:* \n' +
+            'A self-optimizing system that rewards holders constantly while autonomously defending the chart.',
             { parse_mode: 'Markdown' }
         );
     });
