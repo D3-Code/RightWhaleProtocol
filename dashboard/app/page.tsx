@@ -56,7 +56,7 @@ export default function Home() {
                 <div className="flex items-center mt-1">
                   <div className="h-1 w-6 md:w-8 bg-primary mr-2 animate-pulse"></div>
                   <p className="text-zinc-500 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[9px] md:text-[11px]">
-                    Autonomous Liquidity Engine v1.0
+                    Autonomous Liquidity Engine v1.1
                   </p>
                 </div>
               </div>
@@ -179,7 +179,7 @@ export default function Home() {
             <div className="p-4 rounded border border-zinc-800 bg-zinc-900/20 text-center mt-auto">
               <p className="text-xs text-zinc-600">
                 RightWhale Protocol &copy; 2026 <br />
-                <span className="opacity-50">System ID: RW V1.0</span>
+                <span className="opacity-50">System ID: RW V1.1</span>
               </p>
             </div>
 

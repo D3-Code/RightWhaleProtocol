@@ -109,7 +109,7 @@ export const ProtocolInfo = () => {
                         Fully Automated
                     </div>
                     <div className="text-[7px] opacity-30 uppercase border-l border-white/10 pl-4">
-                        RW-V1-ALPHA
+                        RW-V1.1-ALPHA
                     </div>
                 </div>
             </div>
