@@ -23,7 +23,7 @@ export const setupBot = () => {
             '*Available Commands:*\n' +
             'ℹ️ /info - Protocol Strategy breakdown\n' +
             '📢 /channel - Official Updates\n' +
-            '🧠 /analyze - Run Market Algorithmic Analysis\n' +
+            '🧠 /analysis - Run Market Algorithmic Analysis\n' +
             '🔄 /flywheel - Verify the Flywheel Logic\n' +
             '📊 /status - System Status\n' +
             '🌾 /harvest - Trigger Fee Harvester\n' +
@@ -66,7 +66,7 @@ export const setupBot = () => {
         ctx.reply(`RightWhale System: ONLINE 🟢\n\nMonitor: Active\nStrategy: 30/30/30/10\nTime: ${timestamp}`);
     });
 
-    bot.command('analyze', async (ctx) => {
+    bot.command('analysis', async (ctx) => {
         if (!lastAiDecision) {
             ctx.reply('🧠 *AI Model Initializing...* \nPlease wait for the next cycle.', { parse_mode: 'Markdown' });
             return;
@@ -198,11 +198,11 @@ export const setupBot = () => {
             '   • 💧 *Auto-LP*: For stability and price floor support.\n' +
             '   • 🛡️ *RevShare*: (Always Active) Distributing rewards to holders.\n\n' +
             '*Features:*\n' +
-            '• *Real-time Analysis*: See what the AI sees with /analyze.\n' +
+            '• *Real-time Analysis*: See what the AI sees with /analysis.\n' +
             '• *Transparent Logs*: Track every fee claim with /harvest.\n' +
             '• *Live Updates*: All actions are broadcast here instantly.\n\n' +
             '*Commands:*\n' +
-            '• /analyze - AI Market Status\n' +
+            '• /analysis - AI Market Status\n' +
             '• /status - System Health\n' +
             '• /harvest - Fee Collection Logs\n' +
             '• /history - Transaction Ledger',
