@@ -79,7 +79,7 @@ body {
     0 2px 4px -1px rgba(0, 0, 0, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   /* Top highlight */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Removed transition to prevent card movement on all devices */
 }
 
 .glass-panel:hover {
@@ -91,19 +91,10 @@ body {
     0 10px 10px -5px rgba(0, 0, 0, 0.1),
     0 0 15px rgba(255, 107, 0, 0.1);
   /* Subtle orange glow */
-  transform: translateY(-2px) scale(1.005);
+  /* Removed transform to prevent card movement on all devices */
 }
 
-/* Disable all transitions and transforms on mobile to prevent card movement */
-@media (max-width: 767px) {
-  .glass-panel {
-    transition: none !important;
-  }
 
-  .glass-panel:hover {
-    transform: none !important;
-  }
-}
 
 /* Tech Scrollbar */
 ::-webkit-scrollbar {
