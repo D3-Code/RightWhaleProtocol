@@ -33,7 +33,9 @@ export const setupBot = () => {
             '/harvest - Fee Collection Ledger\n' +
             '/burns - Buyback & Burn History\n' +
             '/lps - Liquidity Injection Log\n' +
-            '/reserves - Strategic Wallet Balance\n\n' +
+            '/reserves - View all Strategic Pots\n' +
+            '/burnpot - Buyback Pot Balance\n' +
+            '/lppot - Liquidity Pot Balance\n\n' +
             '*ℹ️ Information*\n' +
             '/info - Strategy & Tokenomics\n' +
             '/channel - Official Updates\n',
@@ -226,6 +228,18 @@ export const setupBot = () => {
         } catch (error) {
             ctx.reply('⚠️ Failed to fetch reserve balance.');
         }
+    });
+
+    bot.command('burnpot', async (ctx) => {
+        const pots = await getVirtualPots();
+        const burnPot = pots.find(p => p.name === 'burn_pot')?.balance || 0;
+        ctx.reply(`🔥 *Buyback Pot Balance*: \`${burnPot.toFixed(4)} SOL\`\n_Saved for future Buyback & Burn deployments._`, { parse_mode: 'Markdown' });
+    });
+
+    bot.command('lppot', async (ctx) => {
+        const pots = await getVirtualPots();
+        const lpPot = pots.find(p => p.name === 'lp_pot')?.balance || 0;
+        ctx.reply(`💧 *Liquidity Pot Balance*: \`${lpPot.toFixed(4)} SOL\`\n_Saved for future LP Injection deployments._`, { parse_mode: 'Markdown' });
     });
 
     bot.command('info', (ctx) => {
