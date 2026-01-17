@@ -94,7 +94,7 @@ export const GlobalStats = () => {
             {items.map((item, index) => (
                 <div
                     key={item.label}
-                    className={`glass-panel p-6 flex flex-col gap-3 ${item.border} border-2 relative overflow-hidden group hover:bg-zinc-900/60 ${item.glow} ${item.displayValue.includes("PENDING") || item.displayValue.includes("SYSTEM") ? "animate-shimmer" : ""}`}
+                    className={`glass-panel p-6 flex flex-col gap-3 ${item.border} border-2 relative overflow-hidden group hover:bg-zinc-900/60 ${item.glow}`}
                 >
                     <div className="flex items-center gap-3 mb-2 relative z-10">
                         <div className={`p-3 rounded-xl ${item.bg}`}>
