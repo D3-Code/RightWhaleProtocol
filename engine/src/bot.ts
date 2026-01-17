@@ -29,7 +29,7 @@ export const setupBot = () => {
             '/flywheel - The Infinite Growth Loop\n\n' +
             '*📜 Protocol Logs*\n' +
             '/harvest - Fee Collection Ledger\n' +
-            '/buybacks - Buyback & Burn History\n' +
+            '/burns - Buyback & Burn History\n' +
             '/lps - Liquidity Injection Log\n\n' +
             '*ℹ️ Information*\n' +
             '/info - Strategy & Tokenomics\n' +
@@ -130,7 +130,7 @@ export const setupBot = () => {
             '📜 *Protocol History* 📜\n\n' +
             '**Recent Executions**:\n' + logText + '\n\n' +
             'Select a category to view more:\n' +
-            '🔥 /buybacks - Buyback Log\n' +
+            '🔥 /burns - Buy & Burn Log\n' +
             '💧 /lps - Auto-LP Log\n' +
             '🛡️ /payouts - RevShare Log\n\n' +
             '🔍 *Global View*: [Solscan Fee Wallet](https://solscan.io/account/' + wallet + ')',
@@ -140,9 +140,9 @@ export const setupBot = () => {
 
 
 
-    bot.command('buybacks', async (ctx) => {
+    bot.command('burns', async (ctx) => {
         const logs = await getLogs(5, 'BURN');
-        let lines = '_No buybacks recorded yet._';
+        let lines = '_No burns recorded yet._';
         if (logs.length > 0) {
             lines = logs.map((l: any) => {
                 const link = l.txHash && l.txHash.length > 10 ? `[Tx](${'https://solscan.io/tx/' + l.txHash})` : 'Simulated';
@@ -151,7 +151,7 @@ export const setupBot = () => {
         }
 
         ctx.reply(
-            '🔥 *Recent Buybacks* 🔥\n\n' + lines + '\n\n' +
+            '🔥 *Recent Burns* 🔥\n\n' + lines + '\n\n' +
             '_Deflation reduces supply and increases scarcity._',
             { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } }
         );
