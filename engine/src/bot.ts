@@ -257,12 +257,13 @@ export const setupBot = () => {
             '• 🛡️ **RevShare (30%)**: Sent directly to holders.\n' +
             '• 🏗️ **Operations (10%)**: Development & Infrastructure.\n\n' +
             '*3. AI Dynamic Execution (60%)* 🧠\n' +
-            'The AI analyzes market structure to deploy the remaining capital intelligently:\n' +
-            '• 🔥 **Bullish?** Triggers **Buyback & Burn** to drive scarcity.\n' +
-            '• 💧 **Bearish?** Triggers **Auto-LP** to harden the price floor.\n' +
-            '• 😴 **Neutral?** Capital is **SAVED** in the Strategic Reserve for future deployment.\n\n' +
+            'The remaining 60% contains two potential pots: **30% Burn** and **30% LP**.\n' +
+            'The AI makes a decision, and the unused portion is **SAVED** to the Strategic Reserve:\n' +
+            '• 🔥 **Bullish?** Executes **Buyback & Burn** (30%). The unused LP pot (30%) is saved for future use.\n' +
+            '• 💧 **Bearish?** Executes **Auto-LP** (30%). The unused Burn pot (30%) is saved for future use.\n' +
+            '• 😴 **Neutral?** No action taken. The **ENTIRE 60%** is saved to the Strategic Reserve for high-impact opportunities.\n\n' +
             '💡 *The Result:* \n' +
-            'A self-optimizing system that rewards holders constantly while autonomously defending the chart.',
+            'A self-optimizing system that builds a "War Chest" during quiet times and deploys it heavily during volatility.',
             { parse_mode: 'Markdown' }
         );
     });
