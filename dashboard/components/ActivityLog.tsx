@@ -11,6 +11,8 @@ type Log = {
 };
 
 export const ActivityLog = () => {
+    const [logs, setLogs] = useState<Log[]>([]);
+    const [filter, setFilter] = useState('ALL');
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {

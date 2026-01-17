@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BrainCircuit, Activity, Zap, Shield, Terminal, RefreshCw } from 'lucide-react';
+import { Activity, Zap, Shield, Terminal } from 'lucide-react';
 
 interface AiData {
     action: 'BUY_BURN' | 'ADD_LP' | 'WAIT';
@@ -16,6 +16,11 @@ export default function AiStatusWidget() {
     const [displayedReason, setDisplayedReason] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const reasonIndexRef = useRef(0);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Fetch Data
     const fetchStatus = async () => {
@@ -110,26 +115,6 @@ export default function AiStatusWidget() {
                 <div className={`absolute inset-0 opacity-5 ${isBurn ? 'bg-grid-pattern-orange' : 'bg-grid-pattern-blue'}`} />
 
                 <div className="relative z-10 flex flex-col gap-4">
-
-
-                    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-                        setMounted(true);
-    }, []);
-
-                    // ... existing effect logic ...
-
-                    // Fallback for dev/offline mode
-                    const displayData = data || {
-                        action: 'WAIT',
-                    reason: 'NEURAL LINK OFFLINE. ESTABLISHING CONNECTION...',
-                    confidence: 0,
-                    timestamp: new Date().toISOString()
-    };
-
-                    // ... existing logic ...
-
                     {/* Status Line */}
                     <div className="flex items-center gap-3">
                         <div className={`text-xs px-2 py-0.5 rounded border ${colorClass} bg-black/40 font-mono`}>
