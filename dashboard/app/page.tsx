@@ -58,6 +58,9 @@ export default function Home() {
                   <p className="text-orange-100/90 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[9px] md:text-[11px] font-bold shadow-black drop-shadow-md">
                     Autonomous Liquidity Engine v1.1
                   </p>
+                  <span className="text-[9px] bg-pink-500/20 text-pink-500 border border-pink-500/30 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide">
+                    MEMECOIN
+                  </span>
                 </div>
               </div>
 
