@@ -40,7 +40,7 @@ export const ProtocolInfo = () => {
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 
             {/* 3. MODULES ROW (Bottom) */}
-            <div className="flex flex-col md:flex-row items-center gap-4 mt-2 w-full max-w-[500px] md:max-w-none">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 mt-2 w-full md:w-auto">
                 {/* Module A */}
                 <motion.div
                     whileHover={{ scale: 1.05 }}
