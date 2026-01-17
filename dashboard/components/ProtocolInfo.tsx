@@ -40,51 +40,51 @@ export const ProtocolInfo = () => {
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 
             {/* 3. MODULES ROW (Bottom) */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 mt-2 w-full md:w-auto px-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2 w-full px-1">
                 {/* Module A */}
                 <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-full md:w-[140px] text-center shadow-lg group hover:border-red-500/50 transition-all relative overflow-hidden"
+                    whileHover={{ scale: 1.02 }}
+                    className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-2 rounded-lg flex flex-col items-center gap-1.5 w-full text-center shadow-lg group hover:border-red-500/50 transition-all relative overflow-hidden"
                 >
                     {reserves?.burnPot ? <div className="absolute inset-x-0 bottom-0 h-[2px] bg-red-500/50 animate-pulse" /> : null}
-                    <Flame className={`w-6 h-6 text-red-500 ${reserves?.burnPot ? "animate-pulse" : "opacity-50"}`} />
+                    <Flame className={`w-5 h-5 text-red-500 ${reserves?.burnPot ? "animate-pulse" : "opacity-50"}`} />
                     <div className="flex flex-col">
-                        <span className="text-[8px] text-zinc-500 uppercase font-mono-tech">Module A</span>
-                        <span className="text-xs font-bold text-white tracking-widest uppercase">BUYBACK+BURN</span>
-                        <div className={`mt-1 text-[10px] font-bold font-mono-tech ${reserves ? "text-red-400" : "text-zinc-600 animate-pulse"}`}>
-                            {reserves ? `${reserves.burnPot.toFixed(4)} SOL` : "SYNCING..."}
+                        <span className="text-[7px] text-zinc-500 uppercase font-mono-tech">Module A</span>
+                        <span className="text-[9px] font-bold text-white tracking-widest uppercase truncate w-full">BUYBACK+BURN</span>
+                        <div className={`mt-0.5 text-[9px] font-bold font-mono-tech ${reserves ? "text-red-400" : "text-zinc-600 animate-pulse"}`}>
+                            {reserves ? `${reserves.burnPot.toFixed(4)}` : "SYNCING"}
                         </div>
                     </div>
                 </motion.div>
 
                 {/* Module B */}
                 <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-full md:w-[140px] text-center shadow-lg group hover:border-blue-500/50 transition-all relative overflow-hidden"
+                    whileHover={{ scale: 1.02 }}
+                    className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-2 rounded-lg flex flex-col items-center gap-1.5 w-full text-center shadow-lg group hover:border-blue-500/50 transition-all relative overflow-hidden"
                 >
                     {reserves?.lpPot ? <div className="absolute inset-x-0 bottom-0 h-[2px] bg-blue-500/50 animate-pulse" /> : null}
-                    <Droplets className={`w-6 h-6 text-blue-500 ${reserves?.lpPot ? "animate-bounce" : "opacity-50"}`} />
+                    <Droplets className={`w-5 h-5 text-blue-500 ${reserves?.lpPot ? "animate-bounce" : "opacity-50"}`} />
                     <div className="flex flex-col">
-                        <span className="text-[8px] text-zinc-500 uppercase font-mono-tech">Module B</span>
-                        <span className="text-xs font-bold text-white tracking-widest uppercase">LIQUIDITY</span>
-                        <div className={`mt-1 text-[10px] font-bold font-mono-tech ${reserves ? "text-blue-400" : "text-zinc-600 animate-pulse"}`}>
-                            {reserves ? `${reserves.lpPot.toFixed(4)} SOL` : "SYNCING..."}
+                        <span className="text-[7px] text-zinc-500 uppercase font-mono-tech">Module B</span>
+                        <span className="text-[9px] font-bold text-white tracking-widest uppercase truncate w-full">LIQUIDITY</span>
+                        <div className={`mt-0.5 text-[9px] font-bold font-mono-tech ${reserves ? "text-blue-400" : "text-zinc-600 animate-pulse"}`}>
+                            {reserves ? `${reserves.lpPot.toFixed(4)}` : "SYNCING"}
                         </div>
                     </div>
                 </motion.div>
 
                 {/* Module C */}
                 <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-full md:w-[140px] text-center shadow-lg group hover:border-emerald-500/50 transition-all relative overflow-hidden"
+                    whileHover={{ scale: 1.02 }}
+                    className="border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm p-2 rounded-lg flex flex-col items-center gap-1.5 w-full text-center shadow-lg group hover:border-emerald-500/50 transition-all relative overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-emerald-500/10 animate-pulse-glow pointer-events-none" />
                     <div className="absolute inset-x-0 bottom-0 h-[2px] bg-emerald-500/50 animate-pulse" />
-                    <ShieldCheck className="w-6 h-6 text-emerald-500 group-hover:rotate-12 transition-transform" />
+                    <ShieldCheck className="w-5 h-5 text-emerald-500 group-hover:rotate-12 transition-transform" />
                     <div className="flex flex-col">
-                        <span className="text-[8px] text-zinc-500 uppercase font-mono-tech text-emerald-500/50">Module C</span>
-                        <span className="text-xs font-bold text-white tracking-widest uppercase">REVSHARE</span>
-                        <div className="mt-1 text-[10px] font-bold text-emerald-400 font-mono-tech flex items-center justify-center gap-1">
+                        <span className="text-[7px] text-zinc-500 uppercase font-mono-tech text-emerald-500/50">Module C</span>
+                        <span className="text-[9px] font-bold text-white tracking-widest uppercase truncate w-full">REVSHARE</span>
+                        <div className="mt-0.5 text-[9px] font-bold text-emerald-400 font-mono-tech flex items-center justify-center gap-1">
                             <span className="relative flex h-1.5 w-1.5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
