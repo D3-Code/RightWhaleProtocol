@@ -336,6 +336,14 @@ export default function DocumentationPage() {
                                 <code className="text-white font-bold">/status</code>
                                 <span className="text-xs text-zinc-500">System Health & Monitor</span>
                             </div>
+                            <div className="flex items-center justify-between p-3 rounded bg-zinc-900/40 border border-white/5">
+                                <code className="text-pink-500 font-bold">/flywheel</code>
+                                <span className="text-xs text-zinc-500">Explain the Infinite Loop</span>
+                            </div>
+                            <div className="flex items-center justify-between p-3 rounded bg-zinc-900/40 border border-white/5">
+                                <code className="text-emerald-500 font-bold">/payouts</code>
+                                <span className="text-xs text-zinc-500">RevShare Transaction Log</span>
+                            </div>
                         </div>
                     </motion.section>
 
