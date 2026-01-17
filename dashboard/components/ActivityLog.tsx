@@ -11,12 +11,14 @@ type Log = {
 };
 
 export const ActivityLog = () => {
-    const [logs, setLogs] = useState<Log[]>([]);
-    const [filter, setFilter] = useState('ALL');
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // Mock fetching or real fetching
+        setMounted(true);
+        // ... existing fetch logic ...
         const fetchLogs = async () => {
+            // ...
+
             try {
                 // In dev, use mock if API fails
                 const apiUrl = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
@@ -83,7 +85,7 @@ export const ActivityLog = () => {
 
                             return (
                                 <div key={log.id} className="flex gap-4 border-l-2 border-zinc-800 pl-2 hover:border-orange-500 hover:bg-white/5 transition-colors p-1 group items-start">
-                                    <span className="text-zinc-500 opacity-50 whitespace-nowrap">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
+                                    <span className="text-zinc-500 opacity-50 whitespace-nowrap">[{mounted ? new Date(log.timestamp).toLocaleTimeString() : '--:--:--'}]</span>
                                     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full">
                                         <span className={typeColor}>
                                             {log.type === 'LP_ZAP' ? 'LP' : log.type === 'FEE_CLAIM' ? 'HARVEST' : log.type}

@@ -111,13 +111,32 @@ export default function AiStatusWidget() {
 
                 <div className="relative z-10 flex flex-col gap-4">
 
+
+                    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+                        setMounted(true);
+    }, []);
+
+                    // ... existing effect logic ...
+
+                    // Fallback for dev/offline mode
+                    const displayData = data || {
+                        action: 'WAIT',
+                    reason: 'NEURAL LINK OFFLINE. ESTABLISHING CONNECTION...',
+                    confidence: 0,
+                    timestamp: new Date().toISOString()
+    };
+
+                    // ... existing logic ...
+
                     {/* Status Line */}
                     <div className="flex items-center gap-3">
                         <div className={`text-xs px-2 py-0.5 rounded border ${colorClass} bg-black/40 font-mono`}>
                             {(displayData.confidence * 100).toFixed(0)}% PROBABILITY
                         </div>
                         <div className="text-zinc-500 text-xs font-mono">
-                            // {new Date(displayData.timestamp).toLocaleTimeString()}
+                            // {mounted ? new Date(displayData.timestamp).toLocaleTimeString() : '--:--:--'}
                         </div>
                     </div>
 
