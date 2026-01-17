@@ -96,10 +96,10 @@ export const ProtocolInfo = () => {
             </div>
 
             {/* Technical Footer */}
-            <div className="w-full mt-6 pt-4 border-t border-white/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-0 text-[9px] text-zinc-600 font-mono-tech">
+            <div className="w-full mt-6 pt-4 border-t border-white/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-0 text-[9px] text-zinc-400 font-mono-tech">
                 <div className="flex items-center gap-2">
                     <Database className="w-2 h-2 text-orange-500" />
-                    <span className="text-zinc-500">RESERVES:</span>
+                    <span className="text-zinc-300">RESERVES:</span>
                     <span className="text-white font-bold">{reserves ? `${reserves.total.toFixed(4)} SOL` : "---"}</span>
                 </div>
 

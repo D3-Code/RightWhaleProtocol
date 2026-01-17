@@ -55,7 +55,7 @@ export default function Home() {
                 </h1>
                 <div className="flex items-center mt-1">
                   <div className="h-1 w-6 md:w-8 bg-primary mr-2 animate-pulse"></div>
-                  <p className="text-zinc-500 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[9px] md:text-[11px]">
+                  <p className="text-zinc-400 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[9px] md:text-[11px]">
                     Autonomous Liquidity Engine v1.1
                   </p>
                 </div>
@@ -135,7 +135,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
               <h2 className="text-xs text-zinc-500 uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center relative z-10">
                 <span className="flex items-center gap-2 font-bold"><Terminal className="w-4 h-4 text-orange-500" /> SYSTEM SCHEMATIC</span>
-                <span className="text-[10px] text-zinc-600 animate-pulse">LIVE_FLOW</span>
+                <span className="text-[10px] text-zinc-400 animate-pulse">LIVE_FLOW</span>
               </h2>
               <ProtocolInfo />
             </motion.div>
@@ -177,9 +177,9 @@ export default function Home() {
             </motion.div>
 
             <div className="p-4 rounded border border-zinc-800 bg-zinc-900/20 text-center mt-auto">
-              <p className="text-xs text-zinc-600">
+              <p className="text-xs text-zinc-400">
                 RightWhale Protocol &copy; 2026 <br />
-                <span className="opacity-50">System ID: RW V1.1</span>
+                <span className="opacity-70">System ID: RW V1.1</span>
               </p>
             </div>
 
