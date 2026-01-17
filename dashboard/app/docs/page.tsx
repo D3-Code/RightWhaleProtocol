@@ -165,7 +165,7 @@ export default function DocumentationPage() {
                                 </div>
                                 <h3 className="text-lg font-bold text-white mb-2">Distro</h3>
                                 <p className="text-zinc-400 text-sm">
-                                    Funds are executed according to the schedule. Burn, LP, and RevShare are handled by the bot, while the <strong className="text-white">10% Dev Fee</strong> is immediately transferred to the Developer Wallet.
+                                    The Bot claims creator fees into its own Engine Wallet first. Then, during the Distribution cycle, the <strong>10% Dev Fee</strong> is sent back to the Developer Wallet, while the rest is executed by the protocol.
                                 </p>
                             </div>
 
