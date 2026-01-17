@@ -12,7 +12,13 @@ type Stats = {
 };
 
 export const GlobalStats = () => {
-    const [stats, setStats] = useState<Stats | null>(null);
+    // Default to 0s for pre-launch to show "PENDING" text immediately
+    const [stats, setStats] = useState<Stats | null>({
+        totalBurned: 0,
+        totalLP: 0,
+        totalRevShare: 0,
+        distributions: 0
+    });
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -22,15 +28,8 @@ export const GlobalStats = () => {
                 if (res && res.ok) {
                     const data = await res.json();
                     setStats(data);
-                } else {
-                    // Fallback for dev if API off
-                    setStats({
-                        totalBurned: 0,
-                        totalLP: 0,
-                        totalRevShare: 0,
-                        distributions: 0
-                    });
                 }
+                // Removed else block since we have defaults
             } catch (e) {
                 console.error(e);
             }
@@ -44,16 +43,12 @@ export const GlobalStats = () => {
 
     if (!stats) return <div className="h-24 w-full bg-zinc-900/50 animate-pulse rounded-xl"></div>;
 
-    // Real prices to be fetched in future
-    const PRICE_RW = 0;
-    const PRICE_SOL = 0;
-
     const items = [
         {
             label: "MARKET CAP",
-            value: 0, // Placeholder until Coingecko/DexScreener integration
-            unit: "USD",
-            usd: 0,
+            value: 0,
+            displayValue: "PENDING TGE",
+            subtext: "Awaiting Launch",
             icon: BarChart3,
             color: "text-emerald-500",
             bg: "bg-emerald-500/10",
@@ -63,8 +58,8 @@ export const GlobalStats = () => {
         {
             label: "TOTAL BURNED",
             value: stats.totalBurned,
-            unit: "$RightWhale",
-            usd: stats.totalBurned * PRICE_RW,
+            displayValue: stats.totalBurned > 0 ? stats.totalBurned.toLocaleString() : "SYSTEM STANDBY",
+            subtext: "Waiting for Launch",
             icon: Flame,
             color: "text-red-500",
             bg: "bg-red-500/10",
@@ -74,8 +69,8 @@ export const GlobalStats = () => {
         {
             label: "TOTAL LP ADDED",
             value: stats.totalLP,
-            unit: "SOL",
-            usd: stats.totalLP * PRICE_SOL,
+            displayValue: stats.totalLP > 0 ? `${stats.totalLP} SOL` : "PENDING INJECTION",
+            subtext: "Liquidity Event Soon",
             icon: Droplets,
             color: "text-blue-500",
             bg: "bg-blue-500/10",
@@ -85,8 +80,8 @@ export const GlobalStats = () => {
         {
             label: "REVSHARE DISTRIBUTED",
             value: stats.totalRevShare,
-            unit: "SOL",
-            usd: stats.totalRevShare * PRICE_SOL,
+            displayValue: stats.totalRevShare > 0 ? `${stats.totalRevShare} SOL` : "AWAITING REVENUE",
+            subtext: "Holders Reward Pool",
             icon: Trophy,
             color: "text-orange-500",
             bg: "bg-orange-500/10",
@@ -113,12 +108,11 @@ export const GlobalStats = () => {
                     </div>
 
                     <div className="flex flex-col">
-                        <div className="text-3xl font-black text-white font-mono-tech tracking-tight flex items-baseline gap-2">
-                            {item.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            <span className="text-sm text-zinc-500 font-bold">{item.unit}</span>
+                        <div className="text-2xl font-black text-white font-mono-tech tracking-tight flex items-baseline gap-2">
+                            {item.displayValue}
                         </div>
-                        <div className={`text-sm font-mono-tech font-bold ${item.color} mt-1`}>
-                            ≈ ${item.usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <div className={`text-xs font-mono-tech font-bold ${item.color} mt-1 opacity-80 uppercase tracking-widest`}>
+                            {item.subtext}
                         </div>
                     </div>
 

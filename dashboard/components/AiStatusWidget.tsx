@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Zap, Shield, Terminal } from 'lucide-react';
+import { BrainCircuit, Activity, Zap, Shield, Terminal, RefreshCw } from 'lucide-react';
 
 interface AiData {
     action: 'BUY_BURN' | 'ADD_LP' | 'WAIT';
@@ -74,8 +74,8 @@ export default function AiStatusWidget() {
 
     // Fallback for dev/offline mode
     const displayData = data || {
-        action: 'WAIT',
-        reason: 'NEURAL LINK OFFLINE. ESTABLISHING CONNECTION...',
+        action: 'WAIT', // Keeps it gray/neutral
+        reason: '⚠ SYSTEM STANDBY - WAITING FOR LIQUIDITY INJECTION. \nMode: PRE-LAUNCH.\nStatus: Analysis modules initialized and standing by.',
         confidence: 0,
         timestamp: new Date().toISOString()
     };
@@ -98,7 +98,7 @@ export default function AiStatusWidget() {
             <div className={`px-4 py-2 border-b ${isBurn ? 'border-orange-500/20 bg-orange-500/5' : isLp ? 'border-blue-500/20 bg-blue-500/5' : 'border-zinc-800 bg-zinc-900/50'} flex justify-between items-center`}>
                 <div className="flex items-center gap-2">
                     <Terminal className={`w-4 h-4 ${colorClass}`} />
-                    <span className={`text-xs font-bold tracking-widest ${colorClass}`}>NEURAL CORE FEED</span>
+                    <span className={`text-xs font-bold tracking-widest ${colorClass}`}>DECISION CORE</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
@@ -115,11 +115,15 @@ export default function AiStatusWidget() {
                 <div className={`absolute inset-0 opacity-5 ${isBurn ? 'bg-grid-pattern-orange' : 'bg-grid-pattern-blue'}`} />
 
                 <div className="relative z-10 flex flex-col gap-4">
+
+
+
+
+
+
                     {/* Status Line */}
                     <div className="flex items-center gap-3">
-                        <div className={`text-xs px-2 py-0.5 rounded border ${colorClass} bg-black/40 font-mono`}>
-                            {(displayData.confidence * 100).toFixed(0)}% PROBABILITY
-                        </div>
+
                         <div className="text-zinc-500 text-xs font-mono">
                             // {mounted ? new Date(displayData.timestamp).toLocaleTimeString() : '--:--:--'}
                         </div>
@@ -127,11 +131,7 @@ export default function AiStatusWidget() {
 
                     {/* Headline Action */}
                     <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-full border ${colorClass} bg-black/20`}>
-                            {isBurn ? <Zap className={`w-6 h-6 ${colorClass}`} /> :
-                                isLp ? <Shield className={`w-6 h-6 ${colorClass}`} /> :
-                                    <Activity className={`w-6 h-6 ${colorClass}`} />}
-                        </div>
+
                         <div>
                             <h3 className={`text-xl font-black tracking-tight ${colorClass}`}>
                                 {isBurn ? "MOMENTUM DETECTED" : isLp ? "STABILITY PROTOCOL ACTIVE" : "MARKET SCANNING..."}

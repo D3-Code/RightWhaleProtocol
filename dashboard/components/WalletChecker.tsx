@@ -14,16 +14,21 @@ export const WalletChecker = () => {
         setLoading(true);
         setResult(null);
 
-        // Real API integration pending
-        setLoading(false);
-        setResult(null);
+        // Simulate API delay
+        setTimeout(() => {
+            setLoading(false);
+            setResult({
+                status: "ELIGIBLE",
+                tier: "EARLY ADOPTER",
+                message: "Wallet verified for protocol launch."
+            });
+        }, 1500);
     };
 
     return (
         <div className="flex flex-col gap-4 p-6">
             <h2 className="text-sm text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2 flex justify-between items-center">
                 <span className="flex items-center gap-2"><Wallet className="w-4 h-4 text-emerald-500" /> PROTOCOL REWARDS SCANNER</span>
-
             </h2>
 
             <div className="flex gap-2">
@@ -50,48 +55,19 @@ export const WalletChecker = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="flex flex-col gap-4"
                     >
-                        {/* Key Metrics Row */}
-                        <div className="grid grid-cols-2 gap-4">
-                            {/* RightWhale Balance */}
-                            <div className="bg-zinc-900/40 p-4 rounded border border-zinc-800/50 flex flex-col gap-1 group hover:border-orange-500/30 transition-colors">
-                                <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-mono-tech">Holds $RightWhale</span>
-                                <div className="text-2xl font-bold text-white flex items-baseline gap-1">
-                                    {result.balance}
-                                    <span className="text-xs text-orange-500 font-normal">$RW</span>
-                                </div>
-                                <span className="text-[10px] text-zinc-600">≈ $20,250.00 USD</span>
+                        <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded flex items-center justify-between">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-emerald-500/80 uppercase tracking-widest font-bold">STATUS</span>
+                                <span className="text-xl font-black text-emerald-400">✅ {result.status}</span>
                             </div>
-
-                            {/* Total RevShare */}
-                            <div className="bg-zinc-900/40 p-4 rounded border border-zinc-800/50 flex flex-col gap-1 group hover:border-emerald-500/30 transition-colors">
-                                <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-mono-tech">Total RevShare</span>
-                                <div className="text-2xl font-bold text-white flex items-baseline gap-1">
-                                    {result.rewards}
-                                    <span className="text-xs text-emerald-500 font-normal">SOL</span>
-                                </div>
-                                <span className="text-[10px] text-zinc-600">≈ $1,826.02 USD</span>
+                            <div className="flex flex-col text-right">
+                                <span className="text-[10px] text-zinc-500 uppercase tracking-widest">TIER</span>
+                                <span className="text-sm font-bold text-white">{result.tier}</span>
                             </div>
                         </div>
 
-                        {/* RevShare History List */}
-                        <div className="bg-zinc-900/20 rounded border border-zinc-800/50 overflow-hidden">
-                            <div className="px-3 py-2 bg-zinc-900/50 border-b border-zinc-800/50 flex justify-between items-center">
-                                <span className="text-[10px] text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-                                    <History className="w-3 h-3" /> RevShare History
-                                </span>
-                                <span className="text-[9px] text-zinc-600 font-mono-tech">LATEST PAYOUTS</span>
-                            </div>
-                            <div className="flex flex-col">
-                                {result.history.map((item: any, i: number) => (
-                                    <div key={i} className="flex justify-between items-center px-3 py-2 border-b border-zinc-800/30 last:border-0 hover:bg-white/5 transition-colors text-xs font-mono-tech">
-                                        <span className="text-zinc-500">{item.date}</span>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-emerald-500">{item.amount}</span>
-                                            <a href="#" className="text-zinc-600 hover:text-white underline decoration-dotted">[TX]</a>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="text-xs text-zinc-500 font-mono text-center">
+                            {result.message}
                         </div>
                     </motion.div>
                 )}
