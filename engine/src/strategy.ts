@@ -1,7 +1,7 @@
 import { Connection, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { broadcastToChannel } from './telegram';
 import { loadWallet } from './wallet';
-import { addLog } from './db';
+import { addLog, adjustPotBalance } from './db';
 import { runAiCycle } from './ai_trader';
 
 // Mock Token Mint Address (replace with real one)
@@ -82,6 +82,10 @@ export const executeStrategy = async (totalFee: number = 0.3) => {
     const burnAmount = totalFee * 0.30;
     const lpAmount = totalFee * 0.30;
 
+    // --- ACCRUE TO VIRTUAL POTS ---
+    await adjustPotBalance('burn_pot', burnAmount);
+    await adjustPotBalance('lp_pot', lpAmount);
+
     // --- EXECUTE FIXED OBLIGATIONS ---
 
     // 1. RevShare 30%
@@ -113,6 +117,7 @@ export const executeStrategy = async (totalFee: number = 0.3) => {
         console.log(`🔥 Executing Burn Logic (${burnAmount.toFixed(4)} SOL)`);
         broadcastToChannel(`🔥 *Buy & Burn Executed* 🚀\nAllocated: \`${burnAmount.toFixed(4)} SOL\`\n"AI Reason: ${decision.reason}"`);
         await addLog('BURN', burnAmount, 'AI_Burn_Tx');
+        await adjustPotBalance('burn_pot', -burnAmount);
     } else {
         console.log(`⏸️ Burn Skipped (Saving ${burnAmount.toFixed(4)} SOL).`);
     }
@@ -123,6 +128,7 @@ export const executeStrategy = async (totalFee: number = 0.3) => {
         console.log(`💧 Executing LP Logic (${lpAmount.toFixed(4)} SOL)`);
         broadcastToChannel(`💧 *Liquidity Injected* 🛡️\nAllocated: \`${lpAmount.toFixed(4)} SOL\`\n"AI Reason: ${decision.reason}"`);
         await addLog('LP_ZAP', lpAmount, 'AI_LP_Tx');
+        await adjustPotBalance('lp_pot', -lpAmount);
     } else {
         console.log(`⏸️ LP Skipped (Saving ${lpAmount.toFixed(4)} SOL).`);
     }

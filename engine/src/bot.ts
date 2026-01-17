@@ -4,7 +4,7 @@ import { loadWallet } from './wallet';
 import { bot, broadcastToChannel } from './telegram';
 import dotenv from 'dotenv';
 import { claimFees } from './harvester';
-import { getLogs } from './db';
+import { getLogs, getVirtualPots } from './db';
 import { lastAiDecision } from './ai_trader';
 
 dotenv.config();
@@ -208,12 +208,18 @@ export const setupBot = () => {
             const balance = await connection.getBalance(keypair.publicKey);
             const solBalance = (balance / LAMPORTS_PER_SOL).toFixed(4);
 
+            const pots = await getVirtualPots();
+            const burnPot = pots.find(p => p.name === 'burn_pot')?.balance || 0;
+            const lpPot = pots.find(p => p.name === 'lp_pot')?.balance || 0;
+            const operational = (parseFloat(solBalance) - (burnPot + lpPot)).toFixed(4);
+
             ctx.reply(
                 '💰 *Strategic Reserve Audit* 💰\n\n' +
                 `**Total Balance**: \`${solBalance} SOL\`\n\n` +
-                '*Composition:*\n' +
-                '• 🐳 **Strategic Reserves**: Accumulated capital from "Neutral" AI decisions.\n' +
-                '• ⛽ **Gas Tank**: Operational fees for transactions.\n\n' +
+                '*Breakdown:*\n' +
+                `• 🔥 **Buyback Pot**: \`${burnPot.toFixed(4)} SOL\`\n` +
+                `• 💧 **Liquidity Pot**: \`${lpPot.toFixed(4)} SOL\`\n` +
+                `• ⛽ **Operational**: \`${operational} SOL\`\n\n` +
                 `_Address: \`${keypair.publicKey.toBase58()}\`_`,
                 { parse_mode: 'Markdown' }
             );
