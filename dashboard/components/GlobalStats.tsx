@@ -112,10 +112,10 @@ export const GlobalStats = () => {
                     <CardWrapper
                         key={item.label}
                         {...motionProps}
-                        className={`glass-panel p-6 flex flex-col gap-3 ${item.border} border-2 relative overflow-hidden group hover:bg-zinc-900/60 transition-all ${item.glow} ${item.displayValue.includes("PENDING") || item.displayValue.includes("SYSTEM") ? "animate-shimmer" : ""}`}
+                        className={`glass-panel p-6 flex flex-col gap-3 ${item.border} border-2 relative overflow-hidden group hover:bg-zinc-900/60 ${isMobile ? '' : 'transition-all'} ${item.glow} ${item.displayValue.includes("PENDING") || item.displayValue.includes("SYSTEM") ? "animate-shimmer" : ""}`}
                     >
                         <div className="flex items-center gap-3 mb-2 relative z-10">
-                            <div className={`p-3 rounded-xl ${item.bg} group-hover:scale-110 transition-transform duration-500`}>
+                            <div className={`p-3 rounded-xl ${item.bg} ${isMobile ? '' : 'group-hover:scale-110 transition-transform duration-500'}`}>
                                 <item.icon className={`w-8 h-8 ${item.color}`} />
                             </div>
                             <span className="text-[10px] text-zinc-400 font-mono-tech uppercase tracking-[0.2em] font-bold">{item.label}</span>
