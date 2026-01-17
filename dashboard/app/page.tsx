@@ -40,10 +40,10 @@ export default function Home() {
               <div className="flex flex-col">
                 <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-white">
                   RIGHTWHALE
-                  <span className="text-orange-500">PROTOCOL</span>
+                  <span className="text-primary">PROTOCOL</span>
                 </h1>
                 <div className="flex items-center">
-                  <div className="h-1 w-8 bg-orange-500 mr-2 animate-pulse"></div>
+                  <div className="h-1 w-8 bg-primary mr-2 animate-pulse"></div>
                   <p className="text-zinc-500 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[10px] md:text-sm">
                     Autonomous Liquidity Engine v1.0
                   </p>

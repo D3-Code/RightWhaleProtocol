@@ -78,6 +78,7 @@ export const ProtocolInfo = () => {
                     whileHover={{ scale: 1.05 }}
                     className="border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-[140px] text-center shadow-lg group hover:border-emerald-500/50 transition-all relative overflow-hidden"
                 >
+                    <div className="absolute inset-0 bg-emerald-500/10 animate-pulse-glow pointer-events-none" />
                     <div className="absolute inset-x-0 bottom-0 h-[2px] bg-emerald-500/50 animate-pulse" />
                     <ShieldCheck className="w-6 h-6 text-emerald-500 group-hover:rotate-12 transition-transform" />
                     <div className="flex flex-col">

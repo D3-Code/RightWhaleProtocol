@@ -1,20 +1,54 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-background: #050505;
+  --color-foreground: #e4e4e7;
+  --color-primary: #ff6b00;
+  --color-primary-glow: rgba(255, 107, 0, 0.4);
+  --color-secondary: #18181b;
+  --color-accent: #27272a;
+  --color-border: #3f3f46;
+  --color-success: #10b981;
+  --color-matrix: #00ff41;
+
+  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s infinite;
+
+  @keyframes pulse-glow {
+
+    0%,
+    100% {
+      opacity: 0.5;
+      filter: blur(8px);
+    }
+
+    50% {
+      opacity: 1;
+      filter: blur(12px);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}
 
 :root {
-  --background: #050505;
-  --foreground: #e4e4e7;
-  --primary: #ff6b00;
-  /* RightWhale Orange */
-  --primary-glow: rgba(255, 107, 0, 0.4);
-  --secondary: #18181b;
-  /* zinc-900 */
-  --accent: #27272a;
-  /* zinc-800 */
-  --border: #3f3f46;
-  --success: #10b981;
-  --matrix: #00ff41;
+  --background: var(--color-background);
+  --foreground: var(--color-foreground);
+  --primary: var(--color-primary);
+  --primary-glow: var(--color-primary-glow);
+  --secondary: var(--color-secondary);
+  --accent: var(--color-accent);
+  --border: var(--color-border);
+  --success: var(--color-success);
+  --matrix: var(--color-matrix);
 }
 
 body {
@@ -92,17 +126,6 @@ body {
   font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Custom Animations */
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
-}
-
 .animate-shimmer {
   position: relative;
   overflow: hidden;
@@ -119,23 +142,5 @@ body {
       transparent,
       rgba(255, 255, 255, 0.05),
       transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes pulse-glow {
-
-  0%,
-  100% {
-    opacity: 0.5;
-    filter: blur(8px);
-  }
-
-  50% {
-    opacity: 1;
-    filter: blur(12px);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
+  animation: var(--animate-shimmer);
 }
