@@ -156,14 +156,22 @@ export default function Home() {
               whileHover={{ scale: 1.01 }}
               className="glass-panel p-6 flex flex-col gap-4 rounded-xl"
             >
-              <div className="grid grid-cols-2 gap-3">
-                <a href="https://t.me/RightWhaleBotChannel" target="_blank" className="bg-[#229ED9]/10 hover:bg-[#229ED9] border border-[#229ED9]/50 hover:border-[#229ED9] text-[#229ED9] hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
-                  <Send className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Channel</span>
-                </a>
-                <a href="https://t.me/RightWhaleBot" target="_blank" className="bg-[#2AABEE]/10 hover:bg-[#2AABEE] border border-[#2AABEE]/50 hover:border-[#2AABEE] text-[#2AABEE] hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
-                  <Bot className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Start Bot</span>
+              <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <a href="https://t.me/RightWhaleBotChannel" target="_blank" className="bg-[#229ED9]/10 hover:bg-[#229ED9] border border-[#229ED9]/50 hover:border-[#229ED9] text-[#229ED9] hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
+                    <Send className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-bold uppercase tracking-wider">Channel</span>
+                  </a>
+                  <a href="https://t.me/RightWhaleBot" target="_blank" className="bg-[#2AABEE]/10 hover:bg-[#2AABEE] border border-[#2AABEE]/50 hover:border-[#2AABEE] text-[#2AABEE] hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
+                    <Bot className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-bold uppercase tracking-wider">Start Bot</span>
+                  </a>
+                </div>
+                <a href="https://x.com/rightwhalev1?s=21" target="_blank" className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="group-hover:scale-110 transition-transform">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  <span className="text-xs font-bold uppercase tracking-wider">Official X account</span>
                 </a>
               </div>
             </motion.div>
