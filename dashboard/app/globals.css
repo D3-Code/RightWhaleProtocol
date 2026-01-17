@@ -11,10 +11,6 @@
   --color-success: #10b981;
   --color-matrix: #00ff41;
 
-  .console-header-bright {
-    background: rgba(24, 24, 27, 0.3) !important;
-  }
-
   --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
   --animate-shimmer: shimmer 2s infinite;
 
@@ -72,6 +68,10 @@ body {
 
 /* Glass Panel Effect for Top Notch Engineering Feel */
 /* Glass Panel Effect for Top Notch Engineering Feel */
+.console-header-bright {
+  background: rgba(24, 24, 27, 0.3) !important;
+}
+
 .glass-panel {
   background: rgba(24, 24, 27, 0.15);
   /* Slightly darker/more opaque for contrast */
