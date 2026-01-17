@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 export default function DocumentationPage() {
     return (
-        <main className="min-h-screen bg-black bg-grid-pattern p-4 md:p-8 text-zinc-100 font-mono-tech selection:bg-orange-500/30 relative">
+        <main className="min-h-screen bg-black p-4 md:p-8 text-white font-mono-tech selection:bg-orange-500/30 relative">
             {/* Background Elements */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[100px] opacity-30"></div>

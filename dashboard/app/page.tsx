@@ -15,7 +15,7 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black bg-grid-pattern p-4 md:p-6 text-zinc-100 font-mono-tech selection:bg-orange-500/30 relative">
+    <main className="min-h-screen bg-black p-4 md:p-6 text-white font-mono-tech selection:bg-orange-500/30 relative">
 
       {/* Floating HUD Status - Desktop Only */}
       <div className="hidden md:flex fixed items-center gap-2 z-[100]" style={{ top: '2rem', right: '2rem' }}>
