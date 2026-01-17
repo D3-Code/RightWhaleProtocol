@@ -18,8 +18,10 @@ export const setupBot = () => {
 
     const welcomeMessage = (ctx: any) => {
         ctx.reply(
-            '🐋 *Welcome to RightWhale Bot* 🐋\n\n' +
-            'I manage the deployed strategy for the $RightWhale ecosystem.\n\n' +
+            '🐋 *RightWhale Protocol Engine* 🐋\n' +
+            '_System Status: PRE-LAUNCH (STANDBY)_\n\n' +
+            'I am the autonomous trading engine for the $RightWhale ecosystem.\n' +
+            'My analysis modules are active and waiting for the Token Generation Event (TGE).\n\n' +
             '*Available Commands:*\n' +
             'ℹ️ /info - Protocol Strategy breakdown\n' +
             '📢 /channel - Official Updates\n' +
