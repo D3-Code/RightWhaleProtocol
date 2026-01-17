@@ -22,7 +22,7 @@ export const setupBot = () => {
         ctx.reply(
             '🐋 *RightWhale Protocol Engine* 🐋\n' +
             '_System Status: PRE-LAUNCH (STANDBY)_\n\n' +
-            'I am the autonomous trading engine for the $RightWhale ecosystem.\n' +
+            'I am the autonomous trading engine for the $RightWhale Protocol.\n' +
             'My analysis modules are active and waiting for the Token Generation Event (TGE).\n\n' +
             '*Available Commands:*\n\n' +
             '*🧠 Intelligence & Status*\n' +
