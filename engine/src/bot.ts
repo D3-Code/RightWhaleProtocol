@@ -30,6 +30,7 @@ export const setupBot = () => {
             '*📜 Protocol Logs*\n' +
             '/harvest - Fee Collection Ledger\n' +
             '/burns - Buyback & Burn History\n' +
+            '/buybacks - Buyback Log (Alias)\n' +
             '/lps - Liquidity Injection Log\n\n' +
             '*ℹ️ Information*\n' +
             '/info - Strategy & Tokenomics\n' +
@@ -150,6 +151,23 @@ export const setupBot = () => {
 
         ctx.reply(
             '🔥 *Recent Burns* 🔥\n\n' + lines + '\n\n' +
+            '_Deflation reduces supply and increases scarcity._',
+            { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } }
+        );
+    });
+
+    bot.command('buybacks', async (ctx) => {
+        const logs = await getLogs(5, 'BURN');
+        let lines = '_No buybacks recorded yet._';
+        if (logs.length > 0) {
+            lines = logs.map((l: any) => {
+                const link = l.txHash && l.txHash.length > 10 ? `[Tx](${'https://solscan.io/tx/' + l.txHash})` : 'Simulated';
+                return `🔥 ${l.amount.toFixed(4)} SOL - ${link}`;
+            }).join('\n');
+        }
+
+        ctx.reply(
+            '🔥 *Recent Buybacks* 🔥\n\n' + lines + '\n\n' +
             '_Deflation reduces supply and increases scarcity._',
             { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } }
         );
