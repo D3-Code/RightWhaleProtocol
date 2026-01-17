@@ -7,13 +7,14 @@ export const globalStats = {
     totalRevShare: 0,    // SOL Distributed
     distributions: 0
 };
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { loadWallet } from './wallet';
+import { initDB, getLogs, getVirtualPots } from './db';
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
 import { startMarketMonitor } from './market';
 import { lastAiDecision } from './ai_trader';
-
-import { initDB, getLogs } from './db';
 
 dotenv.config();
 
@@ -58,6 +59,33 @@ app.get('/ai-status', (req, res) => {
 
 app.get('/stats', (req, res) => {
     res.json(globalStats);
+});
+
+app.get('/reserves', async (req, res) => {
+    try {
+        const keypair = loadWallet();
+        if (!keypair) return res.status(500).send('Wallet not loaded');
+
+        const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
+        const connection = new Connection(rpcUrl, 'confirmed');
+        const balance = await connection.getBalance(keypair.publicKey);
+        const solBalance = balance / LAMPORTS_PER_SOL;
+
+        const pots = await getVirtualPots();
+        const burnPot = pots.find(p => p.name === 'burn_pot')?.balance || 0;
+        const lpPot = pots.find(p => p.name === 'lp_pot')?.balance || 0;
+        const operational = solBalance - (burnPot + lpPot);
+
+        res.json({
+            total: solBalance,
+            burnPot,
+            lpPot,
+            operational,
+            address: keypair.publicKey.toBase58()
+        });
+    } catch (err) {
+        res.status(500).send('Error fetching reserves');
+    }
 });
 
 // Start Server
