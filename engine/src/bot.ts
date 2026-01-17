@@ -194,7 +194,7 @@ export const setupBot = () => {
             '🐋 *RightWhale Protocol Engine* 🐋\n' +
             '_Status: SYSTEM STANDBY (Pre-Launch)_\n\n' +
             '*Overview:*\n' +
-            'RightWhale is a fully autonomous protocol system designed to manage liquidity, enforce floor price stability, and distribute rewards through intelligent market analysis.\n\n' +
+            'RightWhale is a fully autonomous protocol system designed to manage buyback and burn, liquidity, enforce floor price stability, and distribute rewards through intelligent market analysis.\n\n' +
             '*Core Mechanics:*\n' +
             '1. 🌾 *Harvest*: Fees are collected from DEX volume.\n' +
             '2. 🧠 *Analysis*: The AI Core analyzes market structure in real-time.\n' +
