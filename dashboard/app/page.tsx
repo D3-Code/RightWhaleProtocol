@@ -35,41 +35,39 @@ export default function Home() {
         <div className="mb-6">
           <header className="glass-panel relative flex flex-col md:flex-row items-center justify-between rounded-none border-l-4 border-l-orange-500 p-6 gap-6 md:gap-0">
 
-            {/* Left: Brand */}
-            <div className="flex items-center gap-4 z-20 w-full md:w-auto justify-between md:justify-start">
+            {/* Brand & Logo Section */}
+            <div className="flex items-center gap-6 z-20 w-full md:w-auto">
+              {/* Logo */}
+              <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-primary/50 shadow-[0_0_20px_rgba(255,107,0,0.2)] bg-black shrink-0">
+                <Image
+                  src="/logo.jpg"
+                  alt="RightWhale Logo"
+                  width={80}
+                  height={80}
+                  className="object-cover"
+                />
+              </div>
+
               <div className="flex flex-col">
-                <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-white">
+                <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-white leading-none">
                   RIGHTWHALE
                   <span className="text-primary">PROTOCOL</span>
                 </h1>
-                <div className="flex items-center">
+                <div className="flex items-center mt-1">
                   <div className="h-1 w-8 bg-primary mr-2 animate-pulse"></div>
-                  <p className="text-zinc-500 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[10px] md:text-sm">
+                  <p className="text-zinc-500 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[10px] md:text-[11px]">
                     Autonomous Liquidity Engine v1.0
                   </p>
                 </div>
               </div>
+
               {/* Mobile Status Indicator */}
-              <div className="md:hidden flex items-center gap-2 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
+              <div className="md:hidden ml-auto flex items-center gap-2 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
                 <span className="text-[10px] text-emerald-500 font-bold">LIVE</span>
                 <div className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </div>
-              </div>
-            </div>
-
-            {/* Center: Logo (Mobile: top-rightish, Desktop: Absolute) */}
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 md:left-1/2 md:-translate-x-1/2 z-10 hidden sm:flex">
-              <div className="relative w-12 h-12 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-orange-500/50 shadow-[0_0_25px_rgba(255,107,0,0.3)] group bg-black">
-                <div className="absolute inset-0 group-hover:bg-transparent transition-colors z-10"></div>
-                <Image
-                  src="/logo.jpg"
-                  alt="RightWhale Logo"
-                  width={96}
-                  height={96}
-                  className="object-cover"
-                />
               </div>
             </div>
 
@@ -111,7 +109,7 @@ export default function Home() {
               <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
                 <div className="flex items-center gap-2">
                   <Terminal className="w-4 h-4 text-orange-500" />
-                  <span className="text-xs text-zinc-400 font-mono-tech uppercase tracking-widest">Console Output</span>
+                  <span className="text-xs text-zinc-400 font-mono-tech uppercase tracking-widest">CONSOLE LOG</span>
                 </div>
                 <div className="flex gap-1">
                   <div className="w-2 h-2 rounded-full bg-red-500/20"></div>
