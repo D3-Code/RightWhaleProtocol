@@ -22,17 +22,18 @@ export const setupBot = () => {
             '_System Status: PRE-LAUNCH (STANDBY)_\n\n' +
             'I am the autonomous trading engine for the $RightWhale ecosystem.\n' +
             'My analysis modules are active and waiting for the Token Generation Event (TGE).\n\n' +
-            '*Available Commands:*\n' +
-            'ℹ️ /info - Protocol Strategy breakdown\n' +
-            '📢 /channel - Official Updates\n' +
-            '🧠 /analysis - Run Market Algorithmic Analysis\n' +
-            '🔄 /flywheel - Verify the Flywheel Logic\n' +
-            '📊 /status - System Status\n' +
-            '🌾 /harvest - Trigger Fee Harvester\n' +
-            '📜 /history - Recent Actions (Menu)\n' +
-            '   ├ 🔥 /burns\n' +
-            '   ├ 💧 /lps\n' +
-            '   └ 🛡️ /payouts\n',
+            '*Available Commands:*\n\n' +
+            '*🧠 Intelligence & Status*\n' +
+            '/analysis - Real-time AI Market Scans\n' +
+            '/status - System Health & Monitor\n' +
+            '/flywheel - The Infinite Growth Loop\n\n' +
+            '*📜 Protocol Logs*\n' +
+            '/harvest - Fee Collection Ledger\n' +
+            '/burns - Buyback & Burn History\n' +
+            '/lps - Liquidity Injection Log\n\n' +
+            '*ℹ️ Information*\n' +
+            '/info - Strategy & Tokenomics\n' +
+            '/channel - Official Updates\n',
             { parse_mode: 'Markdown' }
         );
     };
