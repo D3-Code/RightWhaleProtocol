@@ -194,7 +194,7 @@ export const setupBot = () => {
             '🐋 *RightWhale Protocol Engine* 🐋\n' +
             '_Status: SYSTEM STANDBY (Pre-Launch)_\n\n' +
             '*Overview:*\n' +
-            'RightWhale is a fully autonomous liquidity management system designed to optimize the $RW token ecosystem.\n\n' +
+            'RightWhale is a fully autonomous liquidity management system designed to optimize the $RightWhale token ecosystem.\n\n' +
             '*Core Mechanics:*\n' +
             '1. 🌾 *Harvest*: Fees are collected from DEX volume.\n' +
             '2. 🧠 *Analysis*: The AI Core analyzes market structure in real-time.\n' +
