@@ -93,6 +93,11 @@ export const ActivityLog = () => {
                                 isTx = false;
                                 actionText = `AI Analysis >> Decision: <span class="text-white font-bold">${log.txHash}</span> (${(log.amount * 100).toFixed(0)}%)`;
                             }
+                            if (log.type === 'REVSHARE') {
+                                typeColor = 'text-emerald-500 font-bold';
+                                prefix = '🛡️';
+                                actionText = `RevShare Payout >> Distributed: <span class="text-white font-bold">${log.amount} SOL</span>`;
+                            }
 
                             return (
                                 <div key={log.id} className="flex gap-2 md:gap-4 border-l-2 border-zinc-800 pl-2 hover:border-orange-500 hover:bg-white/5 transition-colors p-1 group items-start">
@@ -101,7 +106,7 @@ export const ActivityLog = () => {
                                         <div className="flex items-center gap-2">
                                             <span className="text-[10px]">{prefix}</span>
                                             <span className={typeColor}>
-                                                {log.type === 'LP_ZAP' ? 'LP' : log.type === 'FEE_CLAIM' ? 'HARVEST' : log.type}
+                                                {log.type === 'LP_ZAP' ? 'LP' : log.type === 'FEE_CLAIM' ? 'HARVEST' : log.type === 'REVSHARE' ? 'PAYOUTS' : log.type}
                                             </span>
                                         </div>
                                         <span className="text-zinc-300 flex-1 text-[10px] md:text-xs leading-relaxed" dangerouslySetInnerHTML={{ __html: actionText }} />
