@@ -10,7 +10,7 @@ import { WalletChecker } from "@/components/WalletChecker";
 import { GlobalStats } from "@/components/GlobalStats";
 import Link from 'next/link'
 import AiStatusWidget from '@/components/AiStatusWidget'
-import { Wallet, Globe, Terminal, Activity, Zap, BarChart3, Droplets, Send, Bot, Github } from "lucide-react";
+import { Wallet, Globe, Terminal, Activity, Zap, BarChart3, Droplets, Send, Bot, Github, Book } from "lucide-react";
 import Image from "next/image";
 
 export default function Home() {
@@ -38,7 +38,7 @@ export default function Home() {
             {/* Brand & Logo Section */}
             <div className="flex items-center gap-6 z-20 w-full md:w-auto">
               {/* Logo */}
-              <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-primary/50 shadow-[0_0_20px_rgba(255,107,0,0.2)] bg-black shrink-0">
+              <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-orange-500 shadow-[0_0_20px_rgba(255,107,0,0.4)] bg-black shrink-0">
                 <Image
                   src="/logo.jpg"
                   alt="RightWhale Logo"
@@ -51,11 +51,11 @@ export default function Home() {
               <div className="flex flex-col">
                 <h1 className="text-xl md:text-3xl font-black tracking-tighter text-white leading-none">
                   RIGHTWHALE
-                  <span className="text-primary">PROTOCOL</span>
+                  <span className="text-orange-500">PROTOCOL</span>
                 </h1>
                 <div className="flex items-center mt-1">
-                  <div className="h-1 w-6 md:w-8 bg-primary mr-2 animate-pulse"></div>
-                  <p className="text-zinc-400 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[9px] md:text-[11px]">
+                  <div className="h-1 w-6 md:w-8 bg-orange-500 mr-2 animate-pulse"></div>
+                  <p className="text-orange-100/90 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[9px] md:text-[11px] font-bold shadow-black drop-shadow-md">
                     Autonomous Liquidity Engine v1.1
                   </p>
                 </div>
@@ -133,7 +133,7 @@ export default function Home() {
               className="glass-panel p-6 relative overflow-hidden group rounded-xl border border-white/5"
             >
               <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-              <h2 className="text-xs text-zinc-500 uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center relative z-10">
+              <h2 className="text-xs text-white/90 font-bold uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center relative z-10">
                 <span className="flex items-center gap-2 font-bold"><Terminal className="w-4 h-4 text-orange-500" /> SYSTEM SCHEMATIC</span>
                 <span className="text-[10px] text-zinc-400 animate-pulse">LIVE_FLOW</span>
               </h2>
@@ -145,7 +145,7 @@ export default function Home() {
               whileHover={{ scale: 1.01 }}
               className="glass-panel p-6 relative rounded-xl"
             >
-              <h2 className="text-sm text-zinc-500 uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center">
+              <h2 className="text-sm text-white/90 font-bold uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center">
                 <span className="flex items-center gap-2"><Droplets className="w-4 h-4 text-blue-500" /> ALLOCATIONS</span>
               </h2>
               <Allocations />
@@ -173,13 +173,17 @@ export default function Home() {
                   </svg>
                   <span className="text-xs font-bold uppercase tracking-wider">Official X account</span>
                 </a>
+                <Link href="/docs" className="bg-white/5 hover:bg-orange-500/20 border border-white/10 hover:border-orange-500/30 text-zinc-400 hover:text-orange-500 py-3 rounded transition-all flex items-center justify-center gap-2 group">
+                  <Book className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold uppercase tracking-wider">Documentation</span>
+                </Link>
               </div>
             </motion.div>
 
             <div className="p-4 rounded border border-zinc-800 bg-zinc-900/20 text-center mt-auto">
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-zinc-300 font-bold">
                 RightWhale Protocol &copy; 2026 <br />
-                <span className="opacity-70">System ID: RW V1.1</span>
+                <span className="opacity-90 text-orange-500/80">System ID: RW V1.1</span>
               </p>
             </div>
 

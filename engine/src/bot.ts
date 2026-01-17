@@ -35,7 +35,8 @@ export const setupBot = () => {
             '/lps - Liquidity Injection Log\n' +
             '/reserves - View all Strategic Pots\n' +
             '/burnpot - Buyback Pot Balance\n' +
-            '/lppot - Liquidity Pot Balance\n\n' +
+            '/lppot - Liquidity Pot Balance\n' +
+            '/payouts - RevShare Log\n\n' +
             '*ℹ️ Information*\n' +
             '/info - Strategy & Tokenomics\n' +
             '/channel - Official Updates\n',
@@ -192,7 +193,7 @@ export const setupBot = () => {
 
         ctx.reply(
             '🛡️ *RevShare Payouts* 🛡️\n\n' + lines + '\n\n' +
-            '_Rewards are distributed proportionally to holdings._',
+            '_Rewards are distributed proportionally to eligible holders._',
             { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } }
         );
     });
@@ -253,7 +254,11 @@ export const setupBot = () => {
             '   • 🔥 *Buy & Burn*: For momentum and scarcity.\n' +
             '   • 💧 *Auto-LP*: For stability and price floor support.\n' +
             '   • 🐳 *Strategic Reserve*: Capital is saved for future high-impact deployment.\n' +
-            '   • 🛡️ *RevShare*: (Always Active) Distributing rewards to holders.\n\n' +
+            '   • 🛡️ *RevShare*: (Always Active) Automated rewards for holders.\n\n' +
+            '*RevShare Rules:*\n' +
+            '• **Min-Whale**: Must hold **>0.05% supply** to qualify.\n' +
+            '• **Automated**: Direct wallet airdrops, no claiming.\n' +
+            '• **Frequency**: Executed on every profitable cycle.\n\n' +
             '*Features:*\n' +
             '• *Real-time Analysis*: See what the AI sees with /analysis.\n' +
             '• *Transparent Logs*: Track every fee claim with /harvest.\n' +
@@ -274,7 +279,7 @@ export const setupBot = () => {
             'Trading volume generates fees which accumulate in the Protocol Engine.\n\n' +
             '*2. Fixed Distribution (40%)* 💸\n' +
             'Every cycle, the engine immediately distributes:\n' +
-            '• 🛡️ **RevShare (30%)**: Sent directly to holders.\n' +
+            '• 🛡️ **RevShare (30%)**: Automated airdrops to holders (>0.05% supply).\n' +
             '• 🏗️ **Operations (10%)**: Development & Infrastructure.\n\n' +
             '*3. AI Dynamic Execution (60%)* 🧠\n' +
             'The remaining 60% contains two potential pots: **30% Burn** and **30% LP**.\n' +

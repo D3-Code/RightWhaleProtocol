@@ -1,53 +1,153 @@
 import { Connection, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { broadcastToChannel } from './telegram';
 import { loadWallet } from './wallet';
 import { addLog, adjustPotBalance } from './db';
 import { runAiCycle } from './ai_trader';
 
-// Mock Token Mint Address (replace with real one)
-const TOKEN_MINT_ADDRESS = 'RightWhaleMintAddressExamples';
+// Use env var or fallback for safety
+const TOKEN_MINT_ADDRESS = process.env.TOKEN_MINT_ADDRESS || 'RightWhaleMintAddressExamples';
 
 interface Holder {
     address: string;
     balance: number;
 }
 
-// Mock function to fetch holders (In production, use DAS API or snapshot)
+// Fetch all holders of the token
 const getHolders = async (connection: Connection): Promise<Holder[]> => {
-    // This is still a placeholder until we integrate a real Snapshot API
-    return [];
+    console.log('🔍 Snapshotting holders...');
+    if (!TOKEN_MINT_ADDRESS || TOKEN_MINT_ADDRESS.includes('Example')) {
+        console.warn('⚠️ Invalid Token Mint Address. Skipping snapshot.');
+        return [];
+    }
+
+    try {
+        const accounts = await connection.getParsedProgramAccounts(
+            TOKEN_PROGRAM_ID,
+            {
+                filters: [
+                    {
+                        dataSize: 165, // Standard SPL Token Account size
+                    },
+                    {
+                        memcmp: {
+                            offset: 0,
+                            bytes: TOKEN_MINT_ADDRESS,
+                        },
+                    },
+                ],
+            }
+        );
+
+        const holders: Holder[] = [];
+        for (const { account } of accounts) {
+            const parsedData = (account.data as any).parsed.info;
+            const amount = parseFloat(parsedData.tokenAmount.uiAmountString);
+            const owner = parsedData.owner;
+
+            if (amount > 0) {
+                holders.push({ address: owner, balance: amount });
+            }
+        }
+
+        console.log(`✅ Snapshot Complete: Found ${holders.length} holders.`);
+        return holders;
+
+    } catch (e) {
+        console.error('❌ Failed to fetch holders:', e);
+        return [];
+    }
 };
 
 const distributeRevShare = async (connection: Connection, keypair: any, amountSOL: number) => {
-    console.log(`\n--- Distributing RevShare (${amountSOL} SOL) ---`);
-    broadcastToChannel(`🛡️ *Starting RevShare Distribution...*\nAmount: \`${amountSOL} SOL\``);
+    console.log(`\n--- Distributing RevShare (${amountSOL.toFixed(4)} SOL) ---`);
+    broadcastToChannel(`🛡️ *Starting RevShare Distribution...*\nPot: \`${amountSOL.toFixed(4)} SOL\``);
 
-    // 1. Get Holders
-    // For this MVP, we will mostly simulate the *list* of holders but we CAN send to real test wallets if we had them.
-    // Since we don't have a list of real holders yet, we will skip the actual *mass* transfer to avoid burning gas on 0 recipients.
-    // However, we will send ONE real micro-transaction to the Dev Wallet as a "Proof of Concept" RevShare payment.
+    if (amountSOL < 0.001) {
+        console.log('⚠️ RevShare pot too small to distribute. Skipping.');
+        return;
+    }
 
-    const devWallet = process.env.DEV_WALLET_ADDRESS;
-    if (devWallet) {
-        try {
-            const transaction = new Transaction().add(
-                SystemProgram.transfer({
-                    fromPubkey: keypair.publicKey,
-                    toPubkey: new PublicKey(devWallet),
-                    lamports: Math.floor(amountSOL * LAMPORTS_PER_SOL), // Sending the whole RevShare pot to Dev as "Distributor" for now
-                })
-            );
+    // 1. Get Real Holders
+    const holders = await getHolders(connection);
 
-            const signature = await sendAndConfirmTransaction(connection, transaction, [keypair]);
-            console.log(`✅ RevShare Pot Sent to Distributor: ${signature}`);
-            await addLog('REVSHARE', amountSOL, signature);
-        } catch (e) {
-            console.error('Failed to send RevShare pot:', e);
+    if (holders.length === 0) {
+        console.log('⚠️ No holders found to distribute to.');
+        broadcastToChannel(`⚠️ *RevShare Skipped*: No holders found.`);
+        return;
+    }
+
+    // 2. Calculate Total Supply being tracked (sum of current holders found)
+    const totalSupply = holders.reduce((acc, h) => acc + h.balance, 0);
+    const MIN_HOLDING_PCT = 0.0005; // 0.05% Minimum to qualify
+
+    // Filter eligible holders
+    const eligibleHolders = holders.filter(h => (h.balance / totalSupply) >= MIN_HOLDING_PCT);
+
+    console.log(`📊 Snapshot Stats: ${holders.length} Total Holders | ${eligibleHolders.length} Qualified (>0.05%) | Circ. Supply: ${totalSupply}`);
+
+    if (eligibleHolders.length === 0) {
+        console.log('⚠️ No holders met the 0.05% threshold.');
+        broadcastToChannel(`⚠️ *RevShare Skipped*: No holders met the 0.05% threshold.`);
+        return;
+    }
+
+    broadcastToChannel(`📊 *RevShare Snapshot*\nTotal Holders: ${holders.length}\nQualified (>0.05%): ${eligibleHolders.length}`);
+
+    // 3. Prepare Batch Transactions
+    // Batch size of 15 transfers per transaction to stay well under size limits
+    const BATCH_SIZE = 15;
+    let successfulTransfers = 0;
+
+    // Shuffle holders slightly or just process? Just process.
+    // Chunking
+    for (let i = 0; i < eligibleHolders.length; i += BATCH_SIZE) {
+        const chunk = eligibleHolders.slice(i, i + BATCH_SIZE);
+        const transaction = new Transaction();
+        let hasAction = false;
+
+        for (const holder of chunk) {
+            // Calculate Share
+            const sharePercentage = holder.balance / totalSupply;
+            const payout = amountSOL * sharePercentage;
+
+            // Dust Filter: Only send if payout > 0.000005 SOL (Standard Network Fee)
+            // We only skip if the reward is LESS than the cost to send it.
+            if (payout > 0.000005) {
+                try {
+                    transaction.add(
+                        SystemProgram.transfer({
+                            fromPubkey: keypair.publicKey,
+                            toPubkey: new PublicKey(holder.address),
+                            lamports: Math.floor(payout * LAMPORTS_PER_SOL),
+                        })
+                    );
+                    hasAction = true;
+                } catch (err) {
+                    console.warn(`Skipping invalid address: ${holder.address}`);
+                }
+            }
+        }
+
+        if (hasAction) {
+            try {
+                // Send Batch
+                const signature = await sendAndConfirmTransaction(connection, transaction, [keypair]);
+                successfulTransfers += chunk.length;
+                console.log(`   Detailed Batch [${i}/${eligibleHolders.length}] Sent: ${signature}`);
+
+                // Only log the FIRST batch to DB to save space, or maybe summary later
+                if (i === 0) {
+                    await addLog('REVSHARE', amountSOL, signature); // Log the first one as representative
+                }
+            } catch (e) {
+                console.error(`❌ Failed to send batch [${i}]:`, e);
+            }
         }
     }
 
     console.log('--- RevShare Distribution Complete ---\n');
-    broadcastToChannel(`✅ *RevShare Complete*\nPot distributed successfully!`);
+    broadcastToChannel(`✅ *RevShare Complete*\nDistributed to ${successfulTransfers} holders.`);
 };
 
 export const executeStrategy = async (totalFee: number = 0.3) => {
