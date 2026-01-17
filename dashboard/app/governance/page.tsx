@@ -11,7 +11,7 @@ export default function GovernancePage() {
     const proposals = [
         {
             id: 1,
-            title: "SCP-001: Aggressive Burn Sequence",
+            title: "SCP-001: Aggressive Burn Sequence (EXAMPLE DATA)",
             status: "active",
             type: "STRATEGY",
             votes_for: 65,
@@ -21,7 +21,7 @@ export default function GovernancePage() {
         },
         {
             id: 2,
-            title: "SCP-002: Liquidity Anchor Adjustment",
+            title: "SCP-002: Liquidity Anchor Adjustment (EXAMPLE DATA)",
             status: "passed",
             type: "PARAMETER",
             votes_for: 92,
