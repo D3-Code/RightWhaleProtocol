@@ -109,7 +109,7 @@ export default function Home() {
             <motion.div
               className="glass-panel p-0 overflow-hidden flex flex-col h-[500px] rounded-xl"
             >
-              <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
+              <div className="p-4 border-b border-zinc-800 flex justify-between items-center console-header-bright">
                 <div className="flex items-center gap-2">
                   <Terminal className="w-4 h-4 text-orange-500" />
                   <span className="text-xs text-zinc-400 font-mono-tech uppercase tracking-widest">CONSOLE LOG</span>
