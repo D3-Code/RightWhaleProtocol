@@ -40,11 +40,11 @@ export const ProtocolInfo = () => {
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 
             {/* 3. MODULES ROW (Bottom) */}
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex flex-col md:flex-row items-center gap-4 mt-2 w-full max-w-[500px] md:max-w-none">
                 {/* Module A */}
                 <motion.div
                     whileHover={{ scale: 1.05 }}
-                    className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-[140px] text-center shadow-lg group hover:border-red-500/50 transition-all relative overflow-hidden"
+                    className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-full md:w-[140px] text-center shadow-lg group hover:border-red-500/50 transition-all relative overflow-hidden"
                 >
                     {reserves?.burnPot ? <div className="absolute inset-x-0 bottom-0 h-[2px] bg-red-500/50 animate-pulse" /> : null}
                     <Flame className={`w-6 h-6 text-red-500 ${reserves?.burnPot ? "animate-pulse" : "opacity-50"}`} />
@@ -60,7 +60,7 @@ export const ProtocolInfo = () => {
                 {/* Module B */}
                 <motion.div
                     whileHover={{ scale: 1.05 }}
-                    className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-[140px] text-center shadow-lg group hover:border-blue-500/50 transition-all relative overflow-hidden"
+                    className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-full md:w-[140px] text-center shadow-lg group hover:border-blue-500/50 transition-all relative overflow-hidden"
                 >
                     {reserves?.lpPot ? <div className="absolute inset-x-0 bottom-0 h-[2px] bg-blue-500/50 animate-pulse" /> : null}
                     <Droplets className={`w-6 h-6 text-blue-500 ${reserves?.lpPot ? "animate-bounce" : "opacity-50"}`} />
@@ -76,7 +76,7 @@ export const ProtocolInfo = () => {
                 {/* Module C */}
                 <motion.div
                     whileHover={{ scale: 1.05 }}
-                    className="border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-[140px] text-center shadow-lg group hover:border-emerald-500/50 transition-all relative overflow-hidden"
+                    className="border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-full md:w-[140px] text-center shadow-lg group hover:border-emerald-500/50 transition-all relative overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-emerald-500/10 animate-pulse-glow pointer-events-none" />
                     <div className="absolute inset-x-0 bottom-0 h-[2px] bg-emerald-500/50 animate-pulse" />

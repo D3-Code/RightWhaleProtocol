@@ -47,12 +47,12 @@ export const ActivityLog = () => {
     return (
         <div className="font-mono-tech text-xs h-full bg-black/80 backdrop-blur-sm flex flex-col overflow-hidden relative">
             {/* Filter Bar */}
-            <div className="p-2 border-b border-zinc-800 flex flex-wrap gap-1 md:gap-2 overflow-x-auto custom-scrollbar sticky top-0 bg-black/90 z-10 shrink-0">
+            <div className="p-2 border-b border-zinc-800 flex flex-wrap gap-2 overflow-x-auto custom-scrollbar sticky top-0 bg-black/90 z-10 shrink-0">
                 {['ALL', 'BURN', 'LP_ZAP', 'REVSHARE', 'HARVEST', 'ANALYSIS'].map((f) => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
-                        className={`px-3 py-1 rounded text-[10px] font-bold tracking-wider transition-all border ${filter === f
+                        className={`px-4 py-2 md:px-3 md:py-1 rounded text-[11px] md:text-[10px] font-bold tracking-wider transition-all border ${filter === f
                             ? 'bg-orange-500 text-white border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]'
                             : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:text-white hover:border-zinc-600'
                             }`}
