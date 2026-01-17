@@ -13,7 +13,6 @@ export const ProtocolInfo = () => {
             <div className="flex items-center gap-4 mt-2">
                 {/* Module A */}
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
                     whileHover={{ scale: 1.05 }}
                     className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-[140px] text-center shadow-lg group hover:border-red-500/50 transition-all relative"
                 >
@@ -26,7 +25,6 @@ export const ProtocolInfo = () => {
 
                 {/* Module B */}
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
                     whileHover={{ scale: 1.05 }}
                     className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-[140px] text-center shadow-lg group hover:border-blue-500/50 transition-all relative"
                 >
@@ -39,7 +37,6 @@ export const ProtocolInfo = () => {
 
                 {/* Module C */}
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
                     whileHover={{ scale: 1.05 }}
                     className="border border-white/10 bg-zinc-900/50 backdrop-blur-sm p-4 rounded-lg flex flex-col items-center gap-2 w-[140px] text-center shadow-lg group hover:border-emerald-500/50 transition-all relative"
                 >
