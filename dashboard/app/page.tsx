@@ -17,8 +17,8 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black bg-grid-pattern p-4 md:p-6 text-zinc-100 font-mono-tech selection:bg-orange-500/30 relative">
 
-      {/* Floating HUD Status - Top Right */}
-      <div className="fixed flex items-center gap-2 z-[100]" style={{ top: '2rem', right: '2rem' }}>
+      {/* Floating HUD Status - Desktop Only */}
+      <div className="hidden md:flex fixed items-center gap-2 z-[100]" style={{ top: '2rem', right: '2rem' }}>
         <div className="glass-panel px-3 py-1.5 rounded-full border border-emerald-500/20 bg-black/80 backdrop-blur-md flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
           <div className="text-emerald-500 font-bold text-xs flex items-center gap-2">
             SYSTEM ONLINE <span className="relative flex h-2 w-2">
@@ -44,23 +44,24 @@ export default function Home() {
                 </h1>
                 <div className="flex items-center">
                   <div className="h-1 w-8 bg-orange-500 mr-2 animate-pulse"></div>
-                  <p className="text-zinc-500 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-xs md:text-sm">
+                  <p className="text-zinc-500 uppercase tracking-widest border-r border-zinc-800 pr-4 mr-2 text-[10px] md:text-sm">
                     Autonomous Liquidity Engine v1.0
                   </p>
                 </div>
               </div>
-              {/* Mobile Status Indicator (Visible only on mobile) */}
-              <div className="md:hidden">
-                <div className="relative flex h-3 w-3">
+              {/* Mobile Status Indicator */}
+              <div className="md:hidden flex items-center gap-2 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
+                <span className="text-[10px] text-emerald-500 font-bold">LIVE</span>
+                <div className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </div>
               </div>
             </div>
 
-            {/* Center: Logo & Socials (Relative on Mobile, Absolute on Desktop) */}
-            <div className="relative md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-10 flex flex-col items-center gap-3 mt-4 md:mt-0">
-              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-orange-500/50 shadow-[0_0_25px_rgba(255,107,0,0.3)] group bg-black">
+            {/* Center: Logo (Mobile: top-rightish, Desktop: Absolute) */}
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 md:left-1/2 md:-translate-x-1/2 z-10 hidden sm:flex">
+              <div className="relative w-12 h-12 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-orange-500/50 shadow-[0_0_25px_rgba(255,107,0,0.3)] group bg-black">
                 <div className="absolute inset-0 group-hover:bg-transparent transition-colors z-10"></div>
                 <Image
                   src="/logo.jpg"
@@ -131,10 +132,12 @@ export default function Home() {
             {/* A. Protocol Schematic */}
             <motion.div
               whileHover={{ scale: 1.01 }}
-              className="glass-panel p-6 relative overflow-hidden group rounded-xl"
+              className="glass-panel p-6 relative overflow-hidden group rounded-xl border border-white/5"
             >
-              <h2 className="text-sm text-zinc-500 uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center">
-                <span className="flex items-center gap-2"><Terminal className="w-4 h-4 text-orange-500" /> SCHEMATIC</span>
+              <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+              <h2 className="text-xs text-zinc-500 uppercase tracking-widest mb-6 border-b border-zinc-800 pb-2 flex justify-between items-center relative z-10">
+                <span className="flex items-center gap-2 font-bold"><Terminal className="w-4 h-4 text-orange-500" /> SYSTEM SCHEMATIC</span>
+                <span className="text-[10px] text-zinc-600 animate-pulse">LIVE_FLOW</span>
               </h2>
               <ProtocolInfo />
             </motion.div>

@@ -47,7 +47,7 @@ export const ActivityLog = () => {
     return (
         <div className="font-mono-tech text-xs h-full bg-black/80 backdrop-blur-sm flex flex-col overflow-hidden relative">
             {/* Filter Bar */}
-            <div className="p-2 border-b border-zinc-800 flex gap-2 overflow-x-auto custom-scrollbar sticky top-0 bg-black/90 z-10 shrink-0">
+            <div className="p-2 border-b border-zinc-800 flex flex-wrap gap-1 md:gap-2 overflow-x-auto custom-scrollbar sticky top-0 bg-black/90 z-10 shrink-0">
                 {['ALL', 'BURN', 'LP_ZAP', 'REVSHARE', 'HARVEST', 'ANALYSIS'].map((f) => (
                     <button
                         key={f}
@@ -69,30 +69,42 @@ export const ActivityLog = () => {
                     <div className="flex flex-col-reverse gap-1">
                         {filteredLogs.slice().reverse().map((log) => {
                             let typeColor = 'text-emerald-500 font-bold';
-                            let actionText = `Process Executed >> Amount: <span class="text-white">${log.amount} SOL</span>`;
+                            let actionText = `Process Executed >> Amount: <span class="text-white font-bold">${log.amount} SOL</span>`;
+                            let prefix = '🛡️';
                             let isTx = true;
 
-                            if (log.type === 'BURN') typeColor = 'text-red-500 font-bold';
-                            if (log.type === 'LP_ZAP') typeColor = 'text-blue-400 font-bold';
+                            if (log.type === 'BURN') {
+                                typeColor = 'text-red-500 font-bold';
+                                prefix = '🔥';
+                            }
+                            if (log.type === 'LP_ZAP') {
+                                typeColor = 'text-blue-400 font-bold';
+                                prefix = '💧';
+                                actionText = `LP Injected >> Amount: <span class="text-white font-bold">${log.amount} SOL</span>`;
+                            }
                             if (log.type === 'HARVEST' || log.type === 'FEE_CLAIM') {
                                 typeColor = 'text-yellow-500 font-bold';
-                                actionText = `Fees Collected >> Amount: <span class="text-white">${log.amount} SOL</span>`;
+                                prefix = '💰';
+                                actionText = `Fees Collected >> Amount: <span class="text-white font-bold">${log.amount} SOL</span>`;
                             }
                             if (log.type === 'ANALYSIS') {
                                 typeColor = 'text-purple-400 font-bold';
+                                prefix = '🧠';
                                 isTx = false;
-                                // For Analyze, amount is confidence, txHash is Action
-                                actionText = `AI Decision >> Action: <span class="text-white">${log.txHash}</span> (${(log.amount * 100).toFixed(0)}%)`;
+                                actionText = `AI Analysis >> Decision: <span class="text-white font-bold">${log.txHash}</span> (${(log.amount * 100).toFixed(0)}%)`;
                             }
 
                             return (
-                                <div key={log.id} className="flex gap-4 border-l-2 border-zinc-800 pl-2 hover:border-orange-500 hover:bg-white/5 transition-colors p-1 group items-start">
-                                    <span className="text-zinc-500 opacity-50 whitespace-nowrap">[{mounted ? new Date(log.timestamp).toLocaleTimeString() : '--:--:--'}]</span>
+                                <div key={log.id} className="flex gap-2 md:gap-4 border-l-2 border-zinc-800 pl-2 hover:border-orange-500 hover:bg-white/5 transition-colors p-1 group items-start">
+                                    <span className="text-zinc-500 opacity-50 whitespace-nowrap text-[10px] md:text-xs">[{mounted ? new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '--:--:--'}]</span>
                                     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full">
-                                        <span className={typeColor}>
-                                            {log.type === 'LP_ZAP' ? 'LP' : log.type === 'FEE_CLAIM' ? 'HARVEST' : log.type}
-                                        </span>
-                                        <span className="text-zinc-300 flex-1" dangerouslySetInnerHTML={{ __html: actionText }} />
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px]">{prefix}</span>
+                                            <span className={typeColor}>
+                                                {log.type === 'LP_ZAP' ? 'LP' : log.type === 'FEE_CLAIM' ? 'HARVEST' : log.type}
+                                            </span>
+                                        </div>
+                                        <span className="text-zinc-300 flex-1 text-[10px] md:text-xs leading-relaxed" dangerouslySetInnerHTML={{ __html: actionText }} />
 
                                         {isTx && (
                                             log.txHash ? (

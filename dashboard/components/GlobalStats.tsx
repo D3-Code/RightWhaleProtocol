@@ -95,29 +95,40 @@ export const GlobalStats = () => {
             {items.map((item, index) => (
                 <motion.div
                     key={item.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`glass-panel p-6 flex flex-col gap-3 ${item.border} border-2 relative overflow-hidden group hover:bg-zinc-900/60 transition-all ${item.glow}`}
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{
+                        duration: 0.5,
+                        delay: index * 0.1,
+                        ease: [0.23, 1, 0.32, 1]
+                    }}
+                    className={`glass-panel p-6 flex flex-col gap-3 ${item.border} border-2 relative overflow-hidden group hover:bg-zinc-900/60 transition-all ${item.glow} ${item.displayValue.includes("PENDING") || item.displayValue.includes("SYSTEM") ? "animate-shimmer" : ""}`}
                 >
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className={`p-3 rounded-xl ${item.bg}`}>
+                    <div className="flex items-center gap-3 mb-2 relative z-10">
+                        <div className={`p-3 rounded-xl ${item.bg} group-hover:scale-110 transition-transform duration-500`}>
                             <item.icon className={`w-8 h-8 ${item.color}`} />
                         </div>
-                        <span className="text-xs text-zinc-400 font-mono-tech uppercase tracking-widest font-bold">{item.label}</span>
+                        <span className="text-[10px] text-zinc-400 font-mono-tech uppercase tracking-[0.2em] font-bold">{item.label}</span>
                     </div>
 
-                    <div className="flex flex-col">
-                        <div className="text-2xl font-black text-white font-mono-tech tracking-tight flex items-baseline gap-2">
+                    <div className="flex flex-col relative z-10">
+                        <div className="text-2xl font-black text-white font-mono-tech tracking-tighter flex items-baseline gap-2">
                             {item.displayValue}
                         </div>
-                        <div className={`text-xs font-mono-tech font-bold ${item.color} mt-1 opacity-80 uppercase tracking-widest`}>
+                        <div className={`text-[10px] font-mono-tech font-bold ${item.color} mt-1 opacity-80 uppercase tracking-widest flex items-center gap-2`}>
+                            <span className="h-[1px] w-4 bg-current opacity-30"></span>
                             {item.subtext}
                         </div>
                     </div>
 
                     {/* Background decoration */}
-                    <div className={`absolute -right-6 -bottom-6 w-24 h-24 ${item.bg} rounded-full blur-2xl opacity-50`}></div>
+                    <div className={`absolute -right-6 -bottom-6 w-24 h-24 ${item.bg} rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity`}></div>
+
+                    {/* Interactive Corner Scanline */}
+                    <div className="absolute top-0 right-0 w-16 h-16 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute top-2 right-2 w-2 h-[1px] bg-orange-500"></div>
+                        <div className="absolute top-2 right-2 w-[1px] h-2 bg-orange-500"></div>
+                    </div>
                 </motion.div>
             ))}
         </div>
