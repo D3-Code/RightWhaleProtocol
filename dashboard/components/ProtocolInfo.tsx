@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Droplets, Zap, ShieldCheck, Database } from "lucide-react";
+import { ArrowRight, Flame, Droplets, Zap, ShieldCheck, Database, Wallet } from "lucide-react";
 
 type Reserves = {
     total: number;
@@ -101,6 +101,16 @@ export const ProtocolInfo = () => {
                     <Database className="w-2 h-2 text-orange-500" />
                     <span className="text-zinc-300">RESERVES:</span>
                     <span className="text-white font-bold">{reserves ? `${reserves.total.toFixed(4)} SOL` : "---"}</span>
+                    <span className="text-zinc-600 mx-1">|</span>
+                    <a
+                        href="https://solscan.io/account/EdkQbGwHarKF7PeHdCsbEPmYA56yEG884aRqg4f7ndYZ"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-1.5 hover:bg-white/5 py-0.5 px-1.5 rounded transition-colors group cursor-pointer"
+                    >
+                        <Wallet className="w-2 h-2 text-purple-500 group-hover:text-purple-400" />
+                        <span className="text-zinc-300 group-hover:text-white transition-colors">FEE WALLET</span>
+                    </a>
                 </div>
 
                 <div className="flex items-center gap-4">
