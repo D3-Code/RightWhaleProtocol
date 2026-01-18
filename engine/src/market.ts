@@ -1,7 +1,6 @@
 import { broadcastToChannel } from './telegram';
 
-// Placeholder for Token Mint - In prod, use real mint
-// We will use a popular token like BONK or WIF for testing if needed, or the placeholder
+
 const TOKEN_MINT = process.env.TOKEN_MINT_ADDRESS || '7GCihgDB8fe6KW9b21f3kF2374241641614761476147';
 const DEXSCREENER_API = `https://api.dexscreener.com/latest/dex/tokens/`;
 
@@ -51,23 +50,9 @@ export const startMarketMonitor = () => {
         }
 
         // 2. Whale Watcher
-        // Note: DexScreener API doesn't list individual recent trades easily in the free endpoint,
-        // it gives volume/tx counts. 
-        // For a REAL implementation, we need a Helius/Birdeye webhook for "Swaps > X".
-        // HOWEVER, for this MVP, we will simulate the check or if data allows.
-        // Since we cannot reliably get "last trade > 5 SOL" from simple periodic polling without missing some,
-        // we will use a Mock/Simulation trigger here to demonstrate the FEATURE to the user.
-        // In PROD: Replace this with `connection.onLogs` subscription.
+        // Monitor recent trades
 
-        // --- SIMULATION BLOCK (Uncomment to test) ---
-        // const randomVal = Math.random();
-        // if (randomVal > 0.98) { // Occasional random whale
-        //    await broadcastToChannel(
-        //        `🚨 *WHALE ALERT* 🚨\n\n` +
-        //        `A giant splash detected! \`50.0 SOL\` bought!\n` +
-        //        `[View TX](https://solscan.io/)`
-        //    );
-        // }
+
 
     }, 30000); // 30s
 };

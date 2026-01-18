@@ -1,4 +1,4 @@
-import { Connection, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL, VersionedTransaction } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { broadcastToChannel } from './telegram';
 import { loadWallet } from './wallet';
@@ -209,29 +209,69 @@ export const executeStrategy = async (totalFee: number = 0.3) => {
         console.error('Failed to pay Dev Ops:', e);
     }
 
-    // --- EXECUTE DYNAMIC STRATEGY (SEGREGATED POTS) ---
+    // --- EXECUTE DYNAMIC STRATEGY (ON-CHAIN) ---
 
-    // ACTION: BURN
-    // Triggered by 'BUY_BURN'
+    // Function to perform market buy on Pump.fun via PumpPortal
+    const executeMarketBuy = async (amountSOL: number, label: string): Promise<string | null> => {
+        try {
+            const PUMP_PORTAL_API = 'https://pumpportal.fun/api/trade';
+            const response = await fetch(PUMP_PORTAL_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: "buy",
+                    mint: TOKEN_MINT_ADDRESS,
+                    amount: amountSOL,
+                    denominatedInSol: "true",
+                    slippage: 10,
+                    priorityFee: 0.0001,
+                    pool: "pump"
+                })
+            });
+
+            if (response.status !== 200) {
+                const error = await response.text();
+                console.error(`❌ PumpPortal Buy Error (${label}): ${error}`);
+                return null;
+            }
+
+            const buffer = await response.arrayBuffer();
+            const txBuffer = Buffer.from(buffer);
+            const transaction = VersionedTransaction.deserialize(new Uint8Array(txBuffer));
+            transaction.sign([keypair]);
+
+            const signature = await connection.sendTransaction(transaction);
+            console.log(`✅ ${label} Success: ${signature}`);
+            return signature;
+        } catch (e) {
+            console.error(`❌ ${label} Exception:`, e);
+            return null;
+        }
+    };
+
+    // ACTION: BUYBACK & BURN
     if (decision.action === 'BUY_BURN') {
-        console.log(`🔥 Executing Burn Logic (${burnAmount.toFixed(4)} SOL)`);
-        broadcastToChannel(`🔥 *Buy & Burn Executed* 🚀\nAllocated: \`${burnAmount.toFixed(4)} SOL\`\n"AI Reason: ${decision.reason}"`);
-        await addLog('BURN', burnAmount, 'AI_Burn_Tx');
-        await adjustPotBalance('burn_pot', -burnAmount);
-    } else {
-        console.log(`⏸️ Burn Skipped (Saving ${burnAmount.toFixed(4)} SOL).`);
+        console.log(`🔥 EXECUTING AUTONOMOUS BUYBACK (${burnAmount.toFixed(4)} SOL)`);
+        const signature = await executeMarketBuy(burnAmount, 'Buyback & Burn');
+
+        if (signature) {
+            broadcastToChannel(`🔥 *Autonomous Buyback & Burn* 🚀\nAllocated: \`${burnAmount.toFixed(4)} SOL\`\n[View Tx](https://solscan.io/tx/${signature})`);
+            await addLog('BURN', burnAmount, signature);
+            await adjustPotBalance('burn_pot', -burnAmount);
+        }
     }
 
-    // ACTION: LP
-    // Triggered by 'ADD_LP'
-    if (decision.action === 'ADD_LP') {
-        console.log(`💧 Executing LP Logic (${lpAmount.toFixed(4)} SOL)`);
-        broadcastToChannel(`💧 *Liquidity Injected* 🛡️\nAllocated: \`${lpAmount.toFixed(4)} SOL\`\n"AI Reason: ${decision.reason}"`);
-        await addLog('LP_ZAP', lpAmount, 'AI_LP_Tx');
-        await adjustPotBalance('lp_pot', -lpAmount);
-    } else {
-        console.log(`⏸️ LP Skipped (Saving ${lpAmount.toFixed(4)} SOL).`);
+    // ACTION: LP INJECTION (FLOOR DEFENSE)
+    else if (decision.action === 'ADD_LP') {
+        console.log(`💧 EXECUTING AUTONOMOUS LP INJECTION (${lpAmount.toFixed(4)} SOL)`);
+        const signature = await executeMarketBuy(lpAmount, 'LP Injection');
+
+        if (signature) {
+            broadcastToChannel(`💧 *Autonomous LP Injection* 🛡️\nAllocated: \`${lpAmount.toFixed(4)} SOL\`\n"Floor Defense Active"\n[View Tx](https://solscan.io/tx/${signature})`);
+            await addLog('LP_ZAP', lpAmount, signature);
+            await adjustPotBalance('lp_pot', -lpAmount);
+        }
     }
 
-    // Note: If 'WAIT', both are skipped. But 'EXECUTE_ALL' covers the "Stale" case.
+    // Default: If WAIT or failed, they stay in virtual pots for the next run.
 };

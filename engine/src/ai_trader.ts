@@ -1,13 +1,7 @@
 import { broadcastToChannel } from './telegram';
 import { addLog } from './db';
 
-// ... imports ...
 
-// ... (keep existing code) ...
-
-// ... imports ...
-
-// ... (keep existing code) ...
 
 // 3. The Hands: Execution Loop
 export async function runAiCycle(readOnly: boolean = false) {
