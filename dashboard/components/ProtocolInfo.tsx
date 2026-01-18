@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Droplets, Zap, ShieldCheck, Database, Wallet } from "lucide-react";
+import { ArrowRight, Flame, Droplets, Zap, ShieldCheck, Database, Wallet, Terminal } from "lucide-react";
 
 type Reserves = {
     total: number;
@@ -110,6 +110,16 @@ export const ProtocolInfo = () => {
                     >
                         <Wallet className="w-2 h-2 text-purple-500 group-hover:text-purple-400" />
                         <span className="text-zinc-300 group-hover:text-white transition-colors">FEE WALLET</span>
+                    </a>
+                    <span className="text-zinc-600 mx-1">|</span>
+                    <a
+                        href="https://solscan.io/account/BGEpiN5RmSmbu6j6ioE9KbHuJzaX6TFiH4QvDEgT3Yhu"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-1.5 hover:bg-white/5 py-0.5 px-1.5 rounded transition-colors group cursor-pointer"
+                    >
+                        <Terminal className="w-2 h-2 text-cyan-500 group-hover:text-cyan-400" />
+                        <span className="text-zinc-300 group-hover:text-white transition-colors">DEV OPS</span>
                     </a>
                 </div>
 
