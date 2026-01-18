@@ -75,6 +75,11 @@ export const ActivityLog = () => {
                             if (log.type === 'BURN') {
                                 typeColor = 'text-red-500 font-bold';
                                 prefix = '🔥';
+                                if (log.amount > 0) {
+                                    actionText = `Process Executed >> Amount: <span class="text-white font-bold">${log.amount} SOL</span>`;
+                                } else {
+                                    actionText = `Manual Burn >> <span class="text-white font-bold">See Transaction</span>`;
+                                }
                             }
                             if (log.type === 'LP_ZAP') {
                                 typeColor = 'text-blue-400 font-bold';
