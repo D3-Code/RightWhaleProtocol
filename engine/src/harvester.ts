@@ -4,7 +4,7 @@ import { loadWallet } from './wallet';
 import { broadcastToChannel } from './telegram';
 import { addLog } from './db';
 
-const PUMP_PORTAL_API = 'https://pumpportal.fun/api/trade';
+const PUMP_PORTAL_API_LOCAL = 'https://pumpportal.fun/api/trade-local';
 
 export const claimFees = async () => {
     // 1. Configuration Check
@@ -26,17 +26,16 @@ export const claimFees = async () => {
         const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
         const connection = new Connection(rpcUrl, 'confirmed');
 
-        // 2. Request Transaction from PumpPortal
-        // Note: For Pump.fun fees, 'collectCreatorFee' is the action.
-        const response = await fetch(PUMP_PORTAL_API, {
+        // 2. Request Transaction from PumpPortal (Local API - No API Key Required)
+        // Note: Local API builds the transaction, we sign and send it ourselves
+        const response = await fetch(PUMP_PORTAL_API_LOCAL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                ...(process.env.PUMPPORTAL_API_KEY ? { 'X-API-Key': process.env.PUMPPORTAL_API_KEY } : {})
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                publicKey: keypair.publicKey.toBase58(),
                 action: 'collectCreatorFee',
-                mint: mintAddress,
                 priorityFee: 0.00005, // Standard priority fee
                 pool: 'pump'
             })
@@ -57,8 +56,7 @@ export const claimFees = async () => {
         const txBuffer = Buffer.from(buffer);
 
         // 3. Deserialize and Sign
-        // PumpPortal returns a VersionedTransaction (usually)
-        // We catch deserialization errors just in case format changes
+        // PumpPortal returns a VersionedTransaction
         const transaction = VersionedTransaction.deserialize(new Uint8Array(txBuffer));
 
         transaction.sign([keypair]);
