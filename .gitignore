@@ -2,3 +2,8 @@
 .env
 .vercel
 .env*.local
+
+# Database files (runtime data)
+*.sqlite
+*.sqlite-journal
+*.db
