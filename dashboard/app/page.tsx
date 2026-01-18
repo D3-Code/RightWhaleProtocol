@@ -198,7 +198,7 @@ export default function Home() {
                 </Link>
                 <a href="https://github.com/geraldodiniz/RightWhaleProtocol" target="_blank" className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-zinc-400 hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
                   <Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Open Source Code</span>
+                  <span className="text-xs font-bold uppercase tracking-wider">Git</span>
                 </a>
                 <Link href="/governance" className="bg-[#8B5CF6]/10 hover:bg-[#8B5CF6]/20 border border-[#8B5CF6]/50 hover:border-[#8B5CF6] text-[#8B5CF6] py-3 rounded transition-all flex items-center justify-center gap-2 group">
                   <span className="flex items-center gap-2">
