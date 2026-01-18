@@ -169,6 +169,13 @@ export default function Home() {
               className="glass-panel p-6 flex flex-col gap-4 rounded-xl"
             >
               <div className="flex flex-col gap-3">
+                <a href="https://pump.fun" target="_blank" className="bg-[#14F195]/10 hover:bg-[#14F195]/20 border border-[#14F195]/50 hover:border-[#14F195] text-[#14F195] py-4 rounded-lg transition-all flex flex-col items-center justify-center gap-1 group shadow-[0_0_20px_rgba(20,241,149,0.1)] hover:shadow-[0_0_25px_rgba(20,241,149,0.2)]">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-5 h-5 group-hover:scale-125 transition-transform animate-pulse" />
+                    <span className="text-sm font-black uppercase tracking-widest">Buy on Pump.fun</span>
+                  </div>
+                  <span className="text-[8px] opacity-60 uppercase tracking-tighter font-bold">Bonding Curve Active</span>
+                </a>
                 <div className="grid grid-cols-2 gap-3">
                   <a href="https://t.me/RightWhaleBotChannel" target="_blank" className="bg-[#229ED9]/10 hover:bg-[#229ED9] border border-[#229ED9]/50 hover:border-[#229ED9] text-[#229ED9] hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
                     <Send className="w-5 h-5 group-hover:scale-110 transition-transform" />
