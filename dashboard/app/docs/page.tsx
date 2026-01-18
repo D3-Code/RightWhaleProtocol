@@ -165,7 +165,7 @@ export default function DocumentationPage() {
                                 </div>
                                 <h3 className="text-lg font-bold text-white mb-2">Distro</h3>
                                 <p className="text-zinc-400 text-sm">
-                                    The Bot claims creator fees into its own Engine Wallet first. Then, during the Distribution cycle, the <strong>10% Dev Fee</strong> is sent back to the Developer Wallet, while the rest is executed by the protocol.
+                                    The Bot claims creator fees into its own Engine Wallet first. Then, during the Distribution cycle, the <strong>10% Dev Fee</strong> is sent to DEV OPS Wallet, while the rest is executed by the protocol.
                                 </p>
                             </div>
 
@@ -241,7 +241,7 @@ export default function DocumentationPage() {
                                 <div className="absolute inset-0 bg-yellow-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 <div className="text-3xl font-black text-white mb-1 group-hover:scale-110 transition-transform">10%</div>
                                 <div className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Dev Ops</div>
-                                <p className="text-[10px] text-zinc-600 mt-2">10% sent to Dev Wallet for Ops.</p>
+                                <p className="text-[10px] text-zinc-600 mt-2">10% sent to DEV OPS Wallet for Ops.</p>
                             </div>
                         </div>
                     </motion.section>
