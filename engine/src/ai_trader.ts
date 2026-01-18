@@ -15,6 +15,9 @@ export async function runAiCycle(readOnly: boolean = false) {
     // Save to global state
     lastAiDecision = decisionWithTime;
 
+    // Log to DB for the "System Console" feed
+    await addLog('ANALYSIS', decision.confidence, decision.reason);
+
     console.log(`\n🤖 AI DECISION FINALIZED:`);
     console.log(`➤ Action: ${decision.action}`);
     console.log(`➤ Confidence: ${decision.confidence * 100}%`);
