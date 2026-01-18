@@ -84,7 +84,11 @@ export const ActivityLog = () => {
                             if (log.type === 'HARVEST' || log.type === 'FEE_CLAIM') {
                                 typeColor = 'text-yellow-500 font-bold';
                                 prefix = '💰';
-                                actionText = `Fees Collected >> Amount: <span class="text-white font-bold">${log.amount} SOL</span>`;
+                                if (log.amount > 0) {
+                                    actionText = `Fees Collected >> Amount: <span class="text-white font-bold">${log.amount} SOL</span>`;
+                                } else {
+                                    actionText = `Fees Collected >> <span class="text-white font-bold">Swept to Wallet</span>`;
+                                }
                             }
                             if (log.type === 'ANALYSIS') {
                                 typeColor = 'text-purple-400 font-bold';
