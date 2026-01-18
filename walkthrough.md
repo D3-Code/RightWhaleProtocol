@@ -50,6 +50,12 @@ We have successfully updated the dashboard to reflect a professional "Pre-Launch
 -   **Subtext**: Added "Bonding Curve Active" badge for increased urgency and clarity.
 -   ** animations**: Includes scale-up effects on hover and pulsing icon micro-animations.
 
+### 9. Open Source Access
+-   **New Feature**: Added a GitHub button labeled "Git".
+-   **Placement**: Positioned directly below the Documentation button for easy developer access.
+-   **Styling**: Matches the utility button style with a clean icon and white hover state.
+
+
 
 ````carousel
 ![Desktop Dashboard Top](file:///Users/geraldodiniz/.gemini/antigravity/brain/bded415d-3518-429e-adc8-5c7002f6e6ab/dashboard_initial_view_1768634405926.png)
@@ -73,6 +79,8 @@ We have successfully updated the dashboard to reflect a professional "Pre-Launch
 ![Dev Ops Module Hover](file:///Users/geraldodiniz/.gemini/antigravity/brain/acb876ae-c21b-4b95-95e7-2e022ac029c2/dev_ops_hover_1768702530248.png)
 <!-- slide -->
 ![Pump.fun Button Verification](file:///Users/geraldodiniz/.gemini/antigravity/brain/acb876ae-c21b-4b95-95e7-2e022ac029c2/buy_on_pumpfun_button_detail_1768703625195.png)
+<!-- slide -->
+![GitHub Button Verification](file:///Users/geraldodiniz/.gemini/antigravity/brain/acb876ae-c21b-4b95-95e7-2e022ac029c2/github_button_verification_1768703818109.png)
 ````
 
 ## Verification
