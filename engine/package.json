@@ -1,5 +1,5 @@
 {
-  "name": "rightwhale-engine",
+  "name": "rightwhale-protocol-engine",
   "version": "1.0.0",
   "description": "Engine for RightWhale Protocol",
   "main": "dist/index.js",
