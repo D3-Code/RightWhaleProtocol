@@ -19,7 +19,7 @@ export const ProtocolInfo = () => {
         const fetchReserves = async () => {
             try {
                 // const apiUrl = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
-                const apiUrl = "https://36decf92116d8b.lhr.life";
+                const apiUrl = "https://da14aa08cf9bd5.lhr.life";
                 const res = await fetch(`${apiUrl}/reserves`).catch(() => null);
                 if (res && res.ok) {
                     const data = await res.json();
