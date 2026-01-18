@@ -196,13 +196,10 @@ export default function Home() {
                   <Book className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span className="text-xs font-bold uppercase tracking-wider">Documentation</span>
                 </Link>
-                {/* Hidden until ready */}
-                {/* 
                 <a href="https://github.com/D3-Code/RightWhaleProtocol" target="_blank" className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-zinc-400 hover:text-white py-3 rounded transition-all flex items-center justify-center gap-2 group">
                   <Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span className="text-xs font-bold uppercase tracking-wider">Git</span>
-                </a> 
-                */}
+                </a>
                 <Link href="/governance" className="bg-[#8B5CF6]/10 hover:bg-[#8B5CF6]/20 border border-[#8B5CF6]/50 hover:border-[#8B5CF6] text-[#8B5CF6] py-3 rounded transition-all flex items-center justify-center gap-2 group">
                   <span className="flex items-center gap-2">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>

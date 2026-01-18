@@ -59,17 +59,7 @@ export let lastAiDecision: AiDecision | null = null;
 // 1. The Eyes: Fetch Data (Real DexScreener)
 export async function fetchMarketData(tokenAddress: string): Promise<MarketData | null> {
 
-    // --- TEMP: VISUALIZATION MOCK DATA ---
-    // Remove this block to go back to real mode
-    if (tokenAddress === 'mock-token' || !tokenAddress) {
-        return {
-            price: 0.0045,
-            volume24h: 250000,
-            priceChange5m: 12.5, // Pumping!
-            lastCandles: []
-        };
-    }
-    // -------------------------------------
+    // Real mode enabled
 
     console.log(`👀 AICore: Watching chart for ${tokenAddress}...`);
 
