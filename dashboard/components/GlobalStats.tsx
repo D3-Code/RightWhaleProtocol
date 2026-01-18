@@ -10,14 +10,22 @@ type Stats = {
     distributions: number;
 };
 
+type MarketData = {
+    marketCap: number;
+    price: number;
+    volume24h: number;
+    priceChange24h: number;
+};
+
 export const GlobalStats = () => {
-    // Default to 0s for pre-launch to show "PENDING" text immediately
     const [stats, setStats] = useState<Stats | null>({
         totalBurned: 0,
         totalLP: 0,
         totalRevShare: 0,
         distributions: 0
     });
+
+    const [marketData, setMarketData] = useState<MarketData | null>(null);
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -28,26 +36,56 @@ export const GlobalStats = () => {
                     const data = await res.json();
                     setStats(data);
                 }
-                // Removed else block since we have defaults
             } catch (e) {
                 console.error(e);
             }
         };
 
+        const fetchMarketData = async () => {
+            try {
+                const tokenAddress = "AdwrMB45dAVuSfDT7YRVshK4QJtzaJyAKVKimJDrpump";
+                const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`);
+                const data = await res.json();
+                const pair = data.pairs?.[0];
+
+                if (pair) {
+                    setMarketData({
+                        marketCap: pair.fdv || pair.marketCap || 0,
+                        price: parseFloat(pair.priceUsd) || 0,
+                        volume24h: pair.volume?.h24 || 0,
+                        priceChange24h: pair.priceChange?.h24 || 0
+                    });
+                }
+            } catch (e) {
+                console.error('Failed to fetch market data:', e);
+            }
+        };
+
         fetchStats();
-        // Poll every 5s
-        const interval = setInterval(fetchStats, 5000);
+        fetchMarketData();
+
+        const interval = setInterval(() => {
+            fetchStats();
+            fetchMarketData();
+        }, 10000); // Update every 10s
+
         return () => clearInterval(interval);
     }, []);
 
     if (!stats) return <div className="h-24 w-full bg-zinc-900/50 animate-pulse rounded-xl"></div>;
 
+    const formatNumber = (num: number) => {
+        if (num >= 1000000) return `$${(num / 1000000).toFixed(2)}M`;
+        if (num >= 1000) return `$${(num / 1000).toFixed(1)}K`;
+        return `$${num.toFixed(2)}`;
+    };
+
     const items = [
         {
             label: "MARKET CAP",
-            value: 0,
-            displayValue: "PENDING TGE",
-            subtext: "Awaiting Launch",
+            value: marketData?.marketCap || 0,
+            displayValue: marketData?.marketCap ? formatNumber(marketData.marketCap) : "LOADING...",
+            subtext: marketData?.priceChange24h ? `${marketData.priceChange24h > 0 ? '+' : ''}${marketData.priceChange24h.toFixed(2)}% 24h` : "Fetching Data",
             icon: BarChart3,
             color: "text-emerald-500",
             bg: "bg-emerald-500/10",
@@ -57,8 +95,8 @@ export const GlobalStats = () => {
         {
             label: "TOTAL BURNED",
             value: stats.totalBurned,
-            displayValue: stats.totalBurned > 0 ? stats.totalBurned.toLocaleString() : "SYSTEM STANDBY",
-            subtext: "Waiting for Launch",
+            displayValue: stats.totalBurned > 0 ? `${stats.totalBurned.toLocaleString()} Tokens` : "0 Tokens",
+            subtext: stats.totalBurned > 0 ? "Deflationary Active" : "Awaiting First Burn",
             icon: Flame,
             color: "text-red-500",
             bg: "bg-red-500/10",
@@ -68,8 +106,8 @@ export const GlobalStats = () => {
         {
             label: "TOTAL LP ADDED",
             value: stats.totalLP,
-            displayValue: stats.totalLP > 0 ? `${stats.totalLP} SOL` : "PENDING INJECTION",
-            subtext: "Liquidity Event Soon",
+            displayValue: stats.totalLP > 0 ? `${stats.totalLP.toFixed(4)} SOL` : "0 SOL",
+            subtext: stats.totalLP > 0 ? "Floor Strengthened" : "Awaiting Injection",
             icon: Droplets,
             color: "text-blue-500",
             bg: "bg-blue-500/10",
@@ -79,8 +117,8 @@ export const GlobalStats = () => {
         {
             label: "REVSHARE DISTRIBUTED",
             value: stats.totalRevShare,
-            displayValue: stats.totalRevShare > 0 ? `${stats.totalRevShare} SOL` : "AWAITING REVENUE",
-            subtext: "Holders Reward Pool",
+            displayValue: stats.totalRevShare > 0 ? `${stats.totalRevShare.toFixed(4)} SOL` : "0 SOL",
+            subtext: stats.distributions > 0 ? `${stats.distributions} Payouts` : "Awaiting Revenue",
             icon: Trophy,
             color: "text-orange-500",
             bg: "bg-orange-500/10",
