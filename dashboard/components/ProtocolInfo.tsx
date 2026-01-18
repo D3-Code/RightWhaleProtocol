@@ -96,47 +96,58 @@ export const ProtocolInfo = () => {
             </div>
 
             {/* Technical Footer */}
-            <div className="w-full mt-6 pt-4 border-t border-white/5 flex flex-row justify-between items-end text-[9px] text-zinc-400 font-mono-tech">
-                <div className="flex flex-col gap-1.5">
+            <div className="w-full mt-6 pt-4 border-t border-white/5 flex flex-col gap-4 text-[9px] text-zinc-400 font-mono-tech">
+                <div className="flex flex-row justify-between items-center">
                     <div className="flex items-center gap-2">
                         <Database className="w-2 h-2 text-orange-500" />
-                        <span className="text-zinc-300">RESERVES:</span>
+                        <span className="text-zinc-300">SYSTEM RESERVES:</span>
                         <span className="text-white font-bold">{reserves ? `${reserves.total.toFixed(4)} SOL` : "---"}</span>
                     </div>
 
-                    <div className="flex items-center gap-2 pl-0.5">
-                        <a
-                            href="https://solscan.io/account/EdkQbGwHarKF7PeHdCsbEPmYA56yEG884aRqg4f7ndYZ"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex items-center gap-1.5 hover:text-white transition-colors group cursor-pointer"
-                        >
-                            <Wallet className="w-2 h-2 text-purple-500 group-hover:text-purple-400" />
-                            <span className="text-zinc-500 group-hover:text-zinc-300 transition-colors">FEE WALLET</span>
-                        </a>
-                        <a
-                            href="https://solscan.io/account/BGEpiN5RmSmbu6j6ioE9KbHuJzaX6TFiH4QvDEgT3Yhu"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex items-center gap-1.5 hover:text-white transition-colors group cursor-pointer"
-                        >
-                            <Terminal className="w-2 h-2 text-cyan-500 group-hover:text-cyan-400" />
-                            <span className="text-zinc-500 group-hover:text-zinc-300 transition-colors">DEV OPS</span>
-                        </a>
+                    <div className="flex flex-col items-end gap-1">
+                        <div className="text-emerald-500 uppercase tracking-tighter flex items-center gap-1">
+                            <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>
+                            Fully Automated
+                        </div>
+                        <div className="text-[7px] opacity-30 uppercase">
+                            RW-V1.1-ALPHA
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-1 mb-0.5">
-                    <div className="text-emerald-500 uppercase tracking-tighter flex items-center gap-1">
-                        <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>
-                        Fully Automated
-                    </div>
-                    <div className="text-[7px] opacity-30 uppercase">
-                        RW-V1.1-ALPHA
-                    </div>
+                {/* Secondary Modules Grid */}
+                <div className="grid grid-cols-2 gap-2 w-full">
+                    <motion.a
+                        href="https://solscan.io/account/EdkQbGwHarKF7PeHdCsbEPmYA56yEG884aRqg4f7ndYZ"
+                        target="_blank"
+                        rel="noreferrer"
+                        whileHover={{ scale: 1.02 }}
+                        className="border border-white/10 bg-zinc-900/40 backdrop-blur-sm p-3 rounded-lg flex flex-col items-center gap-2 text-center group hover:border-purple-500/50 transition-all relative overflow-hidden"
+                    >
+                        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-purple-500/20 group-hover:bg-purple-500/50 transition-colors" />
+                        <Wallet className="w-4 h-4 text-purple-500 group-hover:scale-110 transition-transform" />
+                        <div className="flex flex-col">
+                            <span className="text-[6px] text-zinc-500 uppercase font-mono-tech group-hover:text-purple-500/50 transition-colors">Module D</span>
+                            <span className="text-[8px] font-bold text-white tracking-widest uppercase">FEE WALLET</span>
+                        </div>
+                    </motion.a>
+
+                    <motion.a
+                        href="https://solscan.io/account/BGEpiN5RmSmbu6j6ioE9KbHuJzaX6TFiH4QvDEgT3Yhu"
+                        target="_blank"
+                        rel="noreferrer"
+                        whileHover={{ scale: 1.02 }}
+                        className="border border-white/10 bg-zinc-900/40 backdrop-blur-sm p-3 rounded-lg flex flex-col items-center gap-2 text-center group hover:border-cyan-500/50 transition-all relative overflow-hidden"
+                    >
+                        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-cyan-500/20 group-hover:bg-cyan-500/50 transition-colors" />
+                        <Terminal className="w-4 h-4 text-cyan-500 group-hover:scale-110 transition-transform" />
+                        <div className="flex flex-col">
+                            <span className="text-[6px] text-zinc-500 uppercase font-mono-tech group-hover:text-cyan-500/50 transition-colors">Module E</span>
+                            <span className="text-[8px] font-bold text-white tracking-widest uppercase">DEV OPS</span>
+                        </div>
+                    </motion.a>
                 </div>
             </div>
         </div>
     );
 };
-
