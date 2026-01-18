@@ -217,7 +217,10 @@ export const executeStrategy = async (totalFee: number = 0.3) => {
             const PUMP_PORTAL_API = 'https://pumpportal.fun/api/trade';
             const response = await fetch(PUMP_PORTAL_API, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(process.env.PUMPPORTAL_API_KEY ? { 'X-API-Key': process.env.PUMPPORTAL_API_KEY } : {})
+                },
                 body: JSON.stringify({
                     action: "buy",
                     mint: TOKEN_MINT_ADDRESS,

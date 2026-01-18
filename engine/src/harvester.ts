@@ -31,7 +31,8 @@ export const claimFees = async () => {
         const response = await fetch(PUMP_PORTAL_API, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                ...(process.env.PUMPPORTAL_API_KEY ? { 'X-API-Key': process.env.PUMPPORTAL_API_KEY } : {})
             },
             body: JSON.stringify({
                 action: 'collectCreatorFee',

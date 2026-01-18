@@ -17,9 +17,7 @@ export const ActivityLog = () => {
 
     useEffect(() => {
         setMounted(true);
-        // ... existing fetch logic ...
         const fetchLogs = async () => {
-            // ...
 
             try {
                 // In dev, use mock if API fails
