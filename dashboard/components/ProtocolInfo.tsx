@@ -18,7 +18,8 @@ export const ProtocolInfo = () => {
     useEffect(() => {
         const fetchReserves = async () => {
             try {
-                const apiUrl = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
+                // const apiUrl = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
+                const apiUrl = "https://great-queens-heal.loca.lt";
                 const res = await fetch(`${apiUrl}/reserves`).catch(() => null);
                 if (res && res.ok) {
                     const data = await res.json();
