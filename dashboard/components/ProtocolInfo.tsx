@@ -96,39 +96,42 @@ export const ProtocolInfo = () => {
             </div>
 
             {/* Technical Footer */}
-            <div className="w-full mt-6 pt-4 border-t border-white/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-0 text-[9px] text-zinc-400 font-mono-tech">
-                <div className="flex items-center gap-2">
-                    <Database className="w-2 h-2 text-orange-500" />
-                    <span className="text-zinc-300">RESERVES:</span>
-                    <span className="text-white font-bold">{reserves ? `${reserves.total.toFixed(4)} SOL` : "---"}</span>
-                    <span className="text-zinc-600 mx-1">|</span>
-                    <a
-                        href="https://solscan.io/account/EdkQbGwHarKF7PeHdCsbEPmYA56yEG884aRqg4f7ndYZ"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-1.5 hover:bg-white/5 py-0.5 px-1.5 rounded transition-colors group cursor-pointer"
-                    >
-                        <Wallet className="w-2 h-2 text-purple-500 group-hover:text-purple-400" />
-                        <span className="text-zinc-300 group-hover:text-white transition-colors">FEE WALLET</span>
-                    </a>
-                    <span className="text-zinc-600 mx-1">|</span>
-                    <a
-                        href="https://solscan.io/account/BGEpiN5RmSmbu6j6ioE9KbHuJzaX6TFiH4QvDEgT3Yhu"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-1.5 hover:bg-white/5 py-0.5 px-1.5 rounded transition-colors group cursor-pointer"
-                    >
-                        <Terminal className="w-2 h-2 text-cyan-500 group-hover:text-cyan-400" />
-                        <span className="text-zinc-300 group-hover:text-white transition-colors">DEV OPS</span>
-                    </a>
+            <div className="w-full mt-6 pt-4 border-t border-white/5 flex flex-row justify-between items-end text-[9px] text-zinc-400 font-mono-tech">
+                <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2">
+                        <Database className="w-2 h-2 text-orange-500" />
+                        <span className="text-zinc-300">RESERVES:</span>
+                        <span className="text-white font-bold">{reserves ? `${reserves.total.toFixed(4)} SOL` : "---"}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 pl-0.5">
+                        <a
+                            href="https://solscan.io/account/EdkQbGwHarKF7PeHdCsbEPmYA56yEG884aRqg4f7ndYZ"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1.5 hover:text-white transition-colors group cursor-pointer"
+                        >
+                            <Wallet className="w-2 h-2 text-purple-500 group-hover:text-purple-400" />
+                            <span className="text-zinc-500 group-hover:text-zinc-300 transition-colors">FEE WALLET</span>
+                        </a>
+                        <a
+                            href="https://solscan.io/account/BGEpiN5RmSmbu6j6ioE9KbHuJzaX6TFiH4QvDEgT3Yhu"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1.5 hover:text-white transition-colors group cursor-pointer"
+                        >
+                            <Terminal className="w-2 h-2 text-cyan-500 group-hover:text-cyan-400" />
+                            <span className="text-zinc-500 group-hover:text-zinc-300 transition-colors">DEV OPS</span>
+                        </a>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col items-end gap-1 mb-0.5">
                     <div className="text-emerald-500 uppercase tracking-tighter flex items-center gap-1">
                         <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>
                         Fully Automated
                     </div>
-                    <div className="text-[7px] opacity-30 uppercase border-l border-white/10 pl-4">
+                    <div className="text-[7px] opacity-30 uppercase">
                         RW-V1.1-ALPHA
                     </div>
                 </div>
