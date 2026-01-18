@@ -26,7 +26,7 @@ export default function AiStatusWidget() {
     const fetchStatus = async () => {
         try {
             // const res = await fetch(`${process.env.NEXT_PUBLIC_ENGINE_API || 'http://localhost:3001'}/ai-status`);
-            const res = await fetch(`https://great-queens-heal.loca.lt/ai-status`);
+            const res = await fetch(`https://72e472a12d3404.lhr.life/ai-status`);
             const json = await res.json();
 
             // Only update if timestamp changed or data is new

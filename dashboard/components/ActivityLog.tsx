@@ -22,7 +22,7 @@ export const ActivityLog = () => {
             try {
                 // In dev, use mock if API fails
                 // const apiUrl = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
-                const apiUrl = "https://great-queens-heal.loca.lt";
+                const apiUrl = "https://72e472a12d3404.lhr.life";
                 const res = await fetch(`${apiUrl}/history`).catch(() => null);
                 if (res && res.ok) {
                     const data = await res.json();
