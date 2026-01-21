@@ -272,4 +272,3 @@ export const FullPageRadar = () => {
                 </div>
                 );
 };
-                ```
