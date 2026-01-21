@@ -42,15 +42,16 @@ export const initDB = async () => {
             CREATE TABLE IF NOT EXISTS tracked_wallets (
                 address TEXT PRIMARY KEY,
                 win_rate REAL DEFAULT 0,
-                total_profit_sol REAL DEFAULT 0,
+                reputation_score REAL DEFAULT 0,
                 total_trades INTEGER DEFAULT 0,
-                wins INTEGER DEFAULT 0,
-                losses INTEGER DEFAULT 0,
-                avg_hold_time INTEGER DEFAULT 0,
-                reputation_score INTEGER DEFAULT 0,
+                total_profit_sol REAL DEFAULT 0,
+                avg_hold_time_seconds REAL DEFAULT 0,
                 avg_impact_volume REAL DEFAULT 0,
-                avg_impact_buyers INTEGER DEFAULT 0,
-                last_active TEXT
+                avg_impact_buyers REAL DEFAULT 0,
+                wallet_name TEXT,
+                twitter_handle TEXT,
+                profile_image_url TEXT,
+                last_identity_check TEXT
             );
 
             CREATE TABLE IF NOT EXISTS positions (
@@ -156,6 +157,19 @@ export const adjustPotBalance = async (name: string, delta: number) => {
         console.log(`💰 Virtual Pot ${name} adjusted by ${delta} SOL`);
     } catch (error) {
         console.error(`Failed to adjust pot ${name}:`, error);
+    }
+};
+
+export const updateWalletIdentity = async (address: string, walletName?: string, twitterHandle?: string, profileImageUrl?: string) => {
+    if (!db) return;
+    try {
+        await db.run(`
+            UPDATE tracked_wallets 
+            SET wallet_name = ?, twitter_handle = ?, profile_image_url = ?, last_identity_check = ?
+            WHERE address = ?
+        `, walletName, twitterHandle, profileImageUrl, new Date().toISOString(), address);
+    } catch (error) {
+        console.error('Failed to update wallet identity:', error);
     }
 };
 
