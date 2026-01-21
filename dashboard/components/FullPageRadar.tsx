@@ -63,9 +63,9 @@ export const FullPageRadar = () => {
                     </div>
                     <div>
                         <h1 className="text-xl font-bold tracking-tighter uppercase text-white flex items-center gap-2">
-                            RightWhale <span className="text-emerald-500">Intelligence</span>
+                            RightWhale <span className="text-emerald-500">WRAS</span>
                         </h1>
-                        <p className="text-xs text-zinc-500 tracking-widest uppercase">Global Liquidity Monitor // Active Dragnet</p>
+                        <p className="text-xs text-zinc-500 tracking-widest uppercase">Whale Report Alert System // Live Intelligence Feed</p>
                     </div>
                 </div>
 
@@ -96,8 +96,8 @@ export const FullPageRadar = () => {
                                     <button
                                         onClick={() => setOnlySmartMoney(!onlySmartMoney)}
                                         className={`flex items-center gap-2 px-3 py-1.5 border rounded text-xs transition-colors ${onlySmartMoney
-                                                ? 'bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-[0_0_10px_rgba(245,158,11,0.2)]'
-                                                : 'bg-white/5 hover:bg-white/10 border-white/10 text-zinc-300'
+                                            ? 'bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-[0_0_10px_rgba(245,158,11,0.2)]'
+                                            : 'bg-white/5 hover:bg-white/10 border-white/10 text-zinc-300'
                                             }`}
                                     >
                                         <Trophy className="w-3 h-3" />
