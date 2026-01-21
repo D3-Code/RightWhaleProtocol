@@ -19,7 +19,7 @@ export const startRadar = async () => {
     const ws = new WebSocket(WS_URL);
 
     ws.on('open', () => {
-        console.log('📡 Connected to RightWhale Radar (PumpPortal WS)');
+        console.log('📡 WRAS Online: Monitoring Pump.fun streams...');
 
         // Subscribe to New Token Creation (Always available global stream)
         // This is "Alpha" source #1

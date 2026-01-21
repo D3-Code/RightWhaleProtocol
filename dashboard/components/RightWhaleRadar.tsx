@@ -50,7 +50,7 @@ export const RightWhaleRadar = () => {
                         <span className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></span>
                     </div>
                     <span className="text-xs text-white font-mono-tech uppercase tracking-widest font-bold">
-                        RIGHTWHALE RADAR
+                        WRAS - Whale Report Alert System
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
