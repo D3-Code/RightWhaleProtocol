@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Radar, ExternalLink, Target, Filter, Clock, ArrowUpRight, Search, Trophy, TrendingUp } from "lucide-react";
+import { Radar, ExternalLink, Target, Filter, Clock, ArrowUpRight, Search, Trophy, TrendingUp, Users, Activity } from "lucide-react";
 
 type WhaleSighting = {
     id: number;
@@ -12,10 +12,13 @@ type WhaleSighting = {
     wallet: string;
     isBuy: boolean;
     timestamp: string;
-    // Smart Money Stats (Left Join)
+    // Smart Money Stats 
     win_rate?: number;
     reputation_score?: number;
     total_profit_sol?: number;
+    // Impact Stats (KOL Effect)
+    avg_impact_volume?: number;
+    avg_impact_buyers?: number;
 };
 
 export const FullPageRadar = () => {
