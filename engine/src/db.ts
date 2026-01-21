@@ -110,22 +110,36 @@ export const getLogs = async (limit = 50, type?: string) => {
     return await db.all('SELECT * FROM activity_logs ORDER BY id DESC LIMIT ?', limit);
 };
 
-export const getWhaleSightings = async (limit = 20) => {
+export const getWhaleSightings = async (limit = 20, verifiedOnly = false) => {
     if (!db) return [];
     try {
-        return await db.all(`
+        let query = `
             SELECT 
                 ws.*,
                 tw.win_rate,
                 tw.reputation_score,
                 tw.total_profit_sol,
+                tw.total_trades,
                 tw.avg_impact_volume,
-                tw.avg_impact_buyers -- Impact Analytics
+                tw.avg_impact_buyers,
+                tw.wallet_name,
+                tw.twitter_handle
             FROM whale_sightings ws
             LEFT JOIN tracked_wallets tw ON ws.wallet = tw.address
-            ORDER BY ws.id DESC 
-            LIMIT ?
-        `, limit);
+        `;
+
+        // Add quality filter if requested
+        if (verifiedOnly) {
+            query += `
+                WHERE tw.reputation_score >= 60 
+                AND tw.win_rate >= 55 
+                AND tw.total_trades >= 3
+            `;
+        }
+
+        query += ` ORDER BY ws.id DESC LIMIT ?`;
+
+        return await db.all(query, limit);
     } catch (error) {
         console.error('Failed to fetch whale sightings:', error);
         return [];

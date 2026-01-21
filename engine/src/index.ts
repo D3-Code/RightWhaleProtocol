@@ -91,7 +91,8 @@ app.get('/reserves', async (req, res) => {
 app.get('/radar', async (req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
-        const sightings = await getWhaleSightings(limit);
+        const verifiedOnly = req.query.verifiedOnly === 'true';
+        const sightings = await getWhaleSightings(limit, verifiedOnly);
         res.json(sightings);
     } catch (err) {
         res.status(500).send('Error fetching radar data');

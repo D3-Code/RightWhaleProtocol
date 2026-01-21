@@ -28,6 +28,8 @@ type TopWhale = {
     win_rate: number;
     total_profit_sol: number;
     avg_impact_buyers: number;
+    wallet_name?: string;
+    twitter_handle?: string;
 };
 
 export const FullPageRadar = () => {
@@ -35,13 +37,14 @@ export const FullPageRadar = () => {
     const [topWhales, setTopWhales] = useState<TopWhale[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
+    const [verifiedOnly, setVerifiedOnly] = useState(true); // Default: show only verified
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
 
     const fetchSightings = async () => {
         try {
-            // Fetch live sightings
-            const res = await fetch(`${ENGINE_API}/radar?limit=50&t=${Date.now()}`);
+            // Fetch live sightings with verified filter
+            const res = await fetch(`${ENGINE_API}/radar?limit=50&verifiedOnly=${verifiedOnly}&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 setSightings(data);
@@ -63,7 +66,7 @@ export const FullPageRadar = () => {
         fetchSightings();
         const interval = setInterval(fetchSightings, 2000);
         return () => clearInterval(interval);
-    }, []);
+    }, [verifiedOnly]); // Re-fetch when filter changes
 
     const filteredSightings = onlySmartMoney
         ? sightings.filter(s => (s.reputation_score || 0) >= 60 || (s.win_rate || 0) > 50)
@@ -118,6 +121,16 @@ export const FullPageRadar = () => {
                         <Trophy className="w-3 h-3" />
                         <span>SMART MONEY (WR &gt; 50%)</span>
                     </button>
+                    <button
+                        onClick={() => setVerifiedOnly(!verifiedOnly)}
+                        className={`flex items-center gap-2 px-3 py-1.5 border rounded text-xs transition-colors ${verifiedOnly
+                            ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+                            : 'bg-white/5 hover:bg-white/10 border-white/10 text-zinc-300'
+                            }`}
+                    >
+                        <span>{verifiedOnly ? '🏆' : '👁️'}</span>
+                        <span>VERIFIED ONLY</span>
+                    </button>
                 </div>
                 <div className="text-[10px] text-zinc-600 uppercase tracking-widest">
                     Displaying last 50 sightings
@@ -140,9 +153,15 @@ export const FullPageRadar = () => {
                                 </div>
                                 <div className="mb-3">
                                     <div className="text-xs text-zinc-500 uppercase mb-1">Wallet</div>
-                                    <code className="text-xs text-white font-mono bg-black/30 px-2 py-1 rounded">
-                                        {whale.address.slice(0, 6)}...{whale.address.slice(-4)}
-                                    </code>
+                                    {whale.twitter_handle ? (
+                                        <div className="text-sm font-bold text-emerald-400">@{whale.twitter_handle}</div>
+                                    ) : whale.wallet_name ? (
+                                        <div className="text-sm font-bold text-white">{whale.wallet_name}</div>
+                                    ) : (
+                                        <code className="text-xs text-white font-mono bg-black/30 px-2 py-1 rounded">
+                                            {whale.address.slice(0, 6)}...{whale.address.slice(-4)}
+                                        </code>
+                                    )}
                                 </div>
                                 <div className="space-y-2 mb-3">
                                     <div className="flex justify-between items-center">
