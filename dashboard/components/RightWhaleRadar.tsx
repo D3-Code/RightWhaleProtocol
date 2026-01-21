@@ -8,6 +8,7 @@ type WhaleSighting = {
     id: number;
     mint: string;
     symbol: string;
+    image_uri?: string;
     amount: number;
     wallet: string;
     isBuy: boolean; // 1 or 0 from sqlite
@@ -97,7 +98,18 @@ export const RightWhaleRadar = () => {
 
                                 {/* Token Symbol - Larger */}
                                 <div className="col-span-5 flex items-center gap-2">
-                                    <Target className="w-4 h-4 text-zinc-400" />
+                                    {s.image_uri ? (
+                                        <img
+                                            src={s.image_uri}
+                                            alt={s.symbol}
+                                            className="w-6 h-6 rounded-full border border-zinc-700"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = 'none';
+                                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                            }}
+                                        />
+                                    ) : null}
+                                    <Target className={`w-4 h-4 text-zinc-400 ${s.image_uri ? 'hidden' : ''}`} />
                                     <span className="font-bold text-white text-base truncate">${s.symbol || 'UNKNOWN'}</span>
                                 </div>
 

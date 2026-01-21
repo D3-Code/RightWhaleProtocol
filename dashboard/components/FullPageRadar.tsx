@@ -8,6 +8,7 @@ type WhaleSighting = {
     id: number;
     mint: string;
     symbol: string;
+    image_uri?: string;
     amount: number;
     wallet: string;
     isBuy: boolean;
@@ -218,7 +219,18 @@ export const FullPageRadar = () => {
                                     {/* Token */}
                                     <div className="col-span-2 flex flex-col">
                                         <div className="flex items-center gap-2 font-bold text-white text-xs truncate">
-                                            <Target className="w-3 h-3 text-zinc-500" />
+                                            {s.image_uri ? (
+                                                <img
+                                                    src={s.image_uri}
+                                                    alt={s.symbol}
+                                                    className="w-5 h-5 rounded-full border border-zinc-700"
+                                                    onError={(e) => {
+                                                        e.currentTarget.style.display = 'none';
+                                                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <Target className={`w-3 h-3 text-zinc-500 ${s.image_uri ? 'hidden' : ''}`} />
                                             {s.symbol || 'UNKNOWN'}
                                         </div>
                                         <span className="text-[9px] text-zinc-500 font-mono truncate">{s.mint}</span>
