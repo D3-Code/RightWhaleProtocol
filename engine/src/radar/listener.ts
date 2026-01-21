@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import { initDB, logWhaleSighting } from '../db';
 import { processTrade } from './tracker';
+import { fetchTokenMetadata } from './metadata';
 
 /**
  * RightWhale Radar: Real-Time Listener
@@ -70,11 +71,16 @@ export const startRadar = async () => {
                     console.log(`🐋 [WHALE ALERT] ${type} ${solAmount.toFixed(2)} SOL on ${event.mint}`);
                     console.log(`   Wallet: ${event.traderPublicKey}`);
 
+                    // Fetch token metadata (includes image)
+                    const metadata = await fetchTokenMetadata(event.mint);
+                    const imageUri = metadata?.image_uri || '';
+                    const symbol = metadata?.symbol || event.symbol || 'UNKNOWN';
+
                     // Log to Database (Visual Feed)
                     await logWhaleSighting(
                         event.mint,
-                        event.symbol || 'UNKNOWN',
-                        event.image_uri || '',
+                        symbol,
+                        imageUri,
                         solAmount,
                         event.traderPublicKey,
                         isBuy

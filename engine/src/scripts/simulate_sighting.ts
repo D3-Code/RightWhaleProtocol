@@ -31,6 +31,7 @@ async function simulate() {
     await logWhaleSighting(
         'AdwrMB45dAVuSfDT7YRVshK4QJtzaJyAKVKimJDrpump',
         'KOL_COIN',
+        '', // image_uri
         250.0,
         wallet,
         true
