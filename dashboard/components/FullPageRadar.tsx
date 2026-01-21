@@ -32,12 +32,29 @@ type TopWhale = {
     twitter_handle?: string;
 };
 
+type ActivePosition = {
+    id: number;
+    wallet: string;
+    mint: string;
+    entry_amount: number;
+    entry_timestamp: string;
+    hold_hours: number;
+    impact_volume?: number;
+    impact_buyers?: number;
+    wallet_name?: string;
+    twitter_handle?: string;
+    reputation_score?: number;
+    win_rate?: number;
+};
+
 export const FullPageRadar = () => {
     const [sightings, setSightings] = useState<WhaleSighting[]>([]);
     const [topWhales, setTopWhales] = useState<TopWhale[]>([]);
+    const [positions, setPositions] = useState<ActivePosition[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
-    const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
+    const [verifiedOnly, setVerifiedOnly] = useState(false);
+    const [activeTab, setActiveTab] = useState<'feed' | 'positions' | 'leaderboard'>('feed'); // Default: show all whales
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
 
@@ -62,11 +79,29 @@ export const FullPageRadar = () => {
         }
     };
 
+    const fetchPositions = async () => {
+        try {
+            const res = await fetch(`${ENGINE_API}/radar/positions?limit=50&verifiedOnly=${verifiedOnly}&t=${Date.now()}`);
+            if (res.ok) {
+                const data = await res.json();
+                setPositions(data);
+            }
+        } catch (e) {
+            console.error("Positions offline");
+        }
+    };
+
     useEffect(() => {
-        fetchSightings();
-        const interval = setInterval(fetchSightings, 2000);
-        return () => clearInterval(interval);
-    }, [verifiedOnly]); // Re-fetch when filter changes
+        if (activeTab === 'feed') {
+            fetchSightings();
+            const interval = setInterval(fetchSightings, 2000);
+            return () => clearInterval(interval);
+        } else if (activeTab === 'positions') {
+            fetchPositions();
+            const interval = setInterval(fetchPositions, 5000); // Update every 5s
+            return () => clearInterval(interval);
+        }
+    }, [verifiedOnly, activeTab]);
 
     const filteredSightings = onlySmartMoney
         ? sightings.filter(s => (s.reputation_score || 0) >= 60 || (s.win_rate || 0) > 50)

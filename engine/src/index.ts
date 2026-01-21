@@ -9,7 +9,7 @@ export const globalStats = {
 };
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { loadWallet } from './wallet';
-import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets } from './db';
+import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets, getActivePositions } from './db';
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
@@ -106,6 +106,27 @@ app.get('/radar/leaderboard', async (req, res) => {
         res.json(wallets);
     } catch (err) {
         res.status(500).send('Error fetching leaderboard');
+    }
+});
+
+app.get('/radar/positions', async (req, res) => {
+    try {
+        const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+        const verifiedOnly = req.query.verifiedOnly === 'true';
+
+        let positions = await getActivePositions(limit);
+
+        // Filter for verified whales only
+        if (verifiedOnly) {
+            positions = positions.filter((p: any) =>
+                p.reputation_score >= 60 &&
+                p.win_rate >= 55
+            );
+        }
+
+        res.json(positions);
+    } catch (err) {
+        res.status(500).send('Error fetching positions');
     }
 });
 
