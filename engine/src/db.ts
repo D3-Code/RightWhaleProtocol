@@ -130,6 +130,21 @@ export const getWhaleSightings = async (limit = 20) => {
     }
 };
 
+export const getTopWallets = async (limit = 50) => {
+    if (!db) return [];
+    try {
+        return await db.all(`
+            SELECT * FROM tracked_wallets 
+            WHERE reputation_score > 0 
+            ORDER BY reputation_score DESC, win_rate DESC 
+            LIMIT ?
+        `, limit);
+    } catch (error) {
+        console.error('Failed to fetch top wallets:', error);
+        return [];
+    }
+};
+
 export const adjustPotBalance = async (name: string, delta: number) => {
     if (!db) return;
     try {

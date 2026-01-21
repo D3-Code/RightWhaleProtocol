@@ -9,7 +9,7 @@ export const globalStats = {
 };
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { loadWallet } from './wallet';
-import { initDB, getLogs, getVirtualPots, getWhaleSightings } from './db';
+import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets } from './db';
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
@@ -95,6 +95,16 @@ app.get('/radar', async (req, res) => {
         res.json(sightings);
     } catch (err) {
         res.status(500).send('Error fetching radar data');
+    }
+});
+
+app.get('/radar/leaderboard', async (req, res) => {
+    try {
+        const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+        const wallets = await getTopWallets(limit);
+        res.json(wallets);
+    } catch (err) {
+        res.status(500).send('Error fetching leaderboard');
     }
 });
 
