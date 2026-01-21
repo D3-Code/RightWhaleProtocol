@@ -37,7 +37,7 @@ export const FullPageRadar = () => {
     const [topWhales, setTopWhales] = useState<TopWhale[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
-    const [verifiedOnly, setVerifiedOnly] = useState(true); // Default: show only verified
+    const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
 
