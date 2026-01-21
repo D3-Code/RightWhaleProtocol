@@ -12,6 +12,7 @@ import Link from 'next/link'
 import AiStatusWidget from '@/components/AiStatusWidget'
 import { Wallet, Globe, Terminal, Activity, Zap, BarChart3, Droplets, Send, Bot, Github, Book } from "lucide-react";
 import Image from "next/image";
+import { RightWhaleRadar } from "@/components/RightWhaleRadar";
 
 
 export default function Home() {
@@ -88,6 +89,14 @@ export default function Home() {
 
           {/* LEFT COLUMN (Main Operations) - 8 Cols */}
           <div className="md:col-span-8 flex flex-col gap-6">
+
+            {/* 0. RightWhale Radar (Live) */}
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              className="glass-panel p-0 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.15)] border-emerald-500/20 h-[300px]"
+            >
+              <RightWhaleRadar />
+            </motion.div>
 
 
 

@@ -27,6 +27,16 @@ export const initDB = async () => {
 
             INSERT OR IGNORE INTO virtual_pots (name, balance) VALUES ('burn_pot', 0);
             INSERT OR IGNORE INTO virtual_pots (name, balance) VALUES ('lp_pot', 0);
+
+            CREATE TABLE IF NOT EXISTS whale_sightings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                mint TEXT NOT NULL,
+                symbol TEXT,
+                amount SOL,
+                wallet TEXT NOT NULL,
+                isBuy BOOLEAN,
+                timestamp TEXT NOT NULL
+            );
         `);
 
         console.log('✅ SQLite Database initialized');
@@ -48,12 +58,35 @@ export const addLog = async (type: string, amount: number, txHash?: string) => {
     }
 };
 
+export const logWhaleSighting = async (mint: string, symbol: string, amount: number, wallet: string, isBuy: boolean) => {
+    if (!db) return;
+    try {
+        await db.run(
+            'INSERT INTO whale_sightings (mint, symbol, amount, wallet, isBuy, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
+            mint, symbol, amount, wallet, isBuy, new Date().toISOString()
+        );
+        console.log(`🐋 DB Logged: Whale on ${symbol}`);
+    } catch (error) {
+        console.error('Failed to log whale sighting:', error);
+    }
+};
+
 export const getLogs = async (limit = 50, type?: string) => {
     if (!db) return [];
     if (type) {
         return await db.all('SELECT * FROM activity_logs WHERE type = ? ORDER BY id DESC LIMIT ?', type, limit);
     }
     return await db.all('SELECT * FROM activity_logs ORDER BY id DESC LIMIT ?', limit);
+};
+
+export const getWhaleSightings = async (limit = 20) => {
+    if (!db) return [];
+    try {
+        return await db.all('SELECT * FROM whale_sightings ORDER BY id DESC LIMIT ?', limit);
+    } catch (error) {
+        console.error('Failed to fetch whale sightings:', error);
+        return [];
+    }
 };
 
 export const adjustPotBalance = async (name: string, delta: number) => {
@@ -78,3 +111,4 @@ export const getVirtualPots = async () => {
         return [];
     }
 };
+

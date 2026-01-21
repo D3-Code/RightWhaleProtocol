@@ -9,7 +9,7 @@ export const globalStats = {
 };
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { loadWallet } from './wallet';
-import { initDB, getLogs, getVirtualPots } from './db';
+import { initDB, getLogs, getVirtualPots, getWhaleSightings } from './db';
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
@@ -88,6 +88,16 @@ app.get('/reserves', async (req, res) => {
     }
 });
 
+app.get('/radar', async (req, res) => {
+    try {
+        const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+        const sightings = await getWhaleSightings(limit);
+        res.json(sightings);
+    } catch (err) {
+        res.status(500).send('Error fetching radar data');
+    }
+});
+
 // Start Server
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
@@ -97,6 +107,10 @@ app.listen(port, () => {
 setupBot();
 startMonitor();
 startMarketMonitor();
+
+// Start RightWhale Radar (Whale Tracker)
+import { startRadar } from './radar/listener';
+startRadar();
 
 // Initial AI Cycle to populate dashboard
 import { runAiCycle } from './ai_trader';
