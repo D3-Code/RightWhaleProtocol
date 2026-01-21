@@ -91,8 +91,8 @@ export const FullPageRadar = () => {
                     <button
                         onClick={() => setOnlySmartMoney(!onlySmartMoney)}
                         className={`flex items-center gap-2 px-3 py-1.5 border rounded text-xs transition-colors ${onlySmartMoney
-                                ? 'bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-[0_0_10px_rgba(245,158,11,0.2)]'
-                                : 'bg-white/5 hover:bg-white/10 border-white/10 text-zinc-300'
+                            ? 'bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-[0_0_10px_rgba(245,158,11,0.2)]'
+                            : 'bg-white/5 hover:bg-white/10 border-white/10 text-zinc-300'
                             }`}
                     >
                         <Trophy className="w-3 h-3" />
@@ -105,15 +105,17 @@ export const FullPageRadar = () => {
             </div>
 
             {/* Data Table */}
-            <div className="flex-1 overflow-auto p-6 z-10">
+            <div className="flex-1 overflow-auto p-6 z-10 w-full overflow-x-hidden">
                 <div className="w-full max-w-7xl mx-auto">
                     {/* Table Header */}
                     <div className="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
-                        <div className="col-span-2">Time</div>
-                        <div className="col-span-2">Type</div>
-                        <div className="col-span-3">Token</div>
+                        <div className="col-span-1">Time</div>
+                        <div className="col-span-1">Type</div>
+                        <div className="col-span-2">Token</div>
                         <div className="col-span-2 text-right">Amount</div>
                         <div className="col-span-2 text-center">Wallet</div>
+                        <div className="col-span-2 text-center">KOL Impact (10m)</div>
+                        <div className="col-span-1 text-center">Score</div>
                         <div className="col-span-1 text-right">Action</div>
                     </div>
 
@@ -134,28 +136,27 @@ export const FullPageRadar = () => {
                                     `}
                                 >
                                     {/* Time */}
-                                    <div className="col-span-2 flex items-center gap-2 text-zinc-400 text-xs text-nowrap">
-                                        <Clock className="w-3 h-3 opacity-50" />
-                                        {new Date(s.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                    <div className="col-span-1 flex items-center gap-2 text-zinc-400 text-xs text-nowrap truncate">
+                                        {new Date(s.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' })}
                                     </div>
 
                                     {/* Type */}
-                                    <div className="col-span-2">
+                                    <div className="col-span-1">
                                         <span className={`
                                             px-2 py-1 rounded text-[10px] font-bold uppercase
-                                            ${s.isBuy ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}
+                                            ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}
                                         `}>
-                                            {s.isBuy ? 'WHALE BUY' : 'WHALE SELL'}
+                                            {s.isBuy ? 'BUY' : 'SELL'}
                                         </span>
                                     </div>
 
                                     {/* Token */}
-                                    <div className="col-span-3 flex flex-col">
-                                        <div className="flex items-center gap-2 font-bold text-white text-sm">
+                                    <div className="col-span-2 flex flex-col">
+                                        <div className="flex items-center gap-2 font-bold text-white text-xs truncate">
                                             <Target className="w-3 h-3 text-zinc-500" />
                                             {s.symbol || 'UNKNOWN'}
                                         </div>
-                                        <span className="text-[9px] text-zinc-500 font-mono truncate max-w-[150px]">{s.mint}</span>
+                                        <span className="text-[9px] text-zinc-500 font-mono truncate">{s.mint}</span>
                                     </div>
 
                                     {/* Amount */}
@@ -165,25 +166,47 @@ export const FullPageRadar = () => {
                                         </span>
                                     </div>
 
-                                    {/* Wallet + Reputation */}
-                                    <div className="col-span-2 flex flex-col items-center gap-1">
-                                        <code className="px-2 py-1 bg-black/50 rounded text-xs text-zinc-400 font-mono">
+                                    {/* Wallet */}
+                                    <div className="col-span-2 text-center">
+                                        <code className="px-1 py-0.5 bg-black/50 rounded text-[10px] text-zinc-400 font-mono">
                                             {s.wallet.slice(0, 4)}...{s.wallet.slice(-4)}
                                         </code>
+                                    </div>
 
-                                        {/* Smart Money Badge */}
-                                        {(s.win_rate || 0) > 50 && (
-                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 text-amber-500 border border-amber-500/30 rounded text-[9px] font-bold uppercase">
-                                                <Trophy className="w-2.5 h-2.5" />
-                                                WR: {s.win_rate?.toFixed(0)}%
+                                    {/* KOL Impact Stats */}
+                                    <div className="col-span-2 flex flex-col items-center gap-1">
+                                        {(s.avg_impact_buyers || 0) > 0 && (
+                                            <div className="flex items-center gap-3 w-full justify-center">
+                                                <div className="flex items-center gap-1 text-[10px] text-purple-400" title="Followers (Unique Buyers)">
+                                                    <Users className="w-3 h-3" />
+                                                    {s.avg_impact_buyers}
+                                                </div>
+                                                <div className="flex items-center gap-1 text-[10px] text-blue-400" title="Volume Impact">
+                                                    <Activity className="w-3 h-3" />
+                                                    {s.avg_impact_volume?.toFixed(1)}◎
+                                                </div>
                                             </div>
                                         )}
-                                        {/* Reputation Badge */}
-                                        {!(s.win_rate && s.win_rate > 50) && (s.reputation_score || 0) > 0 && (
-                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded text-[9px] font-bold uppercase">
-                                                <TrendingUp className="w-2.5 h-2.5" />
-                                                REP: {s.reputation_score}
+                                        {/* Signal Strength Bar */}
+                                        {(s.avg_impact_buyers || 0) > 5 && (
+                                            <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
+                                                    style={{ width: `${Math.min((s.avg_impact_buyers || 0) * 5, 100)}%` }}
+                                                />
                                             </div>
+                                        )}
+                                    </div>
+
+                                    {/* Reputation / Score */}
+                                    <div className="col-span-1 flex justify-center">
+                                        {(s.win_rate || 0) > 50 ? (
+                                            <div className="flex items-center gap-1 text-amber-500" title="Win Rate">
+                                                <Trophy className="w-3 h-3" />
+                                                <span className="text-[10px] font-bold">{s.win_rate?.toFixed(0)}%</span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-[10px] text-zinc-600">-</span>
                                         )}
                                     </div>
 
@@ -194,7 +217,6 @@ export const FullPageRadar = () => {
                                             target="_blank"
                                             rel="noreferrer"
                                             className="inline-flex items-center justify-center p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                                            title="View on Pump.fun"
                                         >
                                             <ArrowUpRight className="w-4 h-4" />
                                         </a>

@@ -15,42 +15,70 @@ const getDB = async () => {
     return db;
 };
 
+const MONITORING_DURATION_MS = 10 * 60 * 1000; // 10 Minutes
+
 /**
  * processTrade
  * Core logic to update "Smart Money" stats based on a new trade.
+ * - Tracks PnL for closed positions
+ * - Tracks Impact (KOL Score) for open positions
  */
 export const processTrade = async (
     mint: string,
     amountSol: number,
     wallet: string,
     isBuy: boolean,
-    timestamp: string
+    timestamp: string,
+    isWhale: boolean // New flag to distinguish Whale Event vs Follower Event
 ) => {
     const database = await getDB();
+    const now = new Date(timestamp).getTime();
 
-    if (isBuy) {
+    // 1. IMPACT ANALYTICS (Check existing open positions for this token)
+    // If ANY whale has an open monitoring window for this token, add this trade to their impact stats
+    const monitoringParams = [mint, new Date().toISOString()];
+    const monitoredPositions = await database.all(
+        `SELECT * FROM positions 
+         WHERE mint = ? 
+         AND status = 'OPEN' 
+         AND monitoring_expires_at > ?`,
+        monitoringParams
+    );
+
+    if (monitoredPositions.length > 0 && isBuy) {
+        for (const pos of monitoredPositions) {
+            // Don't count the whale's own buying as impact
+            if (pos.wallet !== wallet) {
+                await database.run(
+                    `UPDATE positions 
+                     SET impact_volume = impact_volume + ?, impact_buyers = impact_buyers + 1 
+                     WHERE id = ?`,
+                    amountSol, pos.id
+                );
+                console.log(`[Tracker] Impact detected on ${pos.wallet.slice(0, 4)}'s signal: +${amountSol.toFixed(2)} SOL`);
+            }
+        }
+    }
+
+    // 2. WHALE POSITION MANAGEMENT (Only if it's a identified Whale)
+    // Only execute position logic if it's a significant trade (isWhale) OR if we are closing a position
+    if (isBuy && isWhale) {
         // OPEN POSITION
-        // We log a generic 'buy' position. 
-        // Note: Realworld logic needs price-per-token to be exact, but for MVP we track SOL in vs SOL out per token/wallet pair.
+        const expiresAt = new Date(now + MONITORING_DURATION_MS).toISOString();
         await database.run(
-            `INSERT INTO positions (wallet, mint, buy_amount_sol, buy_timestamp, status) 
-             VALUES (?, ?, ?, ?, 'OPEN')`,
-            wallet, mint, amountSol, timestamp
+            `INSERT INTO positions (wallet, mint, buy_amount_sol, buy_timestamp, status, monitoring_expires_at) 
+             VALUES (?, ?, ?, ?, 'OPEN', ?)`,
+            wallet, mint, amountSol, timestamp, expiresAt
         );
-        console.log(`[Tracker] Opened position for ${wallet.slice(0, 4)} on ${mint}`);
-    } else {
+        console.log(`[Tracker] Opened position for ${wallet.slice(0, 4)} on ${mint}. Monitoring impact for 10m.`);
+    } else if (!isBuy) {
         // CLOSE POSITION (FIFO)
-        // Find the oldest OPEN position for this wallet + mint
         const position = await database.get(
             `SELECT * FROM positions WHERE wallet = ? AND mint = ? AND status = 'OPEN' ORDER BY id ASC LIMIT 1`,
             wallet, mint
         );
 
         if (position) {
-            // Calculate PnL
-            // We assume they sold everything from that buy for simplicity in MVP 
-            // OR if sell amount > buy amount, it's a win. 
-
             const buyAmt = position.buy_amount_sol;
             const pnl = amountSol - buyAmt; // Net SOL change
 
@@ -101,12 +129,27 @@ const updateWalletStats = async (wallet: string, pnl: number) => {
     if (score > 100) score = 100;
     if (score < 0) score = 0;
 
-    await database.run(
-        `UPDATE tracked_wallets 
-         SET win_rate = ?, total_profit_sol = ?, total_trades = ?, wins = ?, losses = ?, reputation_score = ?, last_active = ?
-         WHERE address = ?`,
-        winRate, newTotalProfit, newTotalTrades, newWins, newLosses, Math.floor(score), new Date().toISOString(), wallet
+    // IMPACT ANALYTICS AGGREGATION
+    const impactStats = await database.get(
+        `SELECT AVG(impact_volume) as avg_vol, AVG(impact_buyers) as avg_buy 
+         FROM positions WHERE wallet = ?`,
+        wallet
     );
 
-    console.log(`[Tracker] Updated Stats for ${wallet.slice(0, 4)}: Score ${Math.floor(score)} | WR ${winRate.toFixed(1)}%`);
+    const avgImpactVol = impactStats?.avg_vol || 0;
+    const avgImpactBuy = impactStats?.avg_buy || 0;
+
+    // Boost Score for High Impact (KOL Bonus)
+    if (avgImpactBuy > 5) score += 5;
+    if (avgImpactBuy > 20) score += 10;
+    if (score > 100) score = 100;
+
+    await database.run(
+        `UPDATE tracked_wallets 
+         SET win_rate = ?, total_profit_sol = ?, total_trades = ?, wins = ?, losses = ?, reputation_score = ?, avg_impact_volume = ?, avg_impact_buyers = ?, last_active = ?
+         WHERE address = ?`,
+        winRate, newTotalProfit, newTotalTrades, newWins, newLosses, Math.floor(score), avgImpactVol, avgImpactBuy, new Date().toISOString(), wallet
+    );
+
+    console.log(`[Tracker] Updated Stats for ${wallet.slice(0, 4)}: Score ${Math.floor(score)} | Impact ${avgImpactBuy.toFixed(1)} followers`);
 };

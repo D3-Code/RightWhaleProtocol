@@ -59,30 +59,37 @@ export const startRadar = async () => {
             // 2. Trade Alert
             if (event.txType === 'buy' || event.txType === 'sell') {
                 const solAmount = event.solAmount;
-                // Only log WHALE size trades
-                if (solAmount >= WHALE_THRESHOLD_SOL) {
-                    const type = event.txType === 'buy' ? '🟢 BUY' : '🔴 SELL';
+                const isBuy = event.txType === 'buy';
+
+                // Determine if this is a Whale Event (for Visuals/Positions)
+                const isWhale = solAmount >= WHALE_THRESHOLD_SOL;
+
+                // Only log WHALE size trades VISUALLY
+                if (isWhale) {
+                    const type = isBuy ? '🟢 BUY' : '🔴 SELL';
                     console.log(`🐋 [WHALE ALERT] ${type} ${solAmount.toFixed(2)} SOL on ${event.mint}`);
                     console.log(`   Wallet: ${event.traderPublicKey}`);
 
-                    // Log to Database
+                    // Log to Database (Visual Feed)
                     await logWhaleSighting(
                         event.mint,
-                        event.symbol || 'UNKNOWN', // PumpPortal trade events sometimes miss symbol, will default
+                        event.symbol || 'UNKNOWN',
                         solAmount,
                         event.traderPublicKey,
-                        event.txType === 'buy'
-                    );
-
-                    // TRACKER: Process Trade for Smart Money Grading
-                    await processTrade(
-                        event.mint,
-                        solAmount,
-                        event.traderPublicKey,
-                        event.txType === 'buy',
-                        new Date().toISOString()
+                        isBuy
                     );
                 }
+
+                // TRACKER: Process ALL trades for Smart Money Grading & Impact Analytics
+                // (Follower trades contribute to the "Impact" score of open whale positions)
+                await processTrade(
+                    event.mint,
+                    solAmount,
+                    event.traderPublicKey,
+                    isBuy,
+                    new Date().toISOString(),
+                    isWhale
+                );
             }
 
         } catch (e) {

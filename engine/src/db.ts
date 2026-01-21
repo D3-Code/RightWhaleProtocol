@@ -47,6 +47,8 @@ export const initDB = async () => {
                 losses INTEGER DEFAULT 0,
                 avg_hold_time INTEGER DEFAULT 0,
                 reputation_score INTEGER DEFAULT 0,
+                avg_impact_volume REAL DEFAULT 0,
+                avg_impact_buyers INTEGER DEFAULT 0,
                 last_active TEXT
             );
 
@@ -59,7 +61,10 @@ export const initDB = async () => {
                 status TEXT DEFAULT 'OPEN', -- OPEN, CLOSED
                 sell_amount_sol REAL DEFAULT 0,
                 sell_timestamp TEXT,
-                pnl_sol REAL DEFAULT 0
+                pnl_sol REAL DEFAULT 0,
+                impact_volume REAL DEFAULT 0,
+                impact_buyers INTEGER DEFAULT 0,
+                monitoring_expires_at TEXT
             );
         `);
 
@@ -111,7 +116,9 @@ export const getWhaleSightings = async (limit = 20) => {
                 ws.*,
                 tw.win_rate,
                 tw.reputation_score,
-                tw.total_profit_sol
+                tw.total_profit_sol,
+                tw.avg_impact_volume,
+                tw.avg_impact_buyers -- Impact Analytics
             FROM whale_sightings ws
             LEFT JOIN tracked_wallets tw ON ws.wallet = tw.address
             ORDER BY ws.id DESC 
