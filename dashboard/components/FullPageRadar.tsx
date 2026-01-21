@@ -89,7 +89,7 @@ export const FullPageRadar = () => {
                 <div className="flex gap-2">
                     <button className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs text-zinc-300 transition-colors">
                         <Filter className="w-3 h-3" />
-                        <span>Filter: &gt; 1.0 SOL</span>
+                        <span>BUYS ONLY // &gt; 5.0 SOL</span>
                     </button>
                     <button
                         onClick={() => setOnlySmartMoney(!onlySmartMoney)}

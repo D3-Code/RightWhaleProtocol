@@ -10,7 +10,7 @@ import { processTrade } from './tracker';
  */
 
 const WS_URL = 'wss://pumpportal.fun/api/data';
-const WHALE_THRESHOLD_SOL = 1.0;
+const WHALE_THRESHOLD_SOL = 5.0; // Increased from 1.0 for higher quality signals
 
 export const startRadar = async () => {
     // Ensure DB is ready
@@ -64,13 +64,13 @@ export const startRadar = async () => {
                 // Determine if this is a Whale Event (for Visuals/Positions)
                 const isWhale = solAmount >= WHALE_THRESHOLD_SOL;
 
-                // Only log WHALE size trades VISUALLY
-                if (isWhale) {
-                    const type = isBuy ? '🟢 BUY' : '🔴 SELL';
+                // Only log WHALE size trades VISUALLY (BUYS ONLY for cleaner feed)
+                if (isWhale && isBuy) {
+                    const type = '🟢 BUY';
                     console.log(`🐋 [WHALE ALERT] ${type} ${solAmount.toFixed(2)} SOL on ${event.mint}`);
                     console.log(`   Wallet: ${event.traderPublicKey}`);
 
-                    // Log to Database (Visual Feed)
+                    // Log to Database (Visual Feed - BUYS ONLY)
                     await logWhaleSighting(
                         event.mint,
                         event.symbol || 'UNKNOWN',
