@@ -55,7 +55,11 @@ export const RightWhaleRadar = () => {
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span className="text-[9px] text-emerald-500 uppercase tracking-widest font-bold">LIVE FEED</span>
+                    <span className="text-[9px] text-emerald-500 uppercase tracking-widest font-bold hidden md:block">LIVE FEED</span>
+                    <a href="/radar" className="px-2 py-0.5 bg-white/10 hover:bg-white/20 rounded border border-white/10 text-[9px] text-white flex items-center gap-1 transition-colors">
+                        <ExternalLink className="w-2.5 h-2.5" />
+                        EXPAND
+                    </a>
                 </div>
             </div>
 
