@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Droplets, Zap, ShieldCheck, Database, Wallet, Terminal } from "lucide-react";
+import { ArrowRight, Flame, Droplets, Zap, ShieldCheck, Database, Wallet, Terminal, Github } from "lucide-react";
 
 type Reserves = {
     total: number;
@@ -145,6 +145,21 @@ export const ProtocolInfo = () => {
                         <div className="flex flex-col">
                             <span className="text-[6px] text-zinc-500 uppercase font-mono-tech group-hover:text-cyan-500/50 transition-colors">Module E</span>
                             <span className="text-[8px] font-bold text-white tracking-widest uppercase">DEV OPS</span>
+                        </div>
+                    </motion.a>
+
+                    <motion.a
+                        href="https://github.com/D3-Code/RightWhaleBot"
+                        target="_blank"
+                        rel="noreferrer"
+                        whileHover={{ scale: 1.02 }}
+                        className="col-span-2 border border-white/10 bg-zinc-900/40 backdrop-blur-sm p-3 rounded-lg flex flex-row items-center justify-center gap-3 text-center group hover:border-zinc-500/50 transition-all relative overflow-hidden"
+                    >
+                        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-zinc-500/20 group-hover:bg-zinc-500/50 transition-colors" />
+                        <Github className="w-4 h-4 text-zinc-500 group-hover:scale-110 group-hover:text-white transition-all" />
+                        <div className="flex flex-col items-start">
+                            <span className="text-[6px] text-zinc-500 uppercase font-mono-tech group-hover:text-white/50 transition-colors">Open Source</span>
+                            <span className="text-[8px] font-bold text-white tracking-widest uppercase">VIEW CODEBASE</span>
                         </div>
                     </motion.a>
                 </div>
