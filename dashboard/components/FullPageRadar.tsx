@@ -21,8 +21,17 @@ type WhaleSighting = {
     avg_impact_buyers?: number;
 };
 
+type TopWhale = {
+    address: string;
+    reputation_score: number;
+    win_rate: number;
+    total_profit_sol: number;
+    avg_impact_buyers: number;
+};
+
 export const FullPageRadar = () => {
     const [sightings, setSightings] = useState<WhaleSighting[]>([]);
+    const [topWhales, setTopWhales] = useState<TopWhale[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
 
@@ -30,12 +39,19 @@ export const FullPageRadar = () => {
 
     const fetchSightings = async () => {
         try {
-            // Fetch more logs for the full page
+            // Fetch live sightings
             const res = await fetch(`${ENGINE_API}/radar?limit=50&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 setSightings(data);
                 setIsLoading(false);
+            }
+
+            // Fetch top whales
+            const topRes = await fetch(`${ENGINE_API}/radar/leaderboard?limit=5&t=${Date.now()}`);
+            if (topRes.ok) {
+                const topData = await topRes.json();
+                setTopWhales(topData);
             }
         } catch (e) {
             console.error("Radar offline");
@@ -89,7 +105,7 @@ export const FullPageRadar = () => {
                 <div className="flex gap-2">
                     <button className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs text-zinc-300 transition-colors">
                         <Filter className="w-3 h-3" />
-                        <span>BUYS ONLY // &gt; 5.0 SOL</span>
+                        <span>Filter: &gt; 1.0 SOL</span>
                     </button>
                     <button
                         onClick={() => setOnlySmartMoney(!onlySmartMoney)}
@@ -106,6 +122,52 @@ export const FullPageRadar = () => {
                     Displaying last 50 sightings
                 </div>
             </div>
+
+            {/* Top 5 Whales Hero Section */}
+            {topWhales.length > 0 && (
+                <div className="px-6 py-6 border-b border-zinc-800 bg-gradient-to-r from-amber-500/5 to-emerald-500/5">
+                    <div className="flex items-center gap-3 mb-4">
+                        <Trophy className="w-6 h-6 text-amber-500" />
+                        <h2 className="text-xl font-bold text-white uppercase tracking-tight">🔥 Top 5 Whales to Follow</h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                        {topWhales.map((whale, index) => (
+                            <div key={whale.address} className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 hover:border-amber-500/50 transition-all group">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-2xl font-bold text-amber-500">#{index + 1}</span>
+                                    {index === 0 && <span className="text-xl">👑</span>}
+                                </div>
+                                <div className="mb-3">
+                                    <div className="text-xs text-zinc-500 uppercase mb-1">Wallet</div>
+                                    <code className="text-xs text-white font-mono bg-black/30 px-2 py-1 rounded">
+                                        {whale.address.slice(0, 6)}...{whale.address.slice(-4)}
+                                    </code>
+                                </div>
+                                <div className="space-y-2 mb-3">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-zinc-500">Win Rate</span>
+                                        <span className="text-sm font-bold text-emerald-400">{whale.win_rate.toFixed(1)}%</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-zinc-500">Profit</span>
+                                        <span className="text-sm font-bold text-amber-400">+{whale.total_profit_sol.toFixed(1)} SOL</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-zinc-500">Impact</span>
+                                        <span className="text-sm font-bold text-purple-400">{whale.avg_impact_buyers.toFixed(0)} buyers</span>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => navigator.clipboard.writeText(whale.address)}
+                                    className="w-full px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded text-xs font-bold text-amber-400 transition-all"
+                                >
+                                    COPY ADDRESS
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Data Table */}
             <div className="flex-1 overflow-auto p-6 z-10 w-full overflow-x-hidden">
