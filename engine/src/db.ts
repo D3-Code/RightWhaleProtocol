@@ -37,6 +37,30 @@ export const initDB = async () => {
                 isBuy BOOLEAN,
                 timestamp TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS tracked_wallets (
+                address TEXT PRIMARY KEY,
+                win_rate REAL DEFAULT 0,
+                total_profit_sol REAL DEFAULT 0,
+                total_trades INTEGER DEFAULT 0,
+                wins INTEGER DEFAULT 0,
+                losses INTEGER DEFAULT 0,
+                avg_hold_time INTEGER DEFAULT 0,
+                reputation_score INTEGER DEFAULT 0,
+                last_active TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS positions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                wallet TEXT NOT NULL,
+                mint TEXT NOT NULL,
+                buy_amount_sol REAL,
+                buy_timestamp TEXT,
+                status TEXT DEFAULT 'OPEN', -- OPEN, CLOSED
+                sell_amount_sol REAL DEFAULT 0,
+                sell_timestamp TEXT,
+                pnl_sol REAL DEFAULT 0
+            );
         `);
 
         console.log('✅ SQLite Database initialized');
@@ -82,7 +106,17 @@ export const getLogs = async (limit = 50, type?: string) => {
 export const getWhaleSightings = async (limit = 20) => {
     if (!db) return [];
     try {
-        return await db.all('SELECT * FROM whale_sightings ORDER BY id DESC LIMIT ?', limit);
+        return await db.all(`
+            SELECT 
+                ws.*,
+                tw.win_rate,
+                tw.reputation_score,
+                tw.total_profit_sol
+            FROM whale_sightings ws
+            LEFT JOIN tracked_wallets tw ON ws.wallet = tw.address
+            ORDER BY ws.id DESC 
+            LIMIT ?
+        `, limit);
     } catch (error) {
         console.error('Failed to fetch whale sightings:', error);
         return [];

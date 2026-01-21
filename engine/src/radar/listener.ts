@@ -1,5 +1,6 @@
 import WebSocket from 'ws';
 import { initDB, logWhaleSighting } from '../db';
+import { processTrade } from './tracker';
 
 /**
  * RightWhale Radar: Real-Time Listener
@@ -11,7 +12,10 @@ import { initDB, logWhaleSighting } from '../db';
 const WS_URL = 'wss://pumpportal.fun/api/data';
 const WHALE_THRESHOLD_SOL = 1.0;
 
-export const startRadar = () => {
+export const startRadar = async () => {
+    // Ensure DB is ready
+    await initDB();
+
     const ws = new WebSocket(WS_URL);
 
     ws.on('open', () => {
@@ -68,6 +72,15 @@ export const startRadar = () => {
                         solAmount,
                         event.traderPublicKey,
                         event.txType === 'buy'
+                    );
+
+                    // TRACKER: Process Trade for Smart Money Grading
+                    await processTrade(
+                        event.mint,
+                        solAmount,
+                        event.traderPublicKey,
+                        event.txType === 'buy',
+                        new Date().toISOString()
                     );
                 }
             }
