@@ -1,10 +1,10 @@
-import { Telegraf, Context } from 'telegraf';
-import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, Transaction, sendAndConfirmTransaction } from '@solana/web3.js';
+import { createBurnInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { loadWallet } from './wallet';
 import { bot, broadcastToChannel } from './telegram';
 import dotenv from 'dotenv';
 import { claimFees } from './harvester';
-import { getLogs, getVirtualPots } from './db';
+import { getLogs, getVirtualPots, addLog } from './db';
 import { lastAiDecision } from './ai_trader';
 
 dotenv.config();
@@ -45,6 +45,8 @@ export const setupBot = () => {
     };
 
     // 🔒 Security: Middleware to restrict to specific channel/group
+    // COMMENTED OUT FOR DEBUGGING
+    /*
     bot.use(async (ctx, next) => {
         const allowedChannel = 'RightWhaleBotChannel';
         const chat = await ctx.getChat();
@@ -57,6 +59,7 @@ export const setupBot = () => {
         // We aren't actively blocking DMs, just ensuring context awareness if needed.
         return next();
     });
+    */
 
     bot.start(welcomeMessage);
     bot.help(welcomeMessage);
@@ -241,6 +244,103 @@ export const setupBot = () => {
         const pots = await getVirtualPots();
         const lpPot = pots.find(p => p.name === 'lp_pot')?.balance || 0;
         ctx.reply(`💧 *Liquidity Pot Balance*: \`${lpPot.toFixed(4)} SOL\`\n_Saved for future LP Injection deployments._`, { parse_mode: 'Markdown' });
+    });
+
+    bot.command('ping', (ctx) => {
+        ctx.reply('🏓 Pong! Engine is Online.');
+    });
+
+    bot.command('burn', async (ctx) => {
+        // Authenticate (Private Only or Specific Channel usage if needed)
+        const chatId = ctx.chat.id.toString();
+        // You can uncomment strict check:
+        // if (CHANNEL_ID && chatId !== CHANNEL_ID && ctx.chat.type !== 'private') return;
+
+        const args = ctx.message.text.split(' ');
+        if (args.length !== 2) {
+            return ctx.reply('⚠️ Usage: /burn <amount>');
+        }
+
+        const amount = parseFloat(args[1]);
+        if (isNaN(amount) || amount <= 0) {
+            return ctx.reply('⚠️ Invalid amount.');
+        }
+
+        await ctx.reply(`🔥 Initiating Burn of ${amount.toLocaleString()} $RightWhale...`);
+
+        try {
+            const { Connection, PublicKey, Transaction, sendAndConfirmTransaction } = require('@solana/web3.js');
+            const { createBurnInstruction, TOKEN_PROGRAM_ID } = require('@solana/spl-token');
+            const { loadWallet } = require('./wallet');
+            const { addLog } = require('./db');
+
+            const keypair = loadWallet();
+            const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+            const connection = new Connection(rpcUrl, 'confirmed');
+            const mintString = process.env.TOKEN_MINT_ADDRESS;
+
+            if (!mintString || !keypair) {
+                return ctx.reply('❌ Configuration Error: Missing mint or wallet.');
+            }
+
+            const mintPubkey = new PublicKey(mintString);
+            const walletPubkey = keypair.publicKey;
+
+            // Find Token Account
+            // Use same method that worked in check_wallet.ts
+            const accounts = await connection.getParsedTokenAccountsByOwner(walletPubkey, {
+                mint: mintPubkey
+            });
+
+            if (accounts.value.length === 0) {
+                return ctx.reply('❌ No $RightWhale tokens found in Fee Wallet.');
+            }
+
+            // Find account with sufficient balance
+            let tokenAccount = null;
+            let currentBal = 0;
+
+            for (const acc of accounts.value) {
+                const bal = acc.account.data.parsed.info.tokenAmount.uiAmount;
+                if (bal >= amount) {
+                    tokenAccount = new PublicKey(acc.pubkey);
+                    currentBal = bal;
+                    break;
+                }
+            }
+
+            if (!tokenAccount) {
+                const total = accounts.value.reduce((acc: any, curr: any) => acc + curr.account.data.parsed.info.tokenAmount.uiAmount, 0);
+                return ctx.reply(`❌ Insufficient Balance. Have: ${total}, Need: ${amount}`);
+            }
+
+            // Execute Burn
+            // Assuming 6 decimals for Pump.fun
+            const decimals = 6;
+            const burnAmountRaw = BigInt(amount) * BigInt(10 ** decimals); // Use integer math if possible
+
+            // Use Standard Burn Instruction with explicit Program ID if needed, 
+            // but standard createBurnInstruction defaults to TOKEN_PROGRAM_ID which is correct for these accounts
+            const tx = new Transaction().add(
+                createBurnInstruction(
+                    tokenAccount,
+                    mintPubkey,
+                    walletPubkey,
+                    burnAmountRaw
+                )
+            );
+
+            const signature = await sendAndConfirmTransaction(connection, tx, [keypair]);
+
+            await ctx.reply(`✅ *BURN SUCCESSFUL!* 🔥\n\nBurnt: \`${amount.toLocaleString()} $RightWhale\`\n\n[View Tx](https://solscan.io/tx/${signature})`, { parse_mode: 'Markdown', link_preview_options: { is_disabled: true } });
+
+            // Log
+            await addLog('BURN', 0, signature); // 0 amount (special display)
+
+        } catch (e: any) {
+            console.error(e);
+            ctx.reply(`❌ Burn Failed: ${e.message}`);
+        }
     });
 
     bot.command('info', (ctx) => {

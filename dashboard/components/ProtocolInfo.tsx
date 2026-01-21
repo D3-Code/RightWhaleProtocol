@@ -151,6 +151,7 @@ export const ProtocolInfo = () => {
                     <motion.a
                         href="https://github.com/D3-Code/RightWhaleProtocol"
                         target="_blank"
+                        // Link to Public Repository
                         rel="noreferrer"
                         whileHover={{ scale: 1.02 }}
                         className="col-span-2 border border-white/10 bg-zinc-900/40 backdrop-blur-sm p-3 rounded-lg flex flex-row items-center justify-center gap-3 text-center group hover:border-zinc-500/50 transition-all relative overflow-hidden"

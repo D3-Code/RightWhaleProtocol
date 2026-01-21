@@ -65,10 +65,10 @@ export const claimFees = async () => {
         const signature = await connection.sendTransaction(transaction);
 
         console.log(`✅ FEES CLAIMED! Tx: ${signature}`);
-        broadcastToChannel(`🌾 *Fees Harvested!* 🌾\nCollected from Pump.fun.\n[View Tx](https://solscan.io/tx/${signature})`);
+        // broadcastToChannel(`🌾 *Fees Harvested!* 🌾\nCollected from Pump.fun.\n[View Tx](https://solscan.io/tx/${signature})`);
 
         // Log to DB
-        await addLog('FEE_CLAIM', 0, signature); // Amount is unknown until we analyze tx, 0 for now or fetch later
+        // await addLog('FEE_CLAIM', 0, signature); // Silencing per user request to avoid spamming console/bot with every harvest
 
     } catch (error) {
         console.error('❌ Harvester Exception:', error);

@@ -1,12 +1,11 @@
 import { Connection, PublicKey, Transaction, sendAndConfirmTransaction } from '@solana/web3.js';
-import { createBurnInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
+import { createBurnCheckedInstruction, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { loadWallet } from '../wallet';
 import { broadcastToChannel } from '../telegram';
 import { addLog } from '../db';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-// Load .env from engine root (two levels up)
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const TOKEN_MINT_ADDRESS = process.env.TOKEN_MINT_ADDRESS;
@@ -27,7 +26,7 @@ async function run() {
         return;
     }
 
-    const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
+    const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
     const connection = new Connection(rpcUrl, 'confirmed');
 
     try {
@@ -37,37 +36,68 @@ async function run() {
         console.log(`Wallet: ${walletPubkey.toBase58()}`);
         console.log(`Mint: ${mintPubkey.toBase58()}`);
 
-        // Get Associated Token Account
-        const tokenAccount = await getAssociatedTokenAddress(
-            mintPubkey,
-            walletPubkey
-        );
+        let tokenAccount = null;
+        let tokenProgramId = TOKEN_PROGRAM_ID;
+        let foundBalance = 0;
 
-        console.log(`Checking balance for: ${tokenAccount.toBase58()}`);
+        // 1. Check Standard Token Program
+        console.log("Checking Standard Token Program...");
+        let accounts = await connection.getParsedTokenAccountsByOwner(walletPubkey, {
+            programId: TOKEN_PROGRAM_ID
+        });
 
-        try {
-            const balance = await connection.getTokenAccountBalance(tokenAccount);
-            console.log(`Current Balance: ${balance.value.uiAmount} Tokens`);
+        // Filter for mint
+        let match = accounts.value.find(a => a.account.data.parsed.info.mint === TOKEN_MINT_ADDRESS);
 
-            if (!balance.value.uiAmount || balance.value.uiAmount < BURN_AMOUNT) {
-                console.error(`❌ Insufficient balance! Has: ${balance.value.uiAmount}, Needs: ${BURN_AMOUNT}`);
-                return;
+        if (match) {
+            foundBalance = match.account.data.parsed.info.tokenAmount.uiAmount || 0;
+            if (foundBalance >= BURN_AMOUNT) {
+                tokenAccount = match.pubkey;
+                tokenProgramId = TOKEN_PROGRAM_ID;
+                console.log(`✅ Found in Standard Program. Balance: ${foundBalance}`);
             }
-        } catch (e) {
-            console.error('❌ Token account not found or error fetching balance:', e);
+        }
+
+        // 2. Check Token-2022 Program (If not found or insufficient)
+        if (!tokenAccount) {
+            console.log("Checking Token-2022 Program...");
+            accounts = await connection.getParsedTokenAccountsByOwner(walletPubkey, {
+                programId: TOKEN_2022_PROGRAM_ID
+            });
+
+            match = accounts.value.find(a => a.account.data.parsed.info.mint === TOKEN_MINT_ADDRESS);
+
+            if (match) {
+                const bal = match.account.data.parsed.info.tokenAmount.uiAmount || 0;
+                console.log(`✅ Found in Token-2022. Balance: ${bal}`);
+                if (bal >= BURN_AMOUNT) {
+                    tokenAccount = match.pubkey;
+                    tokenProgramId = TOKEN_2022_PROGRAM_ID;
+                    foundBalance = bal;
+                } else {
+                    foundBalance += bal; // Accumulate if split? (Usually only one ATA matters)
+                }
+            }
+        }
+
+        if (!tokenAccount) {
+            console.error(`❌ Insufficient Balance. Found: ${foundBalance}, Need: ${BURN_AMOUNT}`);
             return;
         }
 
+        // Proceed to Burn
         const burnAmountRaw = BigInt(BURN_AMOUNT) * BigInt(10 ** DECIMALS);
-
-        console.log(`Burning ${BURN_AMOUNT.toLocaleString()} Tokens...`);
+        console.log(`🔥 Burning ${BURN_AMOUNT.toLocaleString()} Tokens from ${tokenAccount.toBase58()} using Program ${tokenProgramId.toBase58()}...`);
 
         const tx = new Transaction().add(
-            createBurnInstruction(
+            createBurnCheckedInstruction(
                 tokenAccount,
                 mintPubkey,
                 walletPubkey,
-                burnAmountRaw
+                burnAmountRaw,
+                DECIMALS,
+                [],
+                tokenProgramId
             )
         );
 
@@ -78,7 +108,7 @@ async function run() {
         // Broadcast to Telegram
         await broadcastToChannel(`🔥 *MANUAL BURN EXECUTED* 🔥\nUser burned \`1,000,000 $RightWhale\` from Fee Wallet.\n\n[View Tx](https://solscan.io/tx/${signature})`);
 
-        // Log to DB (0 amount SOL, special marker handled by dashboard)
+        // Log to DB
         await addLog('BURN', 0, signature);
 
     } catch (error) {
