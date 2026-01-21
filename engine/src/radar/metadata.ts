@@ -3,7 +3,7 @@
  * Fetches token images and metadata from Pump.fun API
  */
 
-const PUMP_API = 'https://frontend-api.pump.fun/coins';
+const PUMP_API = 'https://pump.fun/coin';
 
 type TokenMetadata = {
     mint: string;
@@ -21,7 +21,11 @@ export const fetchTokenMetadata = async (mint: string): Promise<TokenMetadata | 
     }
 
     try {
-        const response = await fetch(`${PUMP_API}/${mint}`);
+        const response = await fetch(`${PUMP_API}/${mint}.json`, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0'
+            }
+        });
         if (!response.ok) {
             console.warn(`Failed to fetch metadata for ${mint}: ${response.status}`);
             return null;

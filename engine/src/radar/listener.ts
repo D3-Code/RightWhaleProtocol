@@ -2,6 +2,7 @@ import WebSocket from 'ws';
 import { initDB, logWhaleSighting } from '../db';
 import { processTrade } from './tracker';
 import { fetchTokenMetadata } from './metadata';
+import { registerToken, getTokenSymbol, getTokenName } from './registry';
 
 /**
  * RightWhale Radar: Real-Time Listener
@@ -47,6 +48,9 @@ export const startRadar = async () => {
                 console.log(`   Mint: ${event.mint}`);
                 console.log(`   Dev: ${event.traderPublicKey}`);
 
+                // Register token name/symbol for future lookups
+                registerToken(event.mint, event.name, event.symbol);
+
                 // DYNAMIC DRAGNET: Immediately subscribe to trades for this new token
                 // This allows us to catch the FIRST whales buying in
                 ws.send(JSON.stringify({
@@ -68,13 +72,18 @@ export const startRadar = async () => {
                 // Only log WHALE size trades VISUALLY
                 if (isWhale) {
                     const type = isBuy ? '🟢 BUY' : '🔴 SELL';
-                    console.log(`🐋 [WHALE ALERT] ${type} ${solAmount.toFixed(2)} SOL on ${event.mint}`);
+
+                    // Get token name from registry (from create event)
+                    const tokenName = getTokenName(event.mint);
+                    const tokenSymbol = getTokenSymbol(event.mint);
+
+                    console.log(`🐋 [WHALE ALERT] ${type} ${solAmount.toFixed(2)} SOL on ${tokenName} ($${tokenSymbol})`);
                     console.log(`   Wallet: ${event.traderPublicKey}`);
 
-                    // Fetch token metadata (includes image)
+                    // Fetch token metadata (includes image) - fallback if not in registry
                     const metadata = await fetchTokenMetadata(event.mint);
                     const imageUri = metadata?.image_uri || '';
-                    const symbol = metadata?.symbol || event.symbol || 'UNKNOWN';
+                    const symbol = tokenSymbol !== 'UNKNOWN' ? tokenSymbol : (metadata?.symbol || event.symbol || 'UNKNOWN');
 
                     // Log to Database (Visual Feed)
                     await logWhaleSighting(
