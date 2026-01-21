@@ -149,7 +149,7 @@ export const ProtocolInfo = () => {
                     </motion.a>
 
                     <motion.a
-                        href="https://github.com/D3-Code/RightWhaleBot"
+                        href="https://github.com/D3-Code/RightWhaleProtocol"
                         target="_blank"
                         rel="noreferrer"
                         whileHover={{ scale: 1.02 }}
