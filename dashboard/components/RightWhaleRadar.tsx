@@ -68,6 +68,7 @@ export const RightWhaleRadar = () => {
                 {/* Scanline Effect */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 pointer-events-none bg-[length:100%_2px,3px_100%] opacity-20"></div>
 
+
                 <div className="h-full overflow-y-auto no-scrollbar space-y-1">
                     <AnimatePresence mode="popLayout">
                         {sightings.map((s) => (
@@ -77,42 +78,41 @@ export const RightWhaleRadar = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0 }}
                                 className={`
-                                    grid grid-cols-12 gap-2 items-center p-2 rounded border-l-2
+                                    grid grid-cols-12 gap-2 items-center p-3 rounded-lg border-l-4
                                     ${s.isBuy
-                                        ? 'bg-emerald-500/5 border-emerald-500/50'
-                                        : 'bg-red-500/5 border-red-500/50'
-                                    } group hover:bg-white/5 transition-colors
+                                        ? 'bg-emerald-500/10 border-emerald-500'
+                                        : 'bg-red-500/10 border-red-500'
+                                    } group hover:bg-white/10 transition-all
                                 `}
                             >
-                                {/* Symbol */}
-                                <div className="col-span-3 flex items-center gap-1">
-                                    <Target className={`w-3 h-3 ${s.isBuy ? 'text-emerald-500' : 'text-red-500'}`} />
-                                    <span className="font-bold text-white truncate">{s.symbol || 'UNK'}</span>
+                                {/* BUY/SELL Badge */}
+                                <div className="col-span-3 flex items-center gap-2">
+                                    <div className={`px-2 py-1 rounded-md font-bold text-xs ${s.isBuy
+                                        ? 'bg-emerald-500 text-black'
+                                        : 'bg-red-500 text-white'
+                                        }`}>
+                                        {s.isBuy ? '🟢 BUY' : '🔴 SELL'}
+                                    </div>
                                 </div>
 
-                                {/* Amount */}
-                                <div className="col-span-3 text-right">
-                                    <span className={`font-bold ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}`}>
-                                        {s.amount.toFixed(2)} SOL
+                                {/* Token Symbol - Larger */}
+                                <div className="col-span-5 flex items-center gap-2">
+                                    <Target className="w-4 h-4 text-zinc-400" />
+                                    <span className="font-bold text-white text-base truncate">${s.symbol || 'UNKNOWN'}</span>
+                                </div>
+
+                                {/* Amount - Larger */}
+                                <div className="col-span-4 flex items-center justify-end gap-2">
+                                    <span className={`font-bold text-base ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}`}>
+                                        {s.amount.toFixed(1)} SOL
                                     </span>
-                                </div>
-
-                                {/* Wallet */}
-                                <div className="col-span-4 text-center">
-                                    <span className="text-zinc-500 opacity-70 group-hover:opacity-100">
-                                        {s.wallet.slice(0, 4)}...{s.wallet.slice(-4)}
-                                    </span>
-                                </div>
-
-                                {/* Action */}
-                                <div className="col-span-2 flex justify-end">
                                     <a
                                         href={`https://pump.fun/coin/${s.mint}`}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="p-1 hover:bg-white/20 rounded cursor-pointer transition-colors"
+                                        className="p-1.5 hover:bg-white/20 rounded cursor-pointer transition-colors"
                                     >
-                                        <ExternalLink className="w-3 h-3 text-zinc-400 hover:text-white" />
+                                        <ExternalLink className="w-3.5 h-3.5 text-zinc-400 hover:text-white" />
                                     </a>
                                 </div>
                             </motion.div>
@@ -127,6 +127,6 @@ export const RightWhaleRadar = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
