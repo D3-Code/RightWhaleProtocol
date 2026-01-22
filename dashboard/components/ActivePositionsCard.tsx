@@ -170,7 +170,7 @@ export const ActivePositionsCard = () => {
                                 {/* Impact (Live Flow) */}
                                 <div className="pt-2 border-t border-white/5 flex items-center justify-between">
                                     <div className="text-zinc-600 uppercase text-[8px] font-black tracking-tighter underline decoration-zinc-800 underline-offset-2">Live Impact Flow</div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex flex-col items-end gap-0.5">
                                         {(pos.impact_buyers || 0) > 0 ? (
                                             <>
                                                 <div className="flex items-center gap-1 text-[9px] font-black text-purple-400">

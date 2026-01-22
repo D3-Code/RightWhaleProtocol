@@ -412,13 +412,13 @@ export const FullPageRadar = () => {
                                                     )}
                                                 </div>
                                             ) : (s.avg_impact_buyers || 0) > 0 ? (
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex flex-col gap-0.5">
                                                     <div className="flex items-center gap-1 text-[10px] font-bold text-purple-400/80">
-                                                        <Users className="w-3 h-3" />
+                                                        <Users className="w-2.5 h-2.5" />
                                                         {s.avg_impact_buyers}
                                                     </div>
                                                     <div className="flex items-center gap-1 text-[10px] font-bold text-blue-400/80">
-                                                        <Activity className="w-3 h-3" />
+                                                        <Activity className="w-2.5 h-2.5" />
                                                         {s.avg_impact_volume?.toFixed(1)} SOL
                                                     </div>
                                                 </div>
