@@ -415,3 +415,40 @@ export const getRadarStats = async (hours = 24) => {
         return { total_volume_24h: 0, alerts_count_24h: 0, active_whales_count: 0 };
     }
 };
+
+export const recordPosition = async (wallet: string, mint: string, amountSol: number) => {
+    if (!db) return;
+    try {
+        await db.run(
+            `INSERT INTO positions (wallet, mint, buy_amount_sol, buy_timestamp, status) 
+             VALUES (?, ?, ?, ?, 'OPEN')`,
+            wallet, mint, amountSol, new Date().toISOString()
+        );
+        console.log(`📈 Position Recorded: ${wallet.slice(0, 4)} on ${mint.slice(0, 4)}`);
+    } catch (e) {
+        console.error('Failed to record position:', e);
+    }
+};
+
+export const closePosition = async (wallet: string, mint: string, sellAmountSol: number) => {
+    if (!db) return;
+    try {
+        const position = await db.get(
+            `SELECT * FROM positions WHERE wallet = ? AND mint = ? AND status = 'OPEN' ORDER BY id ASC LIMIT 1`,
+            wallet, mint
+        );
+
+        if (position) {
+            const pnl = sellAmountSol - position.buy_amount_sol;
+            await db.run(
+                `UPDATE positions SET status = 'CLOSED', sell_amount_sol = ?, sell_timestamp = ?, pnl_sol = ? WHERE id = ?`,
+                sellAmountSol, new Date().toISOString(), pnl, position.id
+            );
+            console.log(`📉 Position Closed: ${wallet.slice(0, 4)} | PnL: ${pnl.toFixed(2)} SOL`);
+            return pnl;
+        }
+    } catch (e) {
+        console.error('Failed to close position:', e);
+    }
+    return 0;
+};

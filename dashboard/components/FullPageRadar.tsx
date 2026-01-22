@@ -259,15 +259,23 @@ export const FullPageRadar = () => {
             <div className="sticky top-[85px] flex items-center justify-between px-6 py-3 border-b border-zinc-800 bg-black/60 backdrop-blur-md z-40">
                 <div className="flex gap-2 max-w-[1800px] mx-auto w-full items-center">
                     {/* Search Bar */}
-                    <div className="relative group min-w-[200px]">
+                    <div className="relative group min-w-[200px] flex items-center">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
                         <input
                             type="text"
                             placeholder="SEARCH SYMBOL / MINT..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-white/5 border border-white/10 rounded py-1.5 pl-9 pr-3 text-[10px] font-bold text-white uppercase placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all w-full"
+                            className="bg-white/5 border border-white/10 rounded py-1.5 pl-9 pr-8 text-[10px] font-bold text-white uppercase placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/50 focus:bg-white/10 transition-all w-full"
                         />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery("")}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-white/10 rounded-full transition-colors"
+                            >
+                                <X className="w-3 h-3 text-zinc-500 hover:text-white" />
+                            </button>
+                        )}
                     </div>
 
                     <div className="w-px h-6 bg-zinc-800 mx-2" />
@@ -335,7 +343,7 @@ export const FullPageRadar = () => {
             <main className="flex-1 w-full max-w-[1800px] mx-auto p-6 z-10">
 
                 {/* Global Stats Strip */}
-                <div className="grid grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-5 gap-4 mb-6">
                     <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 flex flex-col group hover:border-emerald-500/30 transition-all">
                         <div className="flex items-center gap-2 mb-2 text-zinc-500 group-hover:text-emerald-500 transition-colors">
                             <TrendingUp className="w-4 h-4" />
@@ -356,6 +364,13 @@ export const FullPageRadar = () => {
                             <span className="text-[10px] font-black uppercase tracking-widest">ACTIVE ELITE WHALES</span>
                         </div>
                         <div className="text-2xl font-black text-white">{radarStats.active_whales_count} <span className="text-sm text-zinc-500">UNIQUE WALLETS</span></div>
+                    </div>
+                    <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 flex flex-col group hover:border-amber-500/30 transition-all">
+                        <div className="flex items-center gap-2 mb-2 text-zinc-500 group-hover:text-amber-500 transition-colors">
+                            <Target className="w-4 h-4" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">SOL PRICE</span>
+                        </div>
+                        <div className="text-2xl font-black text-white">${solPrice.toFixed(2)} <span className="text-sm text-zinc-500">USD</span></div>
                     </div>
                     <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 flex flex-col group hover:border-purple-500/30 transition-all">
                         <div className="flex items-center gap-2 mb-2 text-zinc-500 group-hover:text-purple-500 transition-colors">
@@ -452,7 +467,12 @@ export const FullPageRadar = () => {
                                         </div>
 
                                         <div className="col-span-3 flex items-center gap-3 min-w-0">
-                                            <div className="relative shrink-0">
+                                            <a
+                                                href={`https://dexscreener.com/solana/${s.mint}`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="relative shrink-0 hover:scale-110 transition-transform cursor-pointer"
+                                            >
                                                 {s.image_uri ? (
                                                     <img
                                                         src={s.image_uri}
@@ -464,9 +484,16 @@ export const FullPageRadar = () => {
                                                 <div className={`w-7 h-7 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800 ${s.image_uri ? 'hidden' : ''}`}>
                                                     <Target className="w-3.5 h-3.5 text-zinc-600" />
                                                 </div>
-                                            </div>
+                                            </a>
                                             <div className="flex flex-col min-w-0">
-                                                <span className="text-[13px] font-black text-white truncate uppercase tracking-tight">{s.symbol || '---'}</span>
+                                                <a
+                                                    href={`https://dexscreener.com/solana/${s.mint}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-[13px] font-black text-white truncate uppercase tracking-tight hover:text-emerald-400 transition-colors"
+                                                >
+                                                    {s.symbol || '---'}
+                                                </a>
                                                 <span className="text-[8px] text-zinc-600 font-mono truncate max-w-[80px]">
                                                     {s.market_cap ? `$${Math.round((s.market_cap * solPrice) / 1000)}k MC` : `${s.mint.slice(0, 4)}...${s.mint.slice(-4)}`}
                                                 </span>
