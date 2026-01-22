@@ -23,16 +23,14 @@ export const TopWhaleTokensCard = () => {
 
     const fetchTopTokens = async () => {
         try {
-            // Only show loading on initial load or filter change, not periodic refresh
-            // setIsLoading(true); 
             const res = await fetch(`${ENGINE_API}/radar/top-tokens?limit=10&hours=24&verifiedOnly=true&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 setTokens(data);
-                setIsLoading(false);
             }
         } catch (e) {
             console.error("Failed to fetch top tokens");
+        } finally {
             setIsLoading(false);
         }
     };
@@ -54,15 +52,16 @@ export const TopWhaleTokensCard = () => {
                     <div className="flex items-center gap-2">
                         <Flame className="w-4 h-4 text-orange-500" />
                         <h3 className="text-sm font-bold text-white uppercase tracking-tight">Top Whale Tokens</h3>
-                        <div className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
-                            <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>
-                            <span className="text-[8px] font-black text-emerald-500 uppercase tracking-tighter">Elite Consensus</span>
+                        <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+                                <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>
+                                <span className="text-[8px] font-black text-emerald-500 uppercase tracking-tighter">Elite Consensus</span>
+                            </div>
+                            <div className="px-1.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded-md">
+                                <span className="text-[8px] font-black text-orange-500 uppercase tracking-tighter">24H</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Filters Row */}
-                <div className="flex items-center justify-between gap-2 mt-1">
                 </div>
             </div>
 

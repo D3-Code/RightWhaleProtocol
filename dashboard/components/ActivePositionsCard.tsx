@@ -60,10 +60,10 @@ export const ActivePositionsCard = () => {
             if (res.ok) {
                 const data = await res.json();
                 setPositions(data);
-                setIsLoading(false);
             }
         } catch (e) {
             console.error("Failed to fetch positions");
+        } finally {
             setIsLoading(false);
         }
     };
