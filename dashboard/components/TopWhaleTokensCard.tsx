@@ -23,7 +23,7 @@ export const TopWhaleTokensCard = () => {
 
     const fetchTopTokens = async () => {
         try {
-            const res = await fetch(`${ENGINE_API}/radar/top-tokens?limit=10&hours=24&verifiedOnly=true&t=${Date.now()}`);
+            const res = await fetch(`${ENGINE_API}/radar/top-tokens?limit=10&hours=24&verifiedOnly=false&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 setTokens(data);
