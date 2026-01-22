@@ -13,6 +13,7 @@ import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets, getO
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
+import { calculateSignalScore } from './radar/scoring';
 import { startMarketMonitor } from './market';
 import { lastAiDecision } from './ai_trader';
 
@@ -93,7 +94,11 @@ app.get('/radar', async (req, res) => {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
         const verifiedOnly = req.query.verifiedOnly === 'true';
         const sightings = await getWhaleSightings(limit, verifiedOnly);
-        res.json(sightings);
+        const scoredSightings = sightings.map((s: any) => ({
+            ...s,
+            signal: calculateSignalScore(s.reputation_score || 0, s.amount || 0, s.whale_consensus || 1)
+        }));
+        res.json(scoredSightings);
     } catch (err) {
         res.status(500).send('Error fetching radar data');
     }
@@ -113,7 +118,11 @@ app.get('/radar/positions', async (req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
         const positions = await getOpenPositions(limit);
-        res.json(positions);
+        const scoredPositions = positions.map((p: any) => ({
+            ...p,
+            signal: calculateSignalScore(p.reputation_score || 0, p.buy_amount_sol || 0, p.whale_consensus || 1)
+        }));
+        res.json(scoredPositions);
     } catch (err) {
         res.status(500).send('Error fetching positions');
     }

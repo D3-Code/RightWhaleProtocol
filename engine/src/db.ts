@@ -123,7 +123,8 @@ export const getWhaleSightings = async (limit = 20, verifiedOnly = false) => {
                 tw.avg_impact_volume,
                 tw.avg_impact_buyers,
                 tw.wallet_name,
-                tw.twitter_handle
+                tw.twitter_handle,
+                (SELECT COUNT(DISTINCT wallet) FROM whale_sightings WHERE mint = ws.mint AND isBuy = 1) as whale_consensus
             FROM whale_sightings ws
             LEFT JOIN tracked_wallets tw ON ws.wallet = tw.address
         `;
@@ -172,7 +173,8 @@ export const getOpenPositions = async (limit = 20) => {
                 tw.twitter_handle,
                 tw.reputation_score,
                 tw.win_rate,
-                (julianday('now') - julianday(p.buy_timestamp)) * 24 * 60 AS hold_minutes
+                (julianday('now') - julianday(p.buy_timestamp)) * 24 * 60 AS hold_minutes,
+                (SELECT COUNT(DISTINCT wallet) FROM whale_sightings WHERE mint = p.mint AND isBuy = 1) as whale_consensus
             FROM positions p
             LEFT JOIN tracked_wallets tw ON p.wallet = tw.address
             LEFT JOIN (

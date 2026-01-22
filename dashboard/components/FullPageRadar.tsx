@@ -19,17 +19,24 @@ type WhaleSighting = {
     win_rate?: number;
     reputation_score?: number;
     total_profit_sol?: number;
+    wallet_name?: string;
+    twitter_handle?: string;
     // Impact Stats (KOL Effect)
     avg_impact_volume?: number;
     avg_impact_buyers?: number;
+    signal?: {
+        score: number;
+        grade: string;
+    };
 };
 
 type TopWhale = {
     address: string;
-    reputation_score: number;
-    win_rate: number;
-    total_profit_sol: number;
-    avg_impact_buyers: number;
+    reputation_score?: number;
+    win_rate?: number;
+    total_profit_sol?: number;
+    avg_impact_volume?: number;
+    avg_impact_buyers?: number;
     wallet_name?: string;
     twitter_handle?: string;
 };
@@ -40,8 +47,32 @@ export const FullPageRadar = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
     const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
+    const [lastAlertId, setLastAlertId] = useState<number | null>(null);
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
+
+    const playAlert = (grade: string) => {
+        try {
+            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            // Higher pitch for S-grade
+            osc.frequency.setValueAtTime(grade === 'S' ? 880 : 440, ctx.currentTime);
+            osc.type = 'sine';
+
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 0.5);
+        } catch (e) {
+            console.error("Audio alert failed", e);
+        }
+    };
 
     const fetchSightings = async () => {
         try {
@@ -51,6 +82,18 @@ export const FullPageRadar = () => {
                 const data = await res.json();
                 setSightings(data);
                 setIsLoading(false);
+
+                // Check for high-signal alerts
+                if (data.length > 0) {
+                    const topSighting = data[0];
+                    if (topSighting.id !== lastAlertId) {
+                        const grade = topSighting.signal?.grade;
+                        if (grade === 'S' || grade === 'A') {
+                            playAlert(grade);
+                        }
+                        setLastAlertId(topSighting.id);
+                    }
+                }
             }
 
             // Fetch top whales
@@ -133,6 +176,14 @@ export const FullPageRadar = () => {
                         <span>{verifiedOnly ? '🏆' : '👁️'}</span>
                         <span>VERIFIED ONLY</span>
                     </button>
+                    <div className="h-4 w-[1px] bg-zinc-800 mx-1"></div>
+                    <div className="flex items-center gap-2 text-[10px] text-zinc-500 font-bold">
+                        GRADE SCALE:
+                        <span className="text-fuchsia-400">S</span>
+                        <span className="text-emerald-400">A</span>
+                        <span className="text-blue-400">B</span>
+                        <span className="text-yellow-400">C</span>
+                    </div>
                 </div>
                 <div className="text-[10px] text-zinc-600 uppercase tracking-widest">
                     Displaying last 50 sightings
@@ -168,15 +219,15 @@ export const FullPageRadar = () => {
                                 <div className="space-y-2 mb-3">
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs text-zinc-500">Win Rate</span>
-                                        <span className="text-sm font-bold text-emerald-400">{whale.win_rate.toFixed(1)}%</span>
+                                        <span className="text-sm font-bold text-emerald-400">{whale.win_rate?.toFixed(1)}%</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs text-zinc-500">Profit</span>
-                                        <span className="text-sm font-bold text-amber-400">+{whale.total_profit_sol.toFixed(1)} SOL</span>
+                                        <span className="text-sm font-bold text-amber-400">+{whale.total_profit_sol?.toFixed(1)} SOL</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs text-zinc-500">Impact</span>
-                                        <span className="text-sm font-bold text-purple-400">{whale.avg_impact_buyers.toFixed(0)} buyers</span>
+                                        <span className="text-sm font-bold text-purple-400">{whale.avg_impact_buyers?.toFixed(0)} buyers</span>
                                     </div>
                                 </div>
                                 <button
@@ -209,10 +260,11 @@ export const FullPageRadar = () => {
                                 <div className="col-span-1">Time</div>
                                 <div className="col-span-1">Type</div>
                                 <div className="col-span-2">Token</div>
-                                <div className="col-span-2 text-right">Amount</div>
-                                <div className="col-span-2 text-center">Wallet</div>
-                                <div className="col-span-2 text-center">KOL Impact (10m)</div>
+                                <div className="col-span-1">Amount</div>
+                                <div className="col-span-2">Wallet</div>
+                                <div className="col-span-2">KOL Impact (10m)</div>
                                 <div className="col-span-1 text-center">Score</div>
+                                <div className="col-span-1 text-center">Grade</div>
                                 <div className="col-span-1 text-right">Action</div>
                             </div>
 
@@ -268,16 +320,16 @@ export const FullPageRadar = () => {
                                             </div>
 
                                             {/* Amount */}
-                                            <div className="col-span-2 text-right">
+                                            <div className="col-span-1">
                                                 <span className={`text-sm font-bold ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                    {s.amount.toFixed(2)} SOL
+                                                    {s.amount.toFixed(2)}
                                                 </span>
                                             </div>
 
                                             {/* Wallet */}
-                                            <div className="col-span-2 text-center">
-                                                <code className="px-1 py-0.5 bg-black/50 rounded text-[10px] text-zinc-400 font-mono">
-                                                    {s.wallet.slice(0, 4)}...{s.wallet.slice(-4)}
+                                            <div className="col-span-2">
+                                                <code className="px-1 py-0.5 bg-black/50 rounded text-[9px] text-zinc-400 font-mono truncate block">
+                                                    {s.wallet_name || s.wallet.slice(0, 4) + '...' + s.wallet.slice(-4)}
                                                 </code>
                                             </div>
 
@@ -306,16 +358,23 @@ export const FullPageRadar = () => {
                                                 )}
                                             </div>
 
-                                            {/* Reputation / Score */}
+                                            {/* Signal Score */}
+                                            <div className="col-span-1 text-center font-bold text-zinc-400">
+                                                {s.signal?.score || 0}%
+                                            </div>
+
+                                            {/* Signal Grade */}
                                             <div className="col-span-1 flex justify-center">
-                                                {(s.win_rate || 0) > 50 ? (
-                                                    <div className="flex items-center gap-1 text-amber-500" title="Win Rate">
-                                                        <Trophy className="w-3 h-3" />
-                                                        <span className="text-[10px] font-bold">{s.win_rate?.toFixed(0)}%</span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-[10px] text-zinc-600">-</span>
-                                                )}
+                                                <div className={`
+                                                    w-6 h-6 rounded flex items-center justify-center font-black text-xs
+                                                    ${s.signal?.grade === 'S' ? 'bg-fuchsia-500/20 text-fuchsia-400 border border-fuchsia-500/50 shadow-[0_0_10px_rgba(217,70,239,0.3)]' :
+                                                        s.signal?.grade === 'A' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50' :
+                                                            s.signal?.grade === 'B' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' :
+                                                                s.signal?.grade === 'C' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' :
+                                                                    'bg-zinc-800 text-zinc-500'}
+                                                `}>
+                                                    {s.signal?.grade || 'D'}
+                                                </div>
                                             </div>
 
                                             {/* Action */}
