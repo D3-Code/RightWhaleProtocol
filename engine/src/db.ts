@@ -167,6 +167,7 @@ export const getOpenPositions = async (limit = 20) => {
         return await db.all(`
             SELECT 
                 p.*,
+                ws.symbol,
                 tw.wallet_name,
                 tw.twitter_handle,
                 tw.reputation_score,
@@ -174,6 +175,11 @@ export const getOpenPositions = async (limit = 20) => {
                 (julianday('now') - julianday(p.buy_timestamp)) * 24 * 60 AS hold_minutes
             FROM positions p
             LEFT JOIN tracked_wallets tw ON p.wallet = tw.address
+            LEFT JOIN (
+                SELECT DISTINCT mint, symbol 
+                FROM whale_sightings 
+                WHERE symbol IS NOT NULL AND symbol != 'UNKNOWN'
+            ) ws ON p.mint = ws.mint
             WHERE p.status = 'OPEN'
             ORDER BY p.buy_timestamp DESC
             LIMIT ?
