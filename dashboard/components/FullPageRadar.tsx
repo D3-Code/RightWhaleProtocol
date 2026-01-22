@@ -193,36 +193,34 @@ export const FullPageRadar = () => {
             <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,255,127,0.03),rgba(0,0,0,0))] z-0 pointer-events-none bg-[length:100%_4px,50px_100%]"></div>
 
             {/* Header */}
-            <header className="sticky top-0 w-full flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-lg z-50">
-                <div className="flex items-center gap-4">
-                    <div className="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-                        <Radar className="w-6 h-6 text-emerald-500 animate-spin-slow" />
+            <header className="sticky top-0 w-full flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-black/90 backdrop-blur-lg z-50">
+                <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-zinc-900 rounded-lg border border-zinc-800">
+                        <Radar className="w-5 h-5 text-zinc-500" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold tracking-tighter uppercase text-white flex items-center gap-2">
-                            RightWhale <span className="text-emerald-500">WRAS</span>
+                        <h1 className="text-lg font-bold tracking-tighter uppercase text-white flex items-center gap-2">
+                            RightWhale <span className="text-zinc-600">WRAS</span>
                         </h1>
-                        <p className="text-xs text-zinc-500 tracking-widest uppercase">Whale Report Alert System // Live Intelligence Feed</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/5 border border-emerald-500/20 rounded-full">
+                <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
                         <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-20"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-600"></span>
                         </span>
-                        <span className="text-xs font-bold text-emerald-500">REALTIME FEED</span>
+                        <span className="text-[10px] font-bold text-zinc-600 tracking-widest">LIVE</span>
                     </div>
                     <div className="text-right hidden md:block">
-                        <p className="text-xs text-zinc-500">SYSTEM TIME</p>
-                        <p className="text-sm font-bold text-zinc-300">{new Date().toLocaleTimeString()}</p>
+                        <p className="text-[10px] font-mono text-zinc-600">{new Date().toLocaleTimeString()}</p>
                     </div>
                 </div>
             </header>
 
             {/* Toolbar */}
-            <div className="sticky top-[85px] flex items-center justify-between px-6 py-3 border-b border-zinc-800 bg-black/60 backdrop-blur-md z-40">
+            <div className="sticky top-[69px] flex items-center justify-between px-6 py-3 border-b border-zinc-800 bg-black/60 backdrop-blur-md z-40">
                 <div className="flex gap-2 max-w-[1800px] mx-auto w-full items-center">
                     <button className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs text-zinc-300 transition-colors">
                         <Filter className="w-3 h-3" />
