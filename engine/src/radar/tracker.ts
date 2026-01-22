@@ -1,6 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { open, Database } from 'sqlite';
 import path from 'path';
+import { flagTokenRugged } from '../db';
 
 let db: Database | null = null;
 const DB_PATH = path.join(__dirname, '../../database.sqlite');
@@ -60,8 +61,16 @@ export const processTrade = async (
         }
     }
 
-    // 2. WHALE POSITION MANAGEMENT (Only if it's a identified Whale)
-    // Only execute position logic if it's a significant trade (isWhale) OR if we are closing a position
+    // 2. WHALE & DEV MANAGEMENT
+    // Check if this wallet is the developer
+    const creator = await database.get('SELECT creator_wallet FROM token_creators WHERE mint = ?', mint);
+    const isDev = creator && creator.creator_wallet === wallet;
+
+    // DEV RUG PROTECTION: If dev sells > 1 SOL, flag token as rugged
+    if (isDev && !isBuy && amountSol >= 1.0) {
+        await flagTokenRugged(mint);
+    }
+
     if (isBuy && isWhale) {
         // OPEN POSITION
         const expiresAt = new Date(now + MONITORING_DURATION_MS).toISOString();
@@ -82,15 +91,20 @@ export const processTrade = async (
             const buyAmt = position.buy_amount_sol;
             const pnl = amountSol - buyAmt; // Net SOL change
 
+            // CHURN DETECTION: If hold time < 2 minutes, it's a "Churn" (bad behavior)
+            const holdMs = now - new Date(position.buy_timestamp).getTime();
+            const holdMinutes = holdMs / (1000 * 60);
+            const isChurn = holdMinutes < 2.0;
+
             await database.run(
                 `UPDATE positions SET status = 'CLOSED', sell_amount_sol = ?, sell_timestamp = ?, pnl_sol = ? WHERE id = ?`,
                 amountSol, timestamp, pnl, position.id
             );
 
-            console.log(`[Tracker] Closed position. PnL: ${pnl.toFixed(2)} SOL`);
+            console.log(`[Tracker] Closed position. PnL: ${pnl.toFixed(2)} SOL ${isChurn ? '[CHURN!]' : ''}`);
 
-            // UPDATE WALLET SCORE
-            await updateWalletStats(wallet, pnl);
+            // UPDATE WALLET SCORE (with churn penalty if applicable)
+            await updateWalletStats(wallet, pnl, isChurn);
         } else {
             // Sold without a tracked buy? Maybe they bought before we started listening.
             // Ignore for PnL tracking to avoid skewed data.
@@ -99,7 +113,7 @@ export const processTrade = async (
     }
 };
 
-const updateWalletStats = async (wallet: string, pnl: number) => {
+const updateWalletStats = async (wallet: string, pnl: number, isChurn = false) => {
     const database = await getDB();
 
     // Get current stats or init
@@ -121,11 +135,17 @@ const updateWalletStats = async (wallet: string, pnl: number) => {
 
     const winRate = (newWins / newTotalTrades) * 100;
 
-    // Reputation Score Algorithm (Simple v1)
+    // Reputation Score Algorithm (v2)
     // Base 50
     // +10 for every 10 SOL profit (capped at 50)
     // + WinRate * 0.5
+    // - 10 if isChurn (Scalper Penalty)
     let score = 50 + Math.min(newTotalProfit * 1, 30) + (winRate * 0.2);
+    if (isChurn) {
+        score -= 10;
+        console.log(`[Tracker] Penalty applied to ${wallet.slice(0, 4)} for Churn behavior: -10 Reputation`);
+    }
+
     if (score > 100) score = 100;
     if (score < 0) score = 0;
 

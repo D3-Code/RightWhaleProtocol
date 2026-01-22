@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { initDB, logWhaleSighting } from '../db';
+import { initDB, logWhaleSighting, registerTokenCreator } from '../db';
 import { processTrade } from './tracker';
 import { fetchTokenMetadata } from './metadata';
 import { registerToken, getTokenSymbol, getTokenName } from './registry';
@@ -50,6 +50,7 @@ export const startRadar = async () => {
 
                 // Register token name/symbol for future lookups
                 registerToken(event.mint, event.name, event.symbol);
+                await registerTokenCreator(event.mint, event.traderPublicKey);
 
                 // DYNAMIC DRAGNET: Immediately subscribe to trades for this new token
                 // This allows us to catch the FIRST whales buying in

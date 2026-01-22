@@ -11,6 +11,7 @@ type WhaleSighting = {
     mint: string;
     symbol: string;
     image_uri?: string;
+    is_dev?: boolean;
     amount: number;
     token_amount?: number;
     wallet: string;
@@ -300,10 +301,13 @@ export const FullPageRadar = () => {
                                         </div>
 
                                         <div className="col-span-2 flex items-center gap-2 min-w-0">
-                                            <div className="truncate flex-1">
+                                            <div className="truncate flex-1 flex items-center gap-1.5">
                                                 <span className="text-[11px] font-bold text-zinc-400 truncate block">
                                                     {s.wallet_name || `${s.wallet.slice(0, 4)}...${s.wallet.slice(-4)}`}
                                                 </span>
+                                                {s.is_dev && (
+                                                    <span className="px-1 py-0.5 bg-red-500/10 border border-red-500/20 rounded text-[8px] font-black text-red-500 uppercase tracking-tighter shrink-0">DEV</span>
+                                                )}
                                             </div>
                                             {(s.reputation_score || 0) >= 60 && (
                                                 <Trophy className="w-3.5 h-3.5 text-amber-500/80 shrink-0" />
@@ -377,7 +381,7 @@ export const FullPageRadar = () => {
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 };

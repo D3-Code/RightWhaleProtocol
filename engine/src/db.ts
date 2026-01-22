@@ -27,19 +27,35 @@ export const initDB = async () => {
 
             INSERT OR IGNORE INTO virtual_pots (name, balance) VALUES ('burn_pot', 0);
             INSERT OR IGNORE INTO virtual_pots (name, balance) VALUES ('lp_pot', 0);
+        `);
 
+        // Whale Sightings (Historical Feed)
+        await db.exec(`
             CREATE TABLE IF NOT EXISTS whale_sightings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 mint TEXT NOT NULL,
                 symbol TEXT,
-                image_uri TEXT,
                 amount REAL,
                 token_amount REAL,
                 wallet TEXT NOT NULL,
                 isBuy BOOLEAN,
-                timestamp TEXT NOT NULL
-            );
+                timestamp TEXT NOT NULL,
+                image_uri TEXT,
+                is_dev BOOLEAN DEFAULT 0
+            )
+        `);
 
+        // Token Creators Cache
+        await db.exec(`
+            CREATE TABLE IF NOT EXISTS token_creators (
+                mint TEXT PRIMARY KEY,
+                creator_wallet TEXT NOT NULL,
+                is_rugged BOOLEAN DEFAULT 0,
+                created_at TEXT NOT NULL
+            )
+        `);
+
+        await db.exec(`
             CREATE TABLE IF NOT EXISTS tracked_wallets (
                 address TEXT PRIMARY KEY,
                 win_rate REAL DEFAULT 0,
@@ -93,13 +109,39 @@ export const addLog = async (type: string, amount: number, txHash?: string) => {
 export const logWhaleSighting = async (mint: string, symbol: string, imageUri: string, amount: number, tokenAmount: number, wallet: string, isBuy: boolean) => {
     if (!db) return;
     try {
+        // Check if this wallet is the developer
+        const creator = await db.get('SELECT creator_wallet FROM token_creators WHERE mint = ?', mint);
+        const isDev = creator && creator.creator_wallet === wallet;
+
         await db.run(
-            'INSERT INTO whale_sightings (mint, symbol, image_uri, amount, token_amount, wallet, isBuy, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            mint, symbol, imageUri, amount, tokenAmount, wallet, isBuy, new Date().toISOString()
+            'INSERT INTO whale_sightings (mint, symbol, image_uri, amount, token_amount, wallet, isBuy, timestamp, is_dev) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            mint, symbol, imageUri, amount, tokenAmount, wallet, isBuy, new Date().toISOString(), isDev ? 1 : 0
         );
-        console.log(`🐋 DB Logged: Whale on ${symbol}`);
+        console.log(`🐋 DB Logged: Whale on ${symbol} ${isDev ? '(DEV)' : ''}`);
     } catch (error) {
         console.error('Failed to log whale sighting:', error);
+    }
+};
+
+export const registerTokenCreator = async (mint: string, creatorWallet: string) => {
+    if (!db) return;
+    try {
+        await db.run(
+            'INSERT OR IGNORE INTO token_creators (mint, creator_wallet, created_at) VALUES (?, ?, ?)',
+            mint, creatorWallet, new Date().toISOString()
+        );
+    } catch (e) {
+        console.error('Failed to register creator');
+    }
+};
+
+export const flagTokenRugged = async (mint: string) => {
+    if (!db) return;
+    try {
+        await db.run('UPDATE token_creators SET is_rugged = 1 WHERE mint = ?', mint);
+        console.log(`🚨 TOKEN FLAGGED AS RUGGED: ${mint}`);
+    } catch (e) {
+        console.error('Failed to flag rug');
     }
 };
 
@@ -111,36 +153,26 @@ export const getLogs = async (limit = 50, type?: string) => {
     return await db.all('SELECT * FROM activity_logs ORDER BY id DESC LIMIT ?', limit);
 };
 
-export const getWhaleSightings = async (limit = 20, verifiedOnly = false) => {
+export const getWhaleSightings = async (limit = 50, verifiedOnly = false) => {
     if (!db) return [];
     try {
-        let query = `
+        const query = `
             SELECT 
                 ws.*,
-                tw.win_rate,
-                tw.reputation_score,
-                tw.total_profit_sol,
-                tw.total_trades,
-                tw.avg_impact_volume,
-                tw.avg_impact_buyers,
                 tw.wallet_name,
                 tw.twitter_handle,
+                tw.reputation_score,
+                tw.total_trades,
+                COALESCE(tc.is_rugged, 0) as is_rugged,
                 (SELECT COUNT(DISTINCT wallet) FROM whale_sightings WHERE mint = ws.mint AND isBuy = 1) as whale_consensus
             FROM whale_sightings ws
             LEFT JOIN tracked_wallets tw ON ws.wallet = tw.address
+            LEFT JOIN token_creators tc ON ws.mint = tc.mint
+            WHERE (tc.is_rugged = 0 OR tc.is_rugged IS NULL) -- Hide rugged tokens by default in radar
+            ${verifiedOnly ? 'AND tw.reputation_score >= 60' : ''}
+            ORDER BY ws.id DESC
+            LIMIT ?
         `;
-
-        // Add quality filter if requested
-        if (verifiedOnly) {
-            query += `
-                WHERE tw.reputation_score >= 60 
-                AND tw.win_rate >= 55 
-                AND tw.total_trades >= 3
-            `;
-        }
-
-        query += ` ORDER BY ws.id DESC LIMIT ?`;
-
         return await db.all(query, limit);
     } catch (error) {
         console.error('Failed to fetch whale sightings:', error);
@@ -202,16 +234,19 @@ export const getTopWhaleTokens = async (limit = 10, timeframeHours = 24, verifie
                 ws.symbol,
                 COUNT(DISTINCT ws.wallet) as whale_count,
                 SUM(ws.amount) as total_volume_sol,
+                SUM(COALESCE(tw.reputation_score, 50)) as elite_consensus_score,
                 MAX(ws.timestamp) as last_buy
             FROM whale_sightings ws
-            ${verifiedOnly ? 'INNER JOIN tracked_wallets tw ON ws.wallet = tw.address' : ''}
+            LEFT JOIN tracked_wallets tw ON ws.wallet = tw.address
+            LEFT JOIN token_creators tc ON ws.mint = tc.mint
             WHERE ws.isBuy = 1
             AND datetime(ws.timestamp) >= datetime('now', '-' || ? || ' hours')
+            AND (tc.is_rugged = 0 OR tc.is_rugged IS NULL)
             AND ws.symbol IS NOT NULL 
             AND ws.symbol != 'UNKNOWN'
             ${verifiedOnly ? 'AND tw.reputation_score >= 60' : ''}
             GROUP BY ws.mint, ws.symbol
-            ORDER BY whale_count DESC, total_volume_sol DESC
+            ORDER BY elite_consensus_score DESC, total_volume_sol DESC
             LIMIT ?
         `;
         return await db.all(query, timeframeHours, limit);
