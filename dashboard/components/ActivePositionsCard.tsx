@@ -155,7 +155,7 @@ export const ActivePositionsCard = () => {
                                 <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-white/5">
                                     <div>
                                         <div className="text-zinc-600 uppercase text-[8px] font-black mb-0.5 tracking-tighter">Position Size</div>
-                                        <div className="font-black text-zinc-300 text-[11px]">{pos.buy_amount_sol.toFixed(2)}◎</div>
+                                        <div className="font-black text-zinc-300 text-[11px]">{pos.buy_amount_sol.toFixed(2)} SOL</div>
                                     </div>
                                     <div>
                                         <div className="text-zinc-600 uppercase text-[8px] font-black mb-0.5 tracking-tighter">Time Held</div>

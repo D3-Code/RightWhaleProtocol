@@ -212,7 +212,7 @@ export const FullPageRadar = () => {
                                         </div>
                                         <div className="flex gap-3 text-[9px] font-bold">
                                             <span className="text-emerald-500">{whale.win_rate?.toFixed(0)}% WR</span>
-                                            <span className="text-amber-500">+{whale.total_profit_sol?.toFixed(1)}◎</span>
+                                            <span className="text-amber-500">+{whale.total_profit_sol?.toFixed(1)} SOL</span>
                                         </div>
                                     </div>
                                     {index < topWhales.length - 1 && <div className="ml-4 w-1 h-1 bg-zinc-800 rounded-full"></div>}
@@ -296,7 +296,7 @@ export const FullPageRadar = () => {
 
                                         <div className="col-span-1">
                                             <span className={`text-[13px] font-black ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                {s.amount.toFixed(1)}◎
+                                                {s.amount.toFixed(1)} SOL
                                             </span>
                                         </div>
 
@@ -326,7 +326,7 @@ export const FullPageRadar = () => {
                                                     </div>
                                                     <div className="flex items-center gap-1 text-[10px] font-bold text-blue-400/80">
                                                         <Activity className="w-3 h-3" />
-                                                        {s.avg_impact_volume?.toFixed(1)}◎
+                                                        {s.avg_impact_volume?.toFixed(1)} SOL
                                                     </div>
                                                 </div>
                                             ) : (
