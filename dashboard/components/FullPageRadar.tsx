@@ -393,20 +393,35 @@ export const FullPageRadar = () => {
 
                     {/* Right Sidebar: Sticky Stats */}
                     <div className="lg:col-span-1 flex flex-col gap-6 sticky top-[130px]">
-                        <div className="bg-zinc-900/40 border border-zinc-800 p-4 rounded-lg">
+                        <div className="bg-zinc-900/40 border border-zinc-800 p-4 rounded-lg shadow-xl backdrop-blur-md">
                             <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                <TrendingUp className="w-3 h-3" />
+                                <TrendingUp className="w-3 h-3 text-orange-500" />
                                 Trending Assets
                             </h3>
                             <TopWhaleTokensCard />
                         </div>
-                        <div className="bg-zinc-900/40 border border-zinc-800 p-4 rounded-lg">
-                            <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                <Clock className="w-3 h-3 text-emerald-500" />
-                                Active Whale Positions
-                            </h3>
-                            <ActivePositionsCard />
+                    </div>
+                </div>
+
+                {/* Bottom Section: Active Whale Positions (Full Width) */}
+                <div className="mt-8">
+                    <div className="bg-zinc-900/40 border border-zinc-800 p-6 rounded-xl shadow-2xl backdrop-blur-md">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                                    <Clock className="w-5 h-5 text-emerald-500" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Active Whale Positions</h3>
+                                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Real-time tracking of open smart money trades</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded border border-white/10">
+                                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">MONITORING ACTIVE</span>
+                            </div>
                         </div>
+                        <ActivePositionsCard />
                     </div>
                 </div>
             </main>
