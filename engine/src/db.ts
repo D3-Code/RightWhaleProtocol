@@ -161,7 +161,7 @@ export const getTopWallets = async (limit = 50) => {
     }
 };
 
-export const getActivePositions = async (limit = 50) => {
+export const getOpenPositions = async (limit = 20) => {
     if (!db) return [];
     try {
         return await db.all(`
@@ -171,15 +171,15 @@ export const getActivePositions = async (limit = 50) => {
                 tw.twitter_handle,
                 tw.reputation_score,
                 tw.win_rate,
-                (julianday('now') - julianday(p.entry_timestamp)) * 24 as hold_hours
+                (julianday('now') - julianday(p.opened_at)) * 24 * 60 AS hold_minutes
             FROM positions p
             LEFT JOIN tracked_wallets tw ON p.wallet = tw.address
             WHERE p.is_open = 1
-            ORDER BY p.entry_timestamp DESC
+            ORDER BY p.opened_at DESC
             LIMIT ?
         `, limit);
     } catch (error) {
-        console.error('Failed to fetch active positions:', error);
+        console.error('Failed to fetch open positions:', error);
         return [];
     }
 };

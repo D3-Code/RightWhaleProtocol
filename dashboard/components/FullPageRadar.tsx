@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Radar, ExternalLink, Target, Filter, Clock, ArrowUpRight, Search, Trophy, TrendingUp, Users, Activity } from "lucide-react";
+import { ActivePositionsCard } from "./ActivePositionsCard";
 
 type WhaleSighting = {
     id: number;
@@ -32,29 +33,12 @@ type TopWhale = {
     twitter_handle?: string;
 };
 
-type ActivePosition = {
-    id: number;
-    wallet: string;
-    mint: string;
-    entry_amount: number;
-    entry_timestamp: string;
-    hold_hours: number;
-    impact_volume?: number;
-    impact_buyers?: number;
-    wallet_name?: string;
-    twitter_handle?: string;
-    reputation_score?: number;
-    win_rate?: number;
-};
-
 export const FullPageRadar = () => {
     const [sightings, setSightings] = useState<WhaleSighting[]>([]);
     const [topWhales, setTopWhales] = useState<TopWhale[]>([]);
-    const [positions, setPositions] = useState<ActivePosition[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
-    const [verifiedOnly, setVerifiedOnly] = useState(false);
-    const [activeTab, setActiveTab] = useState<'feed' | 'positions' | 'leaderboard'>('feed'); // Default: show all whales
+    const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
 
@@ -79,29 +63,11 @@ export const FullPageRadar = () => {
         }
     };
 
-    const fetchPositions = async () => {
-        try {
-            const res = await fetch(`${ENGINE_API}/radar/positions?limit=50&verifiedOnly=${verifiedOnly}&t=${Date.now()}`);
-            if (res.ok) {
-                const data = await res.json();
-                setPositions(data);
-            }
-        } catch (e) {
-            console.error("Positions offline");
-        }
-    };
-
     useEffect(() => {
-        if (activeTab === 'feed') {
-            fetchSightings();
-            const interval = setInterval(fetchSightings, 2000);
-            return () => clearInterval(interval);
-        } else if (activeTab === 'positions') {
-            fetchPositions();
-            const interval = setInterval(fetchPositions, 5000); // Update every 5s
-            return () => clearInterval(interval);
-        }
-    }, [verifiedOnly, activeTab]);
+        fetchSightings();
+        const interval = setInterval(fetchSightings, 2000);
+        return () => clearInterval(interval);
+    }, [verifiedOnly]); // Re-fetch when filter changes
 
     const filteredSightings = onlySmartMoney
         ? sightings.filter(s => (s.reputation_score || 0) >= 60 || (s.win_rate || 0) > 50)
@@ -224,144 +190,154 @@ export const FullPageRadar = () => {
                 </div>
             )}
 
-            {/* Data Table */}
-            <div className="flex-1 overflow-auto p-6 z-10 w-full overflow-x-hidden">
-                <div className="w-full max-w-7xl mx-auto">
-                    {/* Table Header */}
-                    <div className="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
-                        <div className="col-span-1">Time</div>
-                        <div className="col-span-1">Type</div>
-                        <div className="col-span-2">Token</div>
-                        <div className="col-span-2 text-right">Amount</div>
-                        <div className="col-span-2 text-center">Wallet</div>
-                        <div className="col-span-2 text-center">KOL Impact (10m)</div>
-                        <div className="col-span-1 text-center">Score</div>
-                        <div className="col-span-1 text-right">Action</div>
-                    </div>
+            {/* 2-Column Layout: Whale Trades + Active Positions */}
+            <div className="flex-1 overflow-hidden p-6 z-10 w-full">
+                <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+                    {/* Left: Whale Trades (2/3 width) */}
+                    <div className="lg:col-span-2 h-full overflow-auto">
+                        <div className="w-full">
+                            {/* Table Header */}
+                            <div className="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
+                                <div className="col-span-1">Time</div>
+                                <div className="col-span-1">Type</div>
+                                <div className="col-span-2">Token</div>
+                                <div className="col-span-2 text-right">Amount</div>
+                                <div className="col-span-2 text-center">Wallet</div>
+                                <div className="col-span-2 text-center">KOL Impact (10m)</div>
+                                <div className="col-span-1 text-center">Score</div>
+                                <div className="col-span-1 text-right">Action</div>
+                            </div>
 
-                    {/* Table Body */}
-                    <div className="space-y-1 mt-2">
-                        <AnimatePresence mode="popLayout">
-                            {filteredSightings.map((s) => (
-                                <motion.div
-                                    key={`${s.id}-${s.timestamp}`}
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className={`
+                            {/* Table Body */}
+                            <div className="space-y-1 mt-2">
+                                <AnimatePresence mode="popLayout">
+                                    {filteredSightings.map((s) => (
+                                        <motion.div
+                                            key={`${s.id}-${s.timestamp}`}
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className={`
                                         grid grid-cols-12 gap-4 px-4 py-3 items-center rounded border-l-2
                                         ${s.isBuy
-                                            ? 'bg-emerald-500/5 border-emerald-500 hover:bg-emerald-500/10'
-                                            : 'bg-red-500/5 border-red-500 hover:bg-red-500/10'
-                                        } transition-colors border-y border-r border-transparent hover:border-white/10 group
+                                                    ? 'bg-emerald-500/5 border-emerald-500 hover:bg-emerald-500/10'
+                                                    : 'bg-red-500/5 border-red-500 hover:bg-red-500/10'
+                                                } transition-colors border-y border-r border-transparent hover:border-white/10 group
                                     `}
-                                >
-                                    {/* Time */}
-                                    <div className="col-span-1 flex items-center gap-2 text-zinc-400 text-xs text-nowrap truncate">
-                                        {new Date(s.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' })}
-                                    </div>
+                                        >
+                                            {/* Time */}
+                                            <div className="col-span-1 flex items-center gap-2 text-zinc-400 text-xs text-nowrap truncate">
+                                                {new Date(s.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' })}
+                                            </div>
 
-                                    {/* Type */}
-                                    <div className="col-span-1">
-                                        <span className={`
+                                            {/* Type */}
+                                            <div className="col-span-1">
+                                                <span className={`
                                             px-2 py-1 rounded text-[10px] font-bold uppercase
                                             ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}
                                         `}>
-                                            {s.isBuy ? 'BUY' : 'SELL'}
-                                        </span>
-                                    </div>
+                                                    {s.isBuy ? 'BUY' : 'SELL'}
+                                                </span>
+                                            </div>
 
-                                    {/* Token */}
-                                    <div className="col-span-2 flex flex-col">
-                                        <div className="flex items-center gap-2 font-bold text-white text-xs truncate">
-                                            {s.image_uri ? (
-                                                <img
-                                                    src={s.image_uri}
-                                                    alt={s.symbol}
-                                                    className="w-5 h-5 rounded-full border border-zinc-700"
-                                                    onError={(e) => {
-                                                        e.currentTarget.style.display = 'none';
-                                                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                                                    }}
-                                                />
-                                            ) : null}
-                                            <Target className={`w-3 h-3 text-zinc-500 ${s.image_uri ? 'hidden' : ''}`} />
-                                            {s.symbol || 'UNKNOWN'}
-                                        </div>
-                                        <span className="text-[9px] text-zinc-500 font-mono truncate">{s.mint}</span>
-                                    </div>
-
-                                    {/* Amount */}
-                                    <div className="col-span-2 text-right">
-                                        <span className={`text-sm font-bold ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}`}>
-                                            {s.amount.toFixed(2)} SOL
-                                        </span>
-                                    </div>
-
-                                    {/* Wallet */}
-                                    <div className="col-span-2 text-center">
-                                        <code className="px-1 py-0.5 bg-black/50 rounded text-[10px] text-zinc-400 font-mono">
-                                            {s.wallet.slice(0, 4)}...{s.wallet.slice(-4)}
-                                        </code>
-                                    </div>
-
-                                    {/* KOL Impact Stats */}
-                                    <div className="col-span-2 flex flex-col items-center gap-1">
-                                        {(s.avg_impact_buyers || 0) > 0 && (
-                                            <div className="flex items-center gap-3 w-full justify-center">
-                                                <div className="flex items-center gap-1 text-[10px] text-purple-400" title="Followers (Unique Buyers)">
-                                                    <Users className="w-3 h-3" />
-                                                    {s.avg_impact_buyers}
+                                            {/* Token */}
+                                            <div className="col-span-2 flex flex-col">
+                                                <div className="flex items-center gap-2 font-bold text-white text-xs truncate">
+                                                    {s.image_uri ? (
+                                                        <img
+                                                            src={s.image_uri}
+                                                            alt={s.symbol}
+                                                            className="w-5 h-5 rounded-full border border-zinc-700"
+                                                            onError={(e) => {
+                                                                e.currentTarget.style.display = 'none';
+                                                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                                            }}
+                                                        />
+                                                    ) : null}
+                                                    <Target className={`w-3 h-3 text-zinc-500 ${s.image_uri ? 'hidden' : ''}`} />
+                                                    {s.symbol || 'UNKNOWN'}
                                                 </div>
-                                                <div className="flex items-center gap-1 text-[10px] text-blue-400" title="Volume Impact">
-                                                    <Activity className="w-3 h-3" />
-                                                    {s.avg_impact_volume?.toFixed(1)}◎
-                                                </div>
+                                                <span className="text-[9px] text-zinc-500 font-mono truncate">{s.mint}</span>
                                             </div>
-                                        )}
-                                        {/* Signal Strength Bar */}
-                                        {(s.avg_impact_buyers || 0) > 5 && (
-                                            <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                                                <div
-                                                    className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
-                                                    style={{ width: `${Math.min((s.avg_impact_buyers || 0) * 5, 100)}%` }}
-                                                />
+
+                                            {/* Amount */}
+                                            <div className="col-span-2 text-right">
+                                                <span className={`text-sm font-bold ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}`}>
+                                                    {s.amount.toFixed(2)} SOL
+                                                </span>
                                             </div>
-                                        )}
-                                    </div>
 
-                                    {/* Reputation / Score */}
-                                    <div className="col-span-1 flex justify-center">
-                                        {(s.win_rate || 0) > 50 ? (
-                                            <div className="flex items-center gap-1 text-amber-500" title="Win Rate">
-                                                <Trophy className="w-3 h-3" />
-                                                <span className="text-[10px] font-bold">{s.win_rate?.toFixed(0)}%</span>
+                                            {/* Wallet */}
+                                            <div className="col-span-2 text-center">
+                                                <code className="px-1 py-0.5 bg-black/50 rounded text-[10px] text-zinc-400 font-mono">
+                                                    {s.wallet.slice(0, 4)}...{s.wallet.slice(-4)}
+                                                </code>
                                             </div>
-                                        ) : (
-                                            <span className="text-[10px] text-zinc-600">-</span>
-                                        )}
-                                    </div>
 
-                                    {/* Action */}
-                                    <div className="col-span-1 text-right">
-                                        <a
-                                            href={`https://pump.fun/coin/${s.mint}`}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="inline-flex items-center justify-center p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                                        >
-                                            <ArrowUpRight className="w-4 h-4" />
-                                        </a>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
+                                            {/* KOL Impact Stats */}
+                                            <div className="col-span-2 flex flex-col items-center gap-1">
+                                                {(s.avg_impact_buyers || 0) > 0 && (
+                                                    <div className="flex items-center gap-3 w-full justify-center">
+                                                        <div className="flex items-center gap-1 text-[10px] text-purple-400" title="Followers (Unique Buyers)">
+                                                            <Users className="w-3 h-3" />
+                                                            {s.avg_impact_buyers}
+                                                        </div>
+                                                        <div className="flex items-center gap-1 text-[10px] text-blue-400" title="Volume Impact">
+                                                            <Activity className="w-3 h-3" />
+                                                            {s.avg_impact_volume?.toFixed(1)}◎
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {/* Signal Strength Bar */}
+                                                {(s.avg_impact_buyers || 0) > 5 && (
+                                                    <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
+                                                            style={{ width: `${Math.min((s.avg_impact_buyers || 0) * 5, 100)}%` }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
 
-                        {filteredSightings.length === 0 && !isLoading && (
-                            <div className="p-12 text-center text-zinc-500 flex flex-col items-center gap-4">
-                                <Radar className="w-12 h-12 opacity-20 animate-pulse" />
-                                <p>SCANNING GLOBAL STREAMS FOR WHALE ACTIVITY...</p>
+                                            {/* Reputation / Score */}
+                                            <div className="col-span-1 flex justify-center">
+                                                {(s.win_rate || 0) > 50 ? (
+                                                    <div className="flex items-center gap-1 text-amber-500" title="Win Rate">
+                                                        <Trophy className="w-3 h-3" />
+                                                        <span className="text-[10px] font-bold">{s.win_rate?.toFixed(0)}%</span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-[10px] text-zinc-600">-</span>
+                                                )}
+                                            </div>
+
+                                            {/* Action */}
+                                            <div className="col-span-1 text-right">
+                                                <a
+                                                    href={`https://pump.fun/coin/${s.mint}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="inline-flex items-center justify-center p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                                                >
+                                                    <ArrowUpRight className="w-4 h-4" />
+                                                </a>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+
+                                {filteredSightings.length === 0 && !isLoading && (
+                                    <div className="p-12 text-center text-zinc-500 flex flex-col items-center gap-4">
+                                        <Radar className="w-12 h-12 opacity-20 animate-pulse" />
+                                        <p>SCANNING GLOBAL STREAMS FOR WHALE ACTIVITY...</p>
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
+                    </div>
+
+                    {/* Right: Active Positions (1/3 width) */}
+                    <div className="lg:col-span-1 h-full">
+                        <ActivePositionsCard />
                     </div>
                 </div>
             </div>
