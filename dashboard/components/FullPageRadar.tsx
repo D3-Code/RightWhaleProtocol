@@ -12,6 +12,7 @@ type WhaleSighting = {
     symbol: string;
     image_uri?: string;
     amount: number;
+    token_amount?: number;
     wallet: string;
     isBuy: boolean;
     timestamp: string;
@@ -243,13 +244,14 @@ export const FullPageRadar = () => {
                         {/* Table Header (Pinned) */}
                         <div className="grid grid-cols-12 gap-3 px-6 py-4 text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-white/5 bg-zinc-900/80 sticky top-0 z-20 backdrop-blur-md">
                             <div className="col-span-1">Time</div>
-                            <div className="col-span-3">Token</div>
-                            <div className="col-span-1">Size</div>
+                            <div className="col-span-2">Token</div>
+                            <div className="col-span-1">Sol</div>
+                            <div className="col-span-1">Vol</div>
                             <div className="col-span-2">Identity</div>
-                            <div className="col-span-2">KOL Impact</div>
+                            <div className="col-span-2">Impact</div>
                             <div className="col-span-1 text-center">Score</div>
-                            <div className="col-span-1 text-center">Grade</div>
-                            <div className="col-span-1 text-right">Intel</div>
+                            <div className="col-span-1 text-center">GR</div>
+                            <div className="col-span-1 text-right">Pump</div>
                         </div>
 
                         {/* Table Body - Independent Scroll */}
@@ -272,7 +274,7 @@ export const FullPageRadar = () => {
                                             {new Date(s.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                         </div>
 
-                                        <div className="col-span-3 flex items-center gap-3 min-w-0">
+                                        <div className="col-span-2 flex items-center gap-3 min-w-0">
                                             <div className="relative shrink-0">
                                                 {s.image_uri ? (
                                                     <img
@@ -288,13 +290,19 @@ export const FullPageRadar = () => {
                                             </div>
                                             <div className="flex flex-col min-w-0">
                                                 <span className="text-[13px] font-black text-white truncate uppercase tracking-tight">{s.symbol || '---'}</span>
-                                                <span className="text-[9px] text-zinc-600 font-mono truncate max-w-[80px]">{s.mint}</span>
+                                                <span className="text-[8px] text-zinc-600 font-mono truncate max-w-[60px]">{s.mint}</span>
                                             </div>
                                         </div>
 
                                         <div className="col-span-1">
                                             <span className={`text-[13px] font-black ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}`}>
                                                 {s.amount.toFixed(1)}◎
+                                            </span>
+                                        </div>
+
+                                        <div className="col-span-1">
+                                            <span className="text-[10px] font-black text-zinc-400">
+                                                {s.token_amount ? (s.token_amount > 1000000 ? `${(s.token_amount / 1000000).toFixed(1)}M` : s.token_amount.toFixed(0)) : '---'}
                                             </span>
                                         </div>
 
@@ -347,9 +355,10 @@ export const FullPageRadar = () => {
                                                 href={`https://pump.fun/coin/${s.mint}`}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="inline-flex items-center justify-center w-8 h-8 text-zinc-600 hover:text-white hover:bg-white/5 rounded-full transition-all"
+                                                className="inline-flex items-center justify-center gap-1.5 px-3 py-1 bg-[#10B981]/10 hover:bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30 rounded-full transition-all group/pump"
                                             >
-                                                <ArrowUpRight className="w-3.5 h-3.5" />
+                                                <span className="text-[10px] font-black tracking-tighter">PUMP</span>
+                                                <ExternalLink className="w-2.5 h-2.5 group-hover/pump:translate-x-0.5 group-hover/pump:-translate-y-0.5 transition-transform" />
                                             </a>
                                         </div>
                                     </motion.div>

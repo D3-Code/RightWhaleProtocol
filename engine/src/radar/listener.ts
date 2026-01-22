@@ -91,6 +91,7 @@ export const startRadar = async () => {
                         symbol,
                         imageUri,
                         solAmount,
+                        event.tokenAmount || event.vTokens || 0,
                         event.traderPublicKey,
                         isBuy
                     );

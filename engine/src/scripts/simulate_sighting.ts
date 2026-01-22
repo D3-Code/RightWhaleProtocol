@@ -29,11 +29,12 @@ async function simulate() {
 
     // 2. Inject the Sighting
     await logWhaleSighting(
-        'AdwrMB45dAVuSfDT7YRVshK4QJtzaJyAKVKimJDrpump',
-        'KOL_COIN',
-        '', // image_uri
-        250.0,
-        wallet,
+        'CVufoBtc1HaqiS4CLeTbqizR87WCGAgkunipNdCipump',
+        'TIMMY',
+        '',
+        2.5,
+        1500000000, // 1.5B tokens
+        'CxVdpbtTZAp756qU1W6r5iNBN9i1opLs4yTdHkWkHbti',
         true
     );
 

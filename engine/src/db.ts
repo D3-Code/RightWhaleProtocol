@@ -33,7 +33,8 @@ export const initDB = async () => {
                 mint TEXT NOT NULL,
                 symbol TEXT,
                 image_uri TEXT,
-                amount SOL,
+                amount REAL,
+                token_amount REAL,
                 wallet TEXT NOT NULL,
                 isBuy BOOLEAN,
                 timestamp TEXT NOT NULL
@@ -89,12 +90,12 @@ export const addLog = async (type: string, amount: number, txHash?: string) => {
     }
 };
 
-export const logWhaleSighting = async (mint: string, symbol: string, imageUri: string, amount: number, wallet: string, isBuy: boolean) => {
+export const logWhaleSighting = async (mint: string, symbol: string, imageUri: string, amount: number, tokenAmount: number, wallet: string, isBuy: boolean) => {
     if (!db) return;
     try {
         await db.run(
-            'INSERT INTO whale_sightings (mint, symbol, image_uri, amount, wallet, isBuy, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            mint, symbol, imageUri, amount, wallet, isBuy, new Date().toISOString()
+            'INSERT INTO whale_sightings (mint, symbol, image_uri, amount, token_amount, wallet, isBuy, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            mint, symbol, imageUri, amount, tokenAmount, wallet, isBuy, new Date().toISOString()
         );
         console.log(`🐋 DB Logged: Whale on ${symbol}`);
     } catch (error) {
