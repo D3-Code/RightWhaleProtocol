@@ -31,7 +31,13 @@ export const fetchTokenMetadata = async (mint: string): Promise<TokenMetadata | 
             return null;
         }
 
-        const data = await response.json();
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            console.warn(`Unexpected response content type for ${mint}: ${contentType}`);
+            return null;
+        }
+
+        const data = await response.json() as any;
         const metadata: TokenMetadata = {
             mint,
             name: data.name || '',
