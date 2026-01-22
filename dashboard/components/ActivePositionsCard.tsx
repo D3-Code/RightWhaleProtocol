@@ -107,51 +107,58 @@ export const ActivePositionsCard = () => {
                     </div>
                 ) : (
                     <AnimatePresence mode="popLayout">
-                        {positions.map((pos) => (
-                            <motion.div
-                                key={pos.id}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0 }}
-                                className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-3 hover:border-zinc-700 transition-all group"
-                            >
-                                {/* Token & Whale */}
-                                <div className="flex items-start justify-between mb-2">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="font-bold text-white text-sm">${pos.symbol || 'UNKNOWN'}</span>
-                                            {pos.reputation_score && pos.reputation_score >= 60 && (
-                                                <Trophy className="w-3 h-3 text-amber-500" />
-                                            )}
+                        {positions
+                            .filter(pos => pos.hold_minutes >= 2)
+                            .sort((a, b) => b.hold_minutes - a.hold_minutes)
+                            .map((pos) => (
+                                <motion.div
+                                    key={pos.id}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-3 hover:border-zinc-600 transition-all group"
+                                >
+                                    {/* Whale Highlight (Wallet First) */}
+                                    <div className="flex items-start justify-between mb-2">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <span className="font-black text-white text-[13px] truncate uppercase tracking-tight">
+                                                    {getWalletDisplay(pos)}
+                                                </span>
+                                                {pos.reputation_score && pos.reputation_score >= 60 && (
+                                                    <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Holding</span>
+                                                <span className="text-[10px] font-black text-emerald-400/80">${pos.symbol || 'UNKNOWN'}</span>
+                                            </div>
                                         </div>
-                                        <div className="text-xs text-zinc-500">{getWalletDisplay(pos)}</div>
+                                        <a
+                                            href={`https://pump.fun/coin/${pos.mint}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="p-1.5 hover:bg-white/10 rounded transition-colors opacity-0 group-hover:opacity-100 shrink-0"
+                                        >
+                                            <ExternalLink className="w-3 h-3 text-zinc-400 hover:text-white" />
+                                        </a>
                                     </div>
-                                    <a
-                                        href={`https://pump.fun/coin/${pos.mint}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="p-1.5 hover:bg-white/10 rounded transition-colors opacity-0 group-hover:opacity-100"
-                                    >
-                                        <ExternalLink className="w-3 h-3 text-zinc-400 hover:text-white" />
-                                    </a>
-                                </div>
 
-                                {/* Metrics */}
-                                <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <div>
-                                        <div className="text-zinc-500 uppercase text-[10px] mb-0.5">Volume</div>
-                                        <div className="font-bold text-emerald-400">{pos.buy_amount_sol.toFixed(2)} SOL</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-zinc-500 uppercase text-[10px] mb-0.5">Holding</div>
-                                        <div className={`font-bold flex items-center gap-1 ${getHoldColor(pos.hold_minutes)}`}>
-                                            <span>{getHoldEmoji(pos.hold_minutes)}</span>
-                                            <span>{formatHoldTime(pos.hold_minutes)}</span>
+                                    {/* Metrics */}
+                                    <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-white/5">
+                                        <div>
+                                            <div className="text-zinc-600 uppercase text-[9px] font-black mb-0.5 tracking-tighter">Volume</div>
+                                            <div className="font-bold text-zinc-300">{pos.buy_amount_sol.toFixed(2)}◎</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-zinc-600 uppercase text-[9px] font-black mb-0.5 tracking-tighter">Time</div>
+                                            <div className={`font-bold flex items-center gap-1 ${getHoldColor(pos.hold_minutes)}`}>
+                                                <span>{formatHoldTime(pos.hold_minutes)}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            ))}
                     </AnimatePresence>
                 )}
             </div>
