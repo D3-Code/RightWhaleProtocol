@@ -76,9 +76,8 @@ export const TopWhaleTokensCard = () => {
                     </div>
                 ) : tokens.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
-                        <span className="text-2xl mb-2">🔭</span>
-                        <div className="text-xs text-zinc-500 font-bold uppercase tracking-widest">No signals found</div>
-                        <div className="text-[10px] text-zinc-600 mt-1">Try changing filters</div>
+                        <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] animate-pulse">Scanning Chains</div>
+                        <div className="text-[8px] text-zinc-600 mt-2 uppercase tracking-widest">Awaiting Whale Consensus</div>
                     </div>
                 ) : (
                     <AnimatePresence mode="popLayout">
