@@ -55,7 +55,7 @@ export const FullPageRadar = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
     const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
-    const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
+
     const [lastAlertId, setLastAlertId] = useState<number | null>(null);
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
