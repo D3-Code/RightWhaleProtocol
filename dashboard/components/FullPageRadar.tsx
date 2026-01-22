@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Radar, ExternalLink, Target, Filter, Clock, ArrowUpRight, Search, Trophy, TrendingUp, Users, Activity } from "lucide-react";
 import { ActivePositionsCard } from "./ActivePositionsCard";
+import { TopWhaleTokensCard } from "./TopWhaleTokensCard";
 
 type WhaleSighting = {
     id: number;
@@ -189,6 +190,13 @@ export const FullPageRadar = () => {
                     </div>
                 </div>
             )}
+
+            {/* Top Whale Tokens Section */}
+            <div className="px-6 pt-4 z-10 w-full">
+                <div className="max-w-7xl mx-auto">
+                    <TopWhaleTokensCard />
+                </div>
+            </div>
 
             {/* 2-Column Layout: Whale Trades + Active Positions */}
             <div className="flex-1 overflow-hidden p-6 z-10 w-full">

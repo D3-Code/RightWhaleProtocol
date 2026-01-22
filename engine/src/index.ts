@@ -9,7 +9,7 @@ export const globalStats = {
 };
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { loadWallet } from './wallet';
-import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets, getOpenPositions } from './db';
+import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets, getOpenPositions, getTopWhaleTokens } from './db';
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
@@ -116,6 +116,17 @@ app.get('/radar/positions', async (req, res) => {
         res.json(positions);
     } catch (err) {
         res.status(500).send('Error fetching positions');
+    }
+});
+
+app.get('/radar/top-tokens', async (req, res) => {
+    try {
+        const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+        const hours = req.query.hours ? parseInt(req.query.hours as string) : 24;
+        const tokens = await getTopWhaleTokens(limit, hours);
+        res.json(tokens);
+    } catch (err) {
+        res.status(500).send('Error fetching top tokens');
     }
 });
 

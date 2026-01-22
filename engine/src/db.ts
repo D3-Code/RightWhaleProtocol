@@ -190,6 +190,31 @@ export const getOpenPositions = async (limit = 20) => {
     }
 };
 
+export const getTopWhaleTokens = async (limit = 10, timeframeHours = 24) => {
+    if (!db) return [];
+    try {
+        return await db.all(`
+            SELECT 
+                ws.mint,
+                ws.symbol,
+                COUNT(DISTINCT ws.wallet) as whale_count,
+                SUM(ws.amount) as total_volume_sol,
+                MAX(ws.timestamp) as last_buy
+            FROM whale_sightings ws
+            WHERE ws.isBuy = 1
+            AND datetime(ws.timestamp) >= datetime('now', '-' || ? || ' hours')
+            AND ws.symbol IS NOT NULL 
+            AND ws.symbol != 'UNKNOWN'
+            GROUP BY ws.mint, ws.symbol
+            ORDER BY whale_count DESC, total_volume_sol DESC
+            LIMIT ?
+        `, timeframeHours, limit);
+    } catch (error) {
+        console.error('Failed to fetch top whale tokens:', error);
+        return [];
+    }
+};
+
 export const adjustPotBalance = async (name: string, delta: number) => {
     if (!db) return;
     try {
