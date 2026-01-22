@@ -240,10 +240,9 @@ export const FullPageRadar = () => {
                             <div className="col-span-1">Time</div>
                             <div className="col-span-3">Token</div>
                             <div className="col-span-1">Sol</div>
-                            <div className="col-span-2">Wallet</div>
+                            <div className="col-span-3">Wallet</div>
                             <div className="col-span-2">Impact</div>
                             <div className="col-span-1 text-center">Score</div>
-                            <div className="col-span-1 text-center">GR</div>
                             <div className="col-span-1 text-right">Pump</div>
                         </div>
 
@@ -293,7 +292,7 @@ export const FullPageRadar = () => {
                                             </span>
                                         </div>
 
-                                        <div className="col-span-2 flex items-center gap-2 min-w-0">
+                                        <div className="col-span-3 flex items-center gap-2 min-w-0">
                                             <div className="truncate flex-1 flex items-center gap-1.5">
                                                 <span className="text-[11px] font-bold text-zinc-400 truncate block">
                                                     {s.wallet_name || `${s.wallet.slice(0, 4)}...${s.wallet.slice(-4)}`}
@@ -326,18 +325,6 @@ export const FullPageRadar = () => {
 
                                         <div className="col-span-1 text-center font-black text-zinc-500 text-[11px]">
                                             {s.signal?.score || 0}%
-                                        </div>
-
-                                        <div className="col-span-1 flex justify-center">
-                                            <div className={`
-                                                w-8 h-8 rounded-lg flex items-center justify-center font-black text-base skew-x-[-12deg]
-                                                ${s.signal?.grade === 'S' ? 'bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/50 shadow-[0_0_15px_rgba(217,70,239,0.2)]' :
-                                                    s.signal?.grade === 'A' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/50' :
-                                                        s.signal?.grade === 'B' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/40' :
-                                                            'bg-zinc-800/50 text-zinc-600 border border-zinc-700/50'}
-                                            `}>
-                                                <span className="skew-x-[12deg]">{s.signal?.grade || 'D'}</span>
-                                            </div>
                                         </div>
 
                                         <div className="col-span-1 text-right">
