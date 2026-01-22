@@ -132,7 +132,8 @@ app.get('/radar/top-tokens', async (req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
         const hours = req.query.hours ? parseInt(req.query.hours as string) : 24;
-        const tokens = await getTopWhaleTokens(limit, hours);
+        const verifiedOnly = req.query.verifiedOnly !== 'false'; // Default to true for safety
+        const tokens = await getTopWhaleTokens(limit, hours, verifiedOnly);
         res.json(tokens);
     } catch (err) {
         res.status(500).send('Error fetching top tokens');

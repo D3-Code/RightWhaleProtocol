@@ -27,18 +27,19 @@ async function simulate() {
         wallet, 85.0, 95, 500.5, 25
     );
 
-    // 2. Inject the Sighting
+    // 3. Inject a NEW (Unverified) Whale Sighting - Should NOT appear in Top Tokens
+    const unverifiedWallet = 'SUS_BOT_666_v2';
     await logWhaleSighting(
-        'CVufoBtc1HaqiS4CLeTbqizR87WCGAgkunipNdCipump',
-        'TIMMY',
+        'RUG_MINT_v2_9999999999999999999999999999',
+        'RUG_PUMP',
         '',
-        2.5,
-        1500000000, // 1.5B tokens
-        'CxVdpbtTZAp756qU1W6r5iNBN9i1opLs4yTdHkWkHbti',
+        100.0, // High SOL amount but from SUS wallet
+        1000000000,
+        unverifiedWallet,
         true
     );
 
-    console.log('✅ Injected KOL KING Sighting (Impact: 25 Buyers, 500 SOL).');
+    console.log('✅ Injected RUG PUMP sighting from Unverified wallet.');
 }
 
 simulate();

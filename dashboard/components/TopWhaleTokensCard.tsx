@@ -22,7 +22,7 @@ export const TopWhaleTokensCard = () => {
     const fetchTopTokens = async () => {
         try {
             const hours = timeframe === 0 ? 999999 : timeframe; // 0 = all time
-            const res = await fetch(`${ENGINE_API}/radar/top-tokens?limit=10&hours=${hours}&t=${Date.now()}`);
+            const res = await fetch(`${ENGINE_API}/radar/top-tokens?limit=10&hours=${hours}&verifiedOnly=true&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 setTokens(data);
@@ -52,6 +52,10 @@ export const TopWhaleTokensCard = () => {
                 <div className="flex items-center gap-2">
                     <Flame className="w-4 h-4 text-orange-500" />
                     <h3 className="text-sm font-bold text-white uppercase tracking-tight">Top Whale Tokens</h3>
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+                        <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>
+                        <span className="text-[8px] font-black text-emerald-500 uppercase tracking-tighter">Elite Consensus</span>
+                    </div>
                 </div>
                 <div className="flex gap-1">
                     {[24, 168, 0].map((hours) => (
@@ -59,8 +63,8 @@ export const TopWhaleTokensCard = () => {
                             key={hours}
                             onClick={() => setTimeframe(hours)}
                             className={`px-2 py-1 text-[10px] font-bold rounded transition-all ${timeframe === hours
-                                    ? 'bg-orange-500/20 text-orange-400 border border-orange-500'
-                                    : 'bg-white/5 text-zinc-500 hover:text-zinc-300 border border-transparent'
+                                ? 'bg-orange-500/20 text-orange-400 border border-orange-500'
+                                : 'bg-white/5 text-zinc-500 hover:text-zinc-300 border border-transparent'
                                 }`}
                         >
                             {hours === 24 ? '24H' : hours === 168 ? '7D' : 'ALL'}
@@ -93,9 +97,9 @@ export const TopWhaleTokensCard = () => {
                                 {/* Rank & Symbol */}
                                 <div className="flex items-center gap-3 flex-1">
                                     <div className={`text-xs font-bold w-6 text-center ${index === 0 ? 'text-yellow-400' :
-                                            index === 1 ? 'text-zinc-400' :
-                                                index === 2 ? 'text-orange-600' :
-                                                    'text-zinc-600'
+                                        index === 1 ? 'text-zinc-400' :
+                                            index === 2 ? 'text-orange-600' :
+                                                'text-zinc-600'
                                         }`}>
                                         #{index + 1}
                                     </div>
