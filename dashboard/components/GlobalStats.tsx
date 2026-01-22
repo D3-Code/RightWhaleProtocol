@@ -44,46 +44,14 @@ export const GlobalStats = () => {
         const fetchMarketData = async () => {
             try {
                 const tokenAddress = "AdwrMB45dAVuSfDT7YRVshK4QJtzaJyAKVKimJDrpump";
+                // Use Next.js Internal Proxy to bypass CORS and handle fallbacks
+                const res = await fetch(`/api/market-cap?mint=${tokenAddress}`);
 
-                // 1. Try DexScreener First
-                const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`);
-                const data = await res.json();
-                const pair = data.pairs?.[0];
-
-                if (pair) {
+                if (res.ok) {
+                    const data = await res.json();
                     setMarketData({
-                        marketCap: pair.fdv || pair.marketCap || 0,
-                        price: parseFloat(pair.priceUsd) || 0,
-                        volume24h: pair.volume?.h24 || 0,
-                        priceChange24h: pair.priceChange?.h24 || 0
-                    });
-                    return;
-                }
-
-                // 2. Fallback to Pump.fun API (Pre-Bond)
-                console.log("DexScreener failed, trying Pump.fun...");
-                const pumpRes = await fetch(`https://frontend-api.pump.fun/coins/${tokenAddress}`);
-                if (pumpRes.ok) {
-                    const pumpData = await pumpRes.json();
-
-                    // Fetch SOL Price for USD conversion
-                    let solPrice = 150; // Fallback
-                    try {
-                        const solRes = await fetch(`https://api.dexscreener.com/latest/dex/tokens/So11111111111111111111111111111111111111112`);
-                        const solData = await solRes.json();
-                        if (solData.pairs?.[0]) {
-                            solPrice = parseFloat(solData.pairs[0].priceUsd);
-                        }
-                    } catch (e) {
-                        // Ignore sol fetch error
-                    }
-
-                    const mcSol = pumpData.market_cap || 0;
-                    const mcUsd = mcSol * solPrice;
-
-                    setMarketData({
-                        marketCap: mcUsd,
-                        price: 0, // Not easily available without calc, but we mainly need MC
+                        marketCap: data.marketCap || 0,
+                        price: 0,
                         volume24h: 0,
                         priceChange24h: 0
                     });

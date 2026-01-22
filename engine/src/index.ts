@@ -67,6 +67,8 @@ app.get('/stats', (req, res) => {
     res.json(globalStats);
 });
 
+
+
 app.get('/reserves', async (req, res) => {
     try {
         const keypair = loadWallet();
@@ -203,3 +205,5 @@ runAiCycle(true);
 setInterval(() => {
     runAiCycle(true);
 }, 15000);
+
+// Force Reload Check
