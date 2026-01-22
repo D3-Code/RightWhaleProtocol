@@ -293,8 +293,8 @@ export const getTopWhaleTokens = async (limit = 10, timeframeHours = 24, verifie
             GROUP BY ws.mint, ws.symbol
             HAVING holders_count > 0 
             AND buy_volume > sell_volume -- Positive Trend: Net buying
-            AND buy_volume > 5.0 -- Good Volume: At least 5 SOL bought
-            AND total_tokens_acquired >= 5000000 -- Min 0.5% Supply (Assuming 1B Supply)
+            AND buy_volume > 0.5 -- Good Volume: At least 0.5 SOL bought
+            AND total_tokens_acquired >= 1000000 -- Min 0.1% Supply (Assuming 1B Supply)
             ORDER BY elite_consensus_score DESC, total_volume_sol DESC
             LIMIT ?
         `;

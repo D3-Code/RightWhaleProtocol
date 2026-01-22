@@ -17,8 +17,6 @@ type TopToken = {
 
 export const TopWhaleTokensCard = () => {
     const [tokens, setTokens] = useState<TopToken[]>([]);
-    const [timeframe, setTimeframe] = useState<number>(24); // 24h, 168h (7d), or 0 (all)
-
     const [isLoading, setIsLoading] = useState(true);
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
@@ -27,8 +25,7 @@ export const TopWhaleTokensCard = () => {
         try {
             // Only show loading on initial load or filter change, not periodic refresh
             // setIsLoading(true); 
-            const hours = timeframe === 0 ? 999999 : timeframe; // 0 = all time
-            const res = await fetch(`${ENGINE_API}/radar/top-tokens?limit=10&hours=${hours}&verifiedOnly=true&t=${Date.now()}`);
+            const res = await fetch(`${ENGINE_API}/radar/top-tokens?limit=10&hours=24&verifiedOnly=true&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 setTokens(data);
@@ -45,7 +42,7 @@ export const TopWhaleTokensCard = () => {
         fetchTopTokens();
         const interval = setInterval(fetchTopTokens, 10000); // Update every 10 seconds
         return () => clearInterval(interval);
-    }, [timeframe]);
+    }, []);
 
 
 
@@ -66,24 +63,6 @@ export const TopWhaleTokensCard = () => {
 
                 {/* Filters Row */}
                 <div className="flex items-center justify-between gap-2 mt-1">
-                    {/* Lifecycle Toggles */}
-
-
-                    {/* Timeframe Toggles */}
-                    <div className="flex gap-1">
-                        {[24, 168].map((hours) => (
-                            <button
-                                key={hours}
-                                onClick={() => setTimeframe(hours)}
-                                className={`px-2 py-1 text-[9px] font-bold rounded transition-all ${timeframe === hours
-                                    ? 'bg-orange-500/20 text-orange-400 border border-orange-500'
-                                    : 'bg-white/5 text-zinc-500 hover:text-zinc-300 border border-transparent'
-                                    }`}
-                            >
-                                {hours === 24 ? '24H' : '7D'}
-                            </button>
-                        ))}
-                    </div>
                 </div>
             </div>
 
