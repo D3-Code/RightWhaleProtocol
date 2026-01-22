@@ -179,13 +179,6 @@ export const FullPageRadar = () => {
                         <span>VERIFIED ONLY</span>
                     </button>
                     <div className="h-4 w-[1px] bg-zinc-800 mx-1"></div>
-                    <div className="flex items-center gap-2 text-[10px] text-zinc-500 font-bold">
-                        GRADE SCALE:
-                        <span className="text-fuchsia-400">S</span>
-                        <span className="text-emerald-400">A</span>
-                        <span className="text-blue-400">B</span>
-                        <span className="text-yellow-400">C</span>
-                    </div>
                     <div className="ml-auto text-[10px] text-zinc-600 uppercase tracking-widest">
                         Displaying last 50 sightings
                     </div>
