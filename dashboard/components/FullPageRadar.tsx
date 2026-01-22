@@ -55,6 +55,7 @@ export const FullPageRadar = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
     const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
+    const [showSignalGuide, setShowSignalGuide] = useState(false);
 
     const [lastAlertId, setLastAlertId] = useState<number | null>(null);
 
@@ -249,6 +250,14 @@ export const FullPageRadar = () => {
                         <span>VERIFIED ONLY</span>
                     </button>
 
+                    <button
+                        onClick={() => setShowSignalGuide(true)}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded text-xs text-orange-400 font-bold transition-all ml-2"
+                    >
+                        <Activity className="w-3 h-3" />
+                        <span>SIGNAL GUIDE</span>
+                    </button>
+
 
 
                     <div className="ml-auto text-[10px] text-zinc-600 uppercase tracking-widest">
@@ -388,8 +397,11 @@ export const FullPageRadar = () => {
 
                                         <div className="col-span-2">
                                             {s.song_tag ? (
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="text-[10px] font-black text-amber-400/90 animate-pulse tracking-tight whitespace-nowrap">
+                                                <div
+                                                    className="flex flex-col gap-1 cursor-pointer group/tag"
+                                                    onClick={() => setShowSignalGuide(true)}
+                                                >
+                                                    <span className="text-[10px] font-black text-amber-400/90 animate-pulse tracking-tight whitespace-nowrap group-hover/tag:text-amber-300 transition-colors">
                                                         {s.song_tag}
                                                     </span>
                                                     {s.whale_consensus && s.whale_consensus >= 3 && (
@@ -454,6 +466,105 @@ export const FullPageRadar = () => {
                     </div>
                 </div>
             </main >
+
+            {/* Signal Intelligence Guide Modal */}
+            <AnimatePresence>
+                {showSignalGuide && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl"
+                        onClick={() => setShowSignalGuide(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                            className="w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="px-6 py-4 border-b border-zinc-800 bg-zinc-900/50 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                                        <Activity className="w-5 h-5 text-orange-500" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black text-white uppercase tracking-tighter">Signal Intelligence Guide</h2>
+                                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Behavioral Fingerprints & Consensus Analysis</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setShowSignalGuide(false)}
+                                    className="p-2 hover:bg-white/5 rounded-full transition-colors text-zinc-500 hover:text-white"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <div className="p-6 space-y-6">
+                                {/* Pod Chorus */}
+                                <div className="grid grid-cols-12 gap-4 items-start p-4 hover:bg-white/[0.02] rounded-xl transition-colors border border-transparent hover:border-white/5 group">
+                                    <div className="col-span-4">
+                                        <div className="text-sm font-black text-emerald-400 uppercase tracking-tighter mb-1">🎵 POD CHORUS</div>
+                                        <div className="text-[9px] font-black text-emerald-500/60 uppercase tracking-widest">ELITE CONSENSUS</div>
+                                    </div>
+                                    <div className="col-span-8">
+                                        <p className="text-xs text-zinc-400 leading-relaxed">
+                                            Strong social consensus detected. At least <span className="text-white font-bold">5 distinct elite whales</span> have opened positions in this token within a <span className="text-white font-bold">30-minute window</span>. This signals high-conviction group accumulation.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Apex Strike */}
+                                <div className="grid grid-cols-12 gap-4 items-start p-4 hover:bg-white/[0.02] rounded-xl transition-colors border border-transparent hover:border-white/5 group">
+                                    <div className="col-span-4">
+                                        <div className="text-sm font-black text-amber-500 uppercase tracking-tighter mb-1">🎵 APEX STRIKE</div>
+                                        <div className="text-[9px] font-black text-amber-600/60 uppercase tracking-widest">HIGH CONVICTION</div>
+                                    </div>
+                                    <div className="col-span-8">
+                                        <p className="text-xs text-zinc-400 leading-relaxed">
+                                            A massive entry from a high-reputation player. Triggered by a <span className="text-white font-bold">&gt; 10 SOL buy</span> from a whale with a <span className="text-white font-bold">80+ Reputation Score</span>. This is a primary trend-setter signal.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Steady Breach */}
+                                <div className="grid grid-cols-12 gap-4 items-start p-4 hover:bg-white/[0.02] rounded-xl transition-colors border border-transparent hover:border-white/5 group">
+                                    <div className="col-span-4">
+                                        <div className="text-sm font-black text-blue-400 uppercase tracking-tighter mb-1">🎵 STEADY BREACH</div>
+                                        <div className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest">STEALTH ACCUMULATION</div>
+                                    </div>
+                                    <div className="col-span-8">
+                                        <p className="text-xs text-zinc-400 leading-relaxed">
+                                            Stealth accumulation behavior. Detected when a single whale executes <span className="text-white font-bold">3 or more buys</span> on the same token within <span className="text-white font-bold">60 minutes</span>. Suggests a larger intended position size being filled slowly.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-zinc-950/50 border border-zinc-800 rounded-xl">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Activity className="w-3 h-3 text-zinc-600" />
+                                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">System Calibration</span>
+                                    </div>
+                                    <p className="text-[10px] text-zinc-600 leading-relaxed">
+                                        WRAS behavioral fingerprints are calculated in real-time by the analytics engine. Signals are weighted by individual whale reputation and historical impact flow to filter out churn noise.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="px-6 py-4 bg-zinc-950/50 border-t border-zinc-800 flex justify-end">
+                                <button
+                                    onClick={() => setShowSignalGuide(false)}
+                                    className="px-6 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-bold text-zinc-300 transition-all uppercase tracking-widest"
+                                >
+                                    Dismiss
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div >
     );
 };
