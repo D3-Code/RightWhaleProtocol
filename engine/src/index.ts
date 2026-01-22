@@ -11,7 +11,7 @@ export const globalStats = {
 };
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { loadWallet } from './wallet';
-import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets, getOpenPositions, getTopWhaleTokens } from './db';
+import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets, getOpenPositions, getTopWhaleTokens, getRadarStats } from './db';
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
@@ -176,6 +176,16 @@ app.get('/radar/top-tokens', async (req, res) => {
         res.json(tokens);
     } catch (err) {
         res.status(500).send('Error fetching top tokens');
+    }
+});
+
+app.get('/radar/stats', async (req, res) => {
+    try {
+        const hours = req.query.hours ? parseInt(req.query.hours as string) : 24;
+        const stats = await getRadarStats(hours);
+        res.json(stats);
+    } catch (err) {
+        res.status(500).send('Error fetching radar stats');
     }
 });
 

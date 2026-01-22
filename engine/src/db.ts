@@ -385,3 +385,33 @@ export const getVirtualPots = async () => {
     }
 };
 
+export const getRadarStats = async (hours = 24) => {
+    if (!db) return { total_volume_24h: 0, alerts_count_24h: 0, active_whales_count: 0 };
+    try {
+        const stats = await db.get(`
+            SELECT 
+                SUM(amount) as total_volume,
+                COUNT(DISTINCT wallet) as active_whales
+            FROM whale_sightings 
+            WHERE datetime(timestamp) >= datetime('now', '-' || ? || ' hours')
+        `, hours);
+
+        // For alerts, we count sightings with a signal score > 70 (representing S and high A grades)
+        const alerts = await db.get(`
+            SELECT COUNT(*) as count 
+            FROM whale_sightings ws
+            JOIN tracked_wallets tw ON ws.wallet = tw.address
+            WHERE datetime(ws.timestamp) >= datetime('now', '-' || ? || ' hours')
+            AND (tw.reputation_score >= 80 OR (ws.amount >= 5 AND tw.reputation_score >= 60))
+        `, hours);
+
+        return {
+            total_volume_24h: stats?.total_volume || 0,
+            alerts_count_24h: alerts?.count || 0,
+            active_whales_count: stats?.active_whales || 0
+        };
+    } catch (error) {
+        console.error('Failed to fetch radar stats:', error);
+        return { total_volume_24h: 0, alerts_count_24h: 0, active_whales_count: 0 };
+    }
+};
