@@ -18,7 +18,7 @@ type TopToken = {
 export const TopWhaleTokensCard = () => {
     const [tokens, setTokens] = useState<TopToken[]>([]);
     const [timeframe, setTimeframe] = useState<number>(24); // 24h, 168h (7d), or 0 (all)
-    const [lifecycleFilter, setLifecycleFilter] = useState<'launched' | 'prebond' | 'bonded_low'>('launched');
+
     const [isLoading, setIsLoading] = useState(true);
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
@@ -28,7 +28,7 @@ export const TopWhaleTokensCard = () => {
             // Only show loading on initial load or filter change, not periodic refresh
             // setIsLoading(true); 
             const hours = timeframe === 0 ? 999999 : timeframe; // 0 = all time
-            const res = await fetch(`${ENGINE_API}/radar/top-tokens?limit=10&hours=${hours}&verifiedOnly=true&filter=${lifecycleFilter}&t=${Date.now()}`);
+            const res = await fetch(`${ENGINE_API}/radar/top-tokens?limit=10&hours=${hours}&verifiedOnly=true&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 setTokens(data);
@@ -45,13 +45,9 @@ export const TopWhaleTokensCard = () => {
         fetchTopTokens();
         const interval = setInterval(fetchTopTokens, 10000); // Update every 10 seconds
         return () => clearInterval(interval);
-    }, [timeframe, lifecycleFilter]);
+    }, [timeframe]);
 
-    const FILTER_OPTIONS = [
-        { id: 'launched', label: 'JUST LAUNCHED' },
-        { id: 'prebond', label: 'PRE-BOND' },
-        { id: 'bonded_low', label: 'BONDED < 100K' },
-    ];
+
 
     return (
         <div className="bg-black/40 border border-zinc-800 rounded-lg overflow-hidden flex flex-col h-full">
@@ -71,20 +67,7 @@ export const TopWhaleTokensCard = () => {
                 {/* Filters Row */}
                 <div className="flex items-center justify-between gap-2 mt-1">
                     {/* Lifecycle Toggles */}
-                    <div className="flex gap-1 bg-zinc-800/50 p-0.5 rounded-lg border border-zinc-700/50">
-                        {FILTER_OPTIONS.map((opt) => (
-                            <button
-                                key={opt.id}
-                                onClick={() => setLifecycleFilter(opt.id as any)}
-                                className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition-all ${lifecycleFilter === opt.id
-                                    ? 'bg-zinc-700 text-white shadow-sm ring-1 ring-zinc-600'
-                                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
-                                    }`}
-                            >
-                                {opt.label}
-                            </button>
-                        ))}
-                    </div>
+
 
                     {/* Timeframe Toggles */}
                     <div className="flex gap-1">

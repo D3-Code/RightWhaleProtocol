@@ -265,17 +265,9 @@ export const getOpenPositions = async (limit = 20) => {
     }
 };
 
-export const getTopWhaleTokens = async (limit = 10, timeframeHours = 24, verifiedOnly = false, filter = 'launched') => {
+export const getTopWhaleTokens = async (limit = 10, timeframeHours = 24, verifiedOnly = false) => {
     if (!db) return [];
     try {
-        let marketCapFilter = 'AND market_cap > 10'; // Default: Not dead
-
-        if (filter === 'prebond') {
-            marketCapFilter = 'AND market_cap < 500'; // Pre-bond curve
-        } else if (filter === 'bonded_low') {
-            marketCapFilter = 'AND market_cap >= 500 AND market_cap < 800'; // Just bonded, low cap
-        }
-
         const query = `
             SELECT 
                 ws.mint,
@@ -303,7 +295,6 @@ export const getTopWhaleTokens = async (limit = 10, timeframeHours = 24, verifie
             AND buy_volume > sell_volume -- Positive Trend: Net buying
             AND buy_volume > 5.0 -- Good Volume: At least 5 SOL bought
             AND total_tokens_acquired >= 5000000 -- Min 0.5% Supply (Assuming 1B Supply)
-            ${marketCapFilter}
             ORDER BY elite_consensus_score DESC, total_volume_sol DESC
             LIMIT ?
         `;

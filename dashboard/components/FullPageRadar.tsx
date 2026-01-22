@@ -55,7 +55,7 @@ export const FullPageRadar = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
     const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
-    const [lifecycleFilter, setLifecycleFilter] = useState<'launched' | 'prebond' | 'bonded_low'>('launched');
+    const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
     const [lastAlertId, setLastAlertId] = useState<number | null>(null);
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
@@ -91,7 +91,7 @@ export const FullPageRadar = () => {
     const fetchSightings = async () => {
         try {
             // Fetch live sightings with verified filter
-            const res = await fetch(`${ENGINE_API}/radar?limit=50&verifiedOnly=${verifiedOnly}&filter=${lifecycleFilter}&t=${Date.now()}`);
+            const res = await fetch(`${ENGINE_API}/radar?limit=50&verifiedOnly=${verifiedOnly}&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 setSightings(data);
@@ -173,7 +173,7 @@ export const FullPageRadar = () => {
 
     useEffect(() => {
         fetchSightings(); // Re-fetch when filter changes
-    }, [verifiedOnly, lifecycleFilter]);
+    }, [verifiedOnly]);
 
     const filteredSightings = sightings.filter(s => {
         // 1. Verified Filter
@@ -184,11 +184,7 @@ export const FullPageRadar = () => {
         return true;
     });
 
-    const FILTER_OPTIONS = [
-        { id: 'launched', label: 'JUST LAUNCHED' },
-        { id: 'prebond', label: 'PRE-BOND' },
-        { id: 'bonded_low', label: 'BONDED < 100K' },
-    ];
+
 
     return (
         <div className="w-full min-h-screen flex flex-col bg-black text-white font-mono-tech relative">
@@ -253,23 +249,7 @@ export const FullPageRadar = () => {
                         <span>VERIFIED ONLY</span>
                     </button>
 
-                    <div className="h-4 w-[1px] bg-zinc-800 mx-1"></div>
 
-                    {/* Lifecycle Filters */}
-                    <div className="flex gap-1 bg-zinc-800/50 p-0.5 rounded-lg border border-zinc-700/50">
-                        {FILTER_OPTIONS.map((opt) => (
-                            <button
-                                key={opt.id}
-                                onClick={() => setLifecycleFilter(opt.id as any)}
-                                className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition-all ${lifecycleFilter === opt.id
-                                    ? 'bg-zinc-700 text-white shadow-sm ring-1 ring-zinc-600'
-                                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
-                                    }`}
-                            >
-                                {opt.label}
-                            </button>
-                        ))}
-                    </div>
 
                     <div className="ml-auto text-[10px] text-zinc-600 uppercase tracking-widest">
                         Displaying last 50 sightings

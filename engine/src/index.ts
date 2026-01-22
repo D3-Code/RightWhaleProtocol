@@ -98,8 +98,7 @@ app.get('/radar', async (req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
         const verifiedOnly = req.query.verifiedOnly === 'true';
-        const filter = req.query.filter as string || 'launched';
-        const sightings = await getWhaleSightings(limit, verifiedOnly, filter);
+        const sightings = await getWhaleSightings(limit, verifiedOnly);
         const scoredSightings = sightings.map((s: any) => ({
             ...s,
             signal: calculateSignalScore(s.reputation_score || 0, s.amount || 0, s.whale_consensus || 1)
@@ -170,9 +169,8 @@ app.get('/radar/top-tokens', async (req, res) => {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
         const hours = req.query.hours ? parseInt(req.query.hours as string) : 24;
         const verifiedOnly = req.query.verifiedOnly !== 'false'; // Default to true for safety
-        const filter = req.query.filter as string || 'launched';
 
-        const tokens = await getTopWhaleTokens(limit, hours, verifiedOnly, filter);
+        const tokens = await getTopWhaleTokens(limit, hours, verifiedOnly);
         res.json(tokens);
     } catch (err) {
         res.status(500).send('Error fetching top tokens');
