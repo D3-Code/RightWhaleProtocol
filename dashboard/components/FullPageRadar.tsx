@@ -387,7 +387,12 @@ export const FullPageRadar = () => {
                                                     {s.wallet_name || `${s.wallet.slice(0, 4)}...${s.wallet.slice(-4)}`}
                                                 </span>
                                                 {s.is_dev && (
-                                                    <span className="px-1 py-0.5 bg-red-500/10 border border-red-500/20 rounded text-[8px] font-black text-red-500 uppercase tracking-tighter shrink-0">DEV</span>
+                                                    <span
+                                                        className="px-1 py-0.5 bg-red-500/10 border border-red-500/20 rounded text-[8px] font-black text-red-500 uppercase tracking-tighter shrink-0 cursor-pointer hover:bg-red-500/20 transition-colors"
+                                                        onClick={(e) => { e.stopPropagation(); setShowSignalGuide(true); }}
+                                                    >
+                                                        DEV
+                                                    </span>
                                                 )}
                                             </div>
                                             {(s.reputation_score || 0) >= 60 && (
@@ -538,6 +543,19 @@ export const FullPageRadar = () => {
                                     <div className="col-span-8">
                                         <p className="text-xs text-zinc-400 leading-relaxed">
                                             Stealth accumulation behavior. Detected when a single whale executes <span className="text-white font-bold">3 or more buys</span> on the same token within <span className="text-white font-bold">60 minutes</span>. Suggests a larger intended position size being filled slowly.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* DEV Tag */}
+                                <div className="grid grid-cols-12 gap-4 items-start p-4 hover:bg-white/[0.02] rounded-xl transition-colors border border-transparent hover:border-white/5 group">
+                                    <div className="col-span-4">
+                                        <div className="text-sm font-black text-red-500 uppercase tracking-tighter mb-1">DEV SIGHTING</div>
+                                        <div className="text-[9px] font-black text-red-600/60 uppercase tracking-widest">CREATOR ACTIVITY</div>
+                                    </div>
+                                    <div className="col-span-8">
+                                        <p className="text-xs text-zinc-400 leading-relaxed">
+                                            Indicates the wallet performing the trade is the <span className="text-white font-bold">Token Creator</span>. Creator activity can signal liquidity provision, marketing wallet funding, or potential early exit behavior. High surveillance priority.
                                         </p>
                                     </div>
                                 </div>
