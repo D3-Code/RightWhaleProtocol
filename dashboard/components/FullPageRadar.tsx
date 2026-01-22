@@ -247,7 +247,7 @@ export const FullPageRadar = () => {
                             <div className="col-span-2">Token</div>
                             <div className="col-span-1">Sol</div>
                             <div className="col-span-1">Vol</div>
-                            <div className="col-span-2">Identity</div>
+                            <div className="col-span-2">Wallet</div>
                             <div className="col-span-2">Impact</div>
                             <div className="col-span-1 text-center">Score</div>
                             <div className="col-span-1 text-center">GR</div>
