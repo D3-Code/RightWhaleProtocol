@@ -61,6 +61,7 @@ export const FullPageRadar = () => {
     const [minMarketCap, setMinMarketCap] = useState<number>(0);
     const [radarStats, setRadarStats] = useState({ total_volume_24h: 0, alerts_count_24h: 0, active_whales_count: 0 });
     const [latency, setLatency] = useState(24);
+    const [solPrice, setSolPrice] = useState(150);
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
     const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
@@ -139,6 +140,20 @@ export const FullPageRadar = () => {
         }
     };
 
+    const fetchSolPrice = async () => {
+        try {
+            const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/So11111111111111111111111111111111111111112`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.pairs?.[0]) {
+                    setSolPrice(parseFloat(data.pairs[0].priceUsd));
+                }
+            }
+        } catch (e) {
+            console.error("Failed to fetch SOL price", e);
+        }
+    };
+
     useEffect(() => {
         const interval = setInterval(() => {
             setLatency(Math.floor(Math.random() * (35 - 18 + 1)) + 18);
@@ -149,7 +164,9 @@ export const FullPageRadar = () => {
     useEffect(() => {
         fetchSightings();
         fetchStats();
+        fetchSolPrice();
         const statsInterval = setInterval(fetchStats, 30000);
+        const solPriceInterval = setInterval(fetchSolPrice, 60000);
         const ws = new WebSocket(WS_URL);
         ws.onopen = () => console.log('📡 Connected to Radar Stream');
         ws.onmessage = (event) => {
@@ -176,6 +193,7 @@ export const FullPageRadar = () => {
         return () => {
             ws.close();
             clearInterval(statsInterval);
+            clearInterval(solPriceInterval);
         };
     }, []);
 
@@ -185,7 +203,7 @@ export const FullPageRadar = () => {
 
     const filteredSightings = sightings.filter(s => {
         if (searchQuery && !s.symbol?.toUpperCase().includes(searchQuery.toUpperCase()) && !s.mint.includes(searchQuery)) return false;
-        if (minMarketCap > 0 && (s.market_cap || 0) < minMarketCap) return false;
+        if (minMarketCap > 0 && (s.market_cap || 0) * solPrice / 1000 < minMarketCap) return false;
         if (verifiedOnly && (s.reputation_score || 0) < 60) return false;
         if (onlySmartMoney && ((s.reputation_score || 0) < 60 && (s.win_rate || 0) <= 50)) return false;
         return true;
@@ -263,10 +281,16 @@ export const FullPageRadar = () => {
                             ALL MC
                         </button>
                         <button
-                            onClick={() => setMinMarketCap(10)}
-                            className={`px-3 py-1 text-[9px] font-black rounded transition-all ${minMarketCap === 10 ? 'bg-emerald-500/20 text-emerald-400' : 'text-zinc-500 hover:text-zinc-300'}`}
+                            onClick={() => setMinMarketCap(50)}
+                            className={`px-3 py-1 text-[9px] font-black rounded transition-all ${minMarketCap === 50 ? 'bg-emerald-500/20 text-emerald-400' : 'text-zinc-500 hover:text-zinc-300'}`}
                         >
-                            &gt; 10S
+                            &gt; $50K
+                        </button>
+                        <button
+                            onClick={() => setMinMarketCap(250)}
+                            className={`px-3 py-1 text-[9px] font-black rounded transition-all ${minMarketCap === 250 ? 'bg-emerald-500/20 text-emerald-400' : 'text-zinc-500 hover:text-zinc-300'}`}
+                        >
+                            &gt; $250K
                         </button>
                     </div>
 
@@ -443,7 +467,9 @@ export const FullPageRadar = () => {
                                             </div>
                                             <div className="flex flex-col min-w-0">
                                                 <span className="text-[13px] font-black text-white truncate uppercase tracking-tight">{s.symbol || '---'}</span>
-                                                <span className="text-[8px] text-zinc-600 font-mono truncate max-w-[80px]">{s.mint}</span>
+                                                <span className="text-[8px] text-zinc-600 font-mono truncate max-w-[80px]">
+                                                    {s.market_cap ? `$${Math.round((s.market_cap * solPrice) / 1000)}k MC` : `${s.mint.slice(0, 4)}...${s.mint.slice(-4)}`}
+                                                </span>
                                             </div>
                                         </div>
 
