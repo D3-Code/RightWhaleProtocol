@@ -242,21 +242,14 @@ export const FullPageRadar = () => {
                 </div>
             )}
 
-            {/* Top Whale Tokens Section */}
-            <div className="px-6 pt-4 z-10 w-full">
-                <div className="max-w-7xl mx-auto">
-                    <TopWhaleTokensCard />
-                </div>
-            </div>
-
-            {/* 2-Column Layout: Whale Trades + Active Positions */}
+            {/* 2-Column Layout: Whale Trades + Sidebar */}
             <div className="flex-1 overflow-hidden p-6 z-10 w-full">
-                <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
-                    {/* Left: Whale Trades (2/3 width) */}
-                    <div className="lg:col-span-2 h-full overflow-auto">
+                <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                    {/* Left: Whale Trades (2/3 width) - Scrollable */}
+                    <div className="lg:col-span-2 h-full flex flex-col border border-zinc-800 bg-black/40 rounded-lg overflow-hidden">
                         <div className="w-full">
                             {/* Table Header */}
-                            <div className="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
+                            <div className="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 bg-zinc-900/50">
                                 <div className="col-span-1">Time</div>
                                 <div className="col-span-1">Type</div>
                                 <div className="col-span-2">Token</div>
@@ -268,142 +261,141 @@ export const FullPageRadar = () => {
                                 <div className="col-span-1 text-right">Action</div>
                             </div>
 
-                            {/* Table Body */}
-                            <div className="space-y-1 mt-2">
-                                <AnimatePresence mode="popLayout">
-                                    {filteredSightings.map((s) => (
-                                        <motion.div
-                                            key={`${s.id}-${s.timestamp}`}
-                                            initial={{ opacity: 0, y: -10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            className={`
-                                        grid grid-cols-12 gap-4 px-4 py-3 items-center rounded border-l-2
-                                        ${s.isBuy
-                                                    ? 'bg-emerald-500/5 border-emerald-500 hover:bg-emerald-500/10'
-                                                    : 'bg-red-500/5 border-red-500 hover:bg-red-500/10'
-                                                } transition-colors border-y border-r border-transparent hover:border-white/10 group
-                                    `}
-                                        >
-                                            {/* Time */}
-                                            <div className="col-span-1 flex items-center gap-2 text-zinc-400 text-xs text-nowrap truncate">
-                                                {new Date(s.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' })}
-                                            </div>
-
-                                            {/* Type */}
-                                            <div className="col-span-1">
-                                                <span className={`
-                                            px-2 py-1 rounded text-[10px] font-bold uppercase
-                                            ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}
-                                        `}>
-                                                    {s.isBuy ? 'BUY' : 'SELL'}
-                                                </span>
-                                            </div>
-
-                                            {/* Token */}
-                                            <div className="col-span-2 flex flex-col">
-                                                <div className="flex items-center gap-2 font-bold text-white text-xs truncate">
-                                                    {s.image_uri ? (
-                                                        <img
-                                                            src={s.image_uri}
-                                                            alt={s.symbol}
-                                                            className="w-5 h-5 rounded-full border border-zinc-700"
-                                                            onError={(e) => {
-                                                                e.currentTarget.style.display = 'none';
-                                                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                                                            }}
-                                                        />
-                                                    ) : null}
-                                                    <Target className={`w-3 h-3 text-zinc-500 ${s.image_uri ? 'hidden' : ''}`} />
-                                                    {s.symbol || 'UNKNOWN'}
+                            {/* Table Body - Scrollable Area */}
+                            <div className="overflow-y-auto max-h-[calc(100vh-450px)] no-scrollbar">
+                                <div className="space-y-1 p-2">
+                                    <AnimatePresence mode="popLayout">
+                                        {filteredSightings.map((s) => (
+                                            <motion.div
+                                                key={`${s.id}-${s.timestamp}`}
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className={`
+                                            grid grid-cols-12 gap-4 px-4 py-3 items-center rounded border-l-2
+                                            ${s.isBuy
+                                                        ? 'bg-emerald-500/5 border-emerald-500 hover:bg-emerald-500/10'
+                                                        : 'bg-red-500/5 border-red-500 hover:bg-red-500/10'
+                                                    } transition-colors border-y border-r border-transparent hover:border-white/10 group
+                                        `}
+                                            >
+                                                {/* Time */}
+                                                <div className="col-span-1 flex items-center gap-2 text-zinc-400 text-xs text-nowrap truncate">
+                                                    {new Date(s.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' })}
                                                 </div>
-                                                <span className="text-[9px] text-zinc-500 font-mono truncate">{s.mint}</span>
-                                            </div>
 
-                                            {/* Amount */}
-                                            <div className="col-span-1">
-                                                <span className={`text-sm font-bold ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                    {s.amount.toFixed(2)}
-                                                </span>
-                                            </div>
-
-                                            {/* Wallet */}
-                                            <div className="col-span-2">
-                                                <code className="px-1 py-0.5 bg-black/50 rounded text-[9px] text-zinc-400 font-mono truncate block">
-                                                    {s.wallet_name || s.wallet.slice(0, 4) + '...' + s.wallet.slice(-4)}
-                                                </code>
-                                            </div>
-
-                                            {/* KOL Impact Stats */}
-                                            <div className="col-span-2 flex flex-col items-center gap-1">
-                                                {(s.avg_impact_buyers || 0) > 0 && (
-                                                    <div className="flex items-center gap-3 w-full justify-center">
-                                                        <div className="flex items-center gap-1 text-[10px] text-purple-400" title="Followers (Unique Buyers)">
-                                                            <Users className="w-3 h-3" />
-                                                            {s.avg_impact_buyers}
-                                                        </div>
-                                                        <div className="flex items-center gap-1 text-[10px] text-blue-400" title="Volume Impact">
-                                                            <Activity className="w-3 h-3" />
-                                                            {s.avg_impact_volume?.toFixed(1)}◎
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {/* Signal Strength Bar */}
-                                                {(s.avg_impact_buyers || 0) > 5 && (
-                                                    <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                                                        <div
-                                                            className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
-                                                            style={{ width: `${Math.min((s.avg_impact_buyers || 0) * 5, 100)}%` }}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Signal Score */}
-                                            <div className="col-span-1 text-center font-bold text-zinc-400">
-                                                {s.signal?.score || 0}%
-                                            </div>
-
-                                            {/* Signal Grade */}
-                                            <div className="col-span-1 flex justify-center">
-                                                <div className={`
-                                                    w-6 h-6 rounded flex items-center justify-center font-black text-xs
-                                                    ${s.signal?.grade === 'S' ? 'bg-fuchsia-500/20 text-fuchsia-400 border border-fuchsia-500/50 shadow-[0_0_10px_rgba(217,70,239,0.3)]' :
-                                                        s.signal?.grade === 'A' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50' :
-                                                            s.signal?.grade === 'B' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' :
-                                                                s.signal?.grade === 'C' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' :
-                                                                    'bg-zinc-800 text-zinc-500'}
-                                                `}>
-                                                    {s.signal?.grade || 'D'}
+                                                {/* Type */}
+                                                <div className="col-span-1 text-center">
+                                                    <span className={`
+                                                px-1 py-0.5 rounded text-[10px] font-black
+                                                ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}
+                                            `}>
+                                                        {s.isBuy ? 'BUY' : 'SELL'}
+                                                    </span>
                                                 </div>
-                                            </div>
 
-                                            {/* Action */}
-                                            <div className="col-span-1 text-right">
-                                                <a
-                                                    href={`https://pump.fun/coin/${s.mint}`}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="inline-flex items-center justify-center p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                                                >
-                                                    <ArrowUpRight className="w-4 h-4" />
-                                                </a>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
+                                                {/* Token */}
+                                                <div className="col-span-2 flex flex-col min-w-0">
+                                                    <div className="flex items-center gap-2 font-bold text-white text-xs truncate">
+                                                        {s.image_uri ? (
+                                                            <img
+                                                                src={s.image_uri}
+                                                                alt={s.symbol}
+                                                                className="w-5 h-5 rounded-full border border-zinc-700 shrink-0"
+                                                                onError={(e) => {
+                                                                    e.currentTarget.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <Target className="w-3 h-3 text-zinc-500 shrink-0" />
+                                                        )}
+                                                        <span className="truncate">{s.symbol || 'UNKNOWN'}</span>
+                                                    </div>
+                                                    <span className="text-[9px] text-zinc-500 font-mono truncate">{s.mint}</span>
+                                                </div>
+
+                                                {/* Amount */}
+                                                <div className="col-span-1">
+                                                    <span className={`text-sm font-bold ${s.isBuy ? 'text-emerald-400' : 'text-red-400'}`}>
+                                                        {s.amount.toFixed(1)}
+                                                    </span>
+                                                </div>
+
+                                                {/* Wallet */}
+                                                <div className="col-span-2 flex items-center gap-1.5 min-w-0">
+                                                    <div className="truncate flex-1">
+                                                        <code className="px-1 py-0.5 bg-black/50 rounded text-[9px] text-zinc-400 font-mono truncate block">
+                                                            {s.wallet_name || s.wallet.slice(0, 4) + '...' + s.wallet.slice(-4)}
+                                                        </code>
+                                                    </div>
+                                                    {(s.reputation_score || 0) >= 60 && (
+                                                        <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                                                    )}
+                                                </div>
+
+                                                {/* KOL Impact Stats */}
+                                                <div className="col-span-2 flex flex-col items-center gap-1">
+                                                    {(s.avg_impact_buyers || 0) > 0 && (
+                                                        <div className="flex items-center gap-3 w-full justify-center">
+                                                            <div className="flex items-center gap-1 text-[10px] text-purple-400" title="Followers (Unique Buyers)">
+                                                                <Users className="w-3 h-3" />
+                                                                {s.avg_impact_buyers}
+                                                            </div>
+                                                            <div className="flex items-center gap-1 text-[10px] text-blue-400" title="Volume Impact">
+                                                                <Activity className="w-3 h-3" />
+                                                                {s.avg_impact_volume?.toFixed(1)}◎
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Signal Score */}
+                                                <div className="col-span-1 text-center font-bold text-zinc-400">
+                                                    {s.signal?.score || 0}%
+                                                </div>
+
+                                                {/* Signal Grade */}
+                                                <div className="col-span-1 flex justify-center">
+                                                    <div className={`
+                                                        w-7 h-7 rounded flex items-center justify-center font-black text-sm
+                                                        ${s.signal?.grade === 'S' ? 'bg-fuchsia-500/20 text-fuchsia-400 border border-fuchsia-500/50 shadow-[0_0_10px_rgba(217,70,239,0.3)]' :
+                                                            s.signal?.grade === 'A' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50' :
+                                                                s.signal?.grade === 'B' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' :
+                                                                    s.signal?.grade === 'C' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' :
+                                                                        'bg-zinc-800 text-zinc-500'}
+                                                    `}>
+                                                        {s.signal?.grade || 'D'}
+                                                    </div>
+                                                </div>
+
+                                                {/* Action */}
+                                                <div className="col-span-1 text-right">
+                                                    <a
+                                                        href={`https://pump.fun/coin/${s.mint}`}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="inline-flex items-center justify-center p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                                                    >
+                                                        <ArrowUpRight className="w-4 h-4" />
+                                                    </a>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
+                                </div>
 
                                 {filteredSightings.length === 0 && !isLoading && (
                                     <div className="p-12 text-center text-zinc-500 flex flex-col items-center gap-4">
                                         <Radar className="w-12 h-12 opacity-20 animate-pulse" />
-                                        <p>SCANNING GLOBAL STREAMS FOR WHALE ACTIVITY...</p>
+                                        <p className="font-bold tracking-widest">SCANNING GLOBAL STREAMS FOR WHALE ACTIVITY...</p>
                                     </div>
                                 )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Right: Active Positions (1/3 width) */}
-                    <div className="lg:col-span-1 h-full">
+                    {/* Right Sidebar: Top Tokens + Active Positions */}
+                    <div className="lg:col-span-1 flex flex-col gap-4 h-full overflow-y-auto no-scrollbar">
+                        <TopWhaleTokensCard />
                         <ActivePositionsCard />
                     </div>
                 </div>
