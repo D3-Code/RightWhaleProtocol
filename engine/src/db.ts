@@ -171,11 +171,11 @@ export const getOpenPositions = async (limit = 20) => {
                 tw.twitter_handle,
                 tw.reputation_score,
                 tw.win_rate,
-                (julianday('now') - julianday(p.opened_at)) * 24 * 60 AS hold_minutes
+                (julianday('now') - julianday(p.buy_timestamp)) * 24 * 60 AS hold_minutes
             FROM positions p
             LEFT JOIN tracked_wallets tw ON p.wallet = tw.address
-            WHERE p.is_open = 1
-            ORDER BY p.opened_at DESC
+            WHERE p.status = 'OPEN'
+            ORDER BY p.buy_timestamp DESC
             LIMIT ?
         `, limit);
     } catch (error) {

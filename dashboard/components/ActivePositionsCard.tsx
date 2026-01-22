@@ -9,8 +9,9 @@ type OpenPosition = {
     wallet: string;
     mint: string;
     symbol?: string;
-    amount_sol: number;
-    opened_at: string;
+    buy_amount_sol: number;
+    buy_timestamp: string;
+    status: string;
     hold_minutes: number;
     wallet_name?: string;
     twitter_handle?: string;
@@ -139,7 +140,7 @@ export const ActivePositionsCard = () => {
                                 <div className="grid grid-cols-2 gap-2 text-xs">
                                     <div>
                                         <div className="text-zinc-500 uppercase text-[10px] mb-0.5">Volume</div>
-                                        <div className="font-bold text-emerald-400">{pos.amount_sol.toFixed(2)} SOL</div>
+                                        <div className="font-bold text-emerald-400">{pos.buy_amount_sol.toFixed(2)} SOL</div>
                                     </div>
                                     <div>
                                         <div className="text-zinc-500 uppercase text-[10px] mb-0.5">Holding</div>
