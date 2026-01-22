@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, ExternalLink, TrendingUp, Trophy } from "lucide-react";
+import { Clock, ExternalLink, TrendingUp, Trophy, Users, Activity } from "lucide-react";
 
 type OpenPosition = {
     id: number;
@@ -17,6 +17,8 @@ type OpenPosition = {
     twitter_handle?: string;
     reputation_score?: number;
     win_rate?: number;
+    impact_volume?: number;
+    impact_buyers?: number;
 };
 
 const formatHoldTime = (minutes: number): string => {
@@ -152,7 +154,7 @@ export const ActivePositionsCard = () => {
                                 </div>
 
                                 {/* Metrics */}
-                                <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-white/5">
+                                <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-white/5 mb-2">
                                     <div>
                                         <div className="text-zinc-600 uppercase text-[8px] font-black mb-0.5 tracking-tighter">Position Size</div>
                                         <div className="font-black text-zinc-300 text-[11px]">{pos.buy_amount_sol.toFixed(2)} SOL</div>
@@ -162,6 +164,27 @@ export const ActivePositionsCard = () => {
                                         <div className={`font-black flex items-center gap-1 text-[11px] ${getHoldColor(pos.hold_minutes)}`}>
                                             <span>{formatHoldTime(pos.hold_minutes)}</span>
                                         </div>
+                                    </div>
+                                </div>
+
+                                {/* Impact (Live Flow) */}
+                                <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                                    <div className="text-zinc-600 uppercase text-[8px] font-black tracking-tighter underline decoration-zinc-800 underline-offset-2">Live Impact Flow</div>
+                                    <div className="flex items-center gap-3">
+                                        {(pos.impact_buyers || 0) > 0 ? (
+                                            <>
+                                                <div className="flex items-center gap-1 text-[9px] font-black text-purple-400">
+                                                    <Users className="w-2.5 h-2.5" />
+                                                    {pos.impact_buyers}
+                                                </div>
+                                                <div className="flex items-center gap-1 text-[9px] font-black text-blue-400">
+                                                    <Activity className="w-2.5 h-2.5" />
+                                                    {pos.impact_volume?.toFixed(1)} SOL
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <span className="text-[8px] text-zinc-700 font-black uppercase tracking-widest">Awaiting Alpha</span>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>

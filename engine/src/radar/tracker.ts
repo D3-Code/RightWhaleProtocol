@@ -19,6 +19,45 @@ const getDB = async () => {
 const MONITORING_DURATION_MS = 10 * 60 * 1000; // 10 Minutes
 
 /**
+ * Trade Song Classifier: Behavioral Fingerprinting
+ */
+export const classifyTradeSong = async (wallet: string, mint: string, amountSol: number, isBuy: boolean): Promise<string> => {
+    const database = await getDB();
+
+    if (!isBuy) return ""; // We mainly classify buy interest
+
+    // 1. APEX STRIKE (High conviction buy from high-rep whale)
+    const walletStats = await database.get(`SELECT reputation_score FROM tracked_wallets WHERE address = ?`, wallet);
+    if (amountSol >= 10 && (walletStats?.reputation_score || 0) >= 80) {
+        return "🎵 APEX STRIKE";
+    }
+
+    // 2. STEALTH ACCUMULATION (Multiple small-medium buys)
+    const recentBuys = await database.get(`
+        SELECT COUNT(*) as count FROM positions 
+        WHERE wallet = ? AND mint = ? AND status = 'OPEN' 
+        AND datetime(buy_timestamp) >= datetime('now', '-1 hour')
+    `, wallet, mint);
+
+    if ((recentBuys?.count || 0) >= 3) {
+        return "🎵 STEADY BREACH";
+    }
+
+    // 3. POD CALL (Consensus building)
+    const pod = await database.get(`
+        SELECT COUNT(DISTINCT wallet) as count FROM positions 
+        WHERE mint = ? AND status = 'OPEN' 
+        AND datetime(buy_timestamp) >= datetime('now', '-30 minutes')
+    `, mint);
+
+    if ((pod?.count || 0) >= 5) {
+        return "🎵 POD CHORUS";
+    }
+
+    return "";
+};
+
+/**
  * processTrade
  * Core logic to update "Smart Money" stats based on a new trade.
  * - Tracks PnL for closed positions
@@ -142,9 +181,15 @@ const updateWalletStats = async (wallet: string, pnl: number, isChurn = false) =
     // - 10 if isChurn (Scalper Penalty)
     let score = 50 + Math.min(newTotalProfit * 1, 30) + (winRate * 0.2);
     if (isChurn) {
-        score -= 10;
-        console.log(`[Tracker] Penalty applied to ${wallet.slice(0, 4)} for Churn behavior: -10 Reputation`);
+        score -= 15; // Increased penalty for Churn
+        console.log(`[Tracker] Penalty applied to ${wallet.slice(0, 4)} for Churn behavior: -15 Reputation`);
     }
+
+    // COGNITIVE DEPTH UPDATES
+    const maxWin = Math.max(stats.max_win_sol || 0, pnl);
+    const holdMs = Date.now() - new Date(new Date().toISOString()).getTime(); // Mocking actual hold time for update
+    // Note: pnl is passed from closed position, so we can calculate max_hold_time here if we had position data
+    // In updateWalletStats, we just update the aggregates.
 
     if (score > 100) score = 100;
     if (score < 0) score = 0;
@@ -166,9 +211,9 @@ const updateWalletStats = async (wallet: string, pnl: number, isChurn = false) =
 
     await database.run(
         `UPDATE tracked_wallets 
-         SET win_rate = ?, total_profit_sol = ?, total_trades = ?, wins = ?, losses = ?, reputation_score = ?, avg_impact_volume = ?, avg_impact_buyers = ?, last_active = ?
+         SET win_rate = ?, total_profit_sol = ?, total_trades = ?, wins = ?, losses = ?, reputation_score = ?, avg_impact_volume = ?, avg_impact_buyers = ?, last_active = ?, max_win_sol = ?
          WHERE address = ?`,
-        winRate, newTotalProfit, newTotalTrades, newWins, newLosses, Math.floor(score), avgImpactVol, avgImpactBuy, new Date().toISOString(), wallet
+        winRate, newTotalProfit, newTotalTrades, newWins, newLosses, Math.floor(score), avgImpactVol, avgImpactBuy, new Date().toISOString(), maxWin, wallet
     );
 
     console.log(`[Tracker] Updated Stats for ${wallet.slice(0, 4)}: Score ${Math.floor(score)} | Impact ${avgImpactBuy.toFixed(1)} followers`);

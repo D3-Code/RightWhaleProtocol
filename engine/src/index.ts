@@ -1,4 +1,6 @@
 import express from 'express';
+import { createServer } from 'http';
+import { initWebSocketServer } from './server_ws';
 import cors from 'cors';
 // Global Stats Store (In-memory for prototype, move to DB for prod)
 export const globalStats = {
@@ -16,10 +18,13 @@ import { startMonitor } from './monitor';
 import { calculateSignalScore } from './radar/scoring';
 import { startMarketMonitor } from './market';
 import { lastAiDecision } from './ai_trader';
+import { fetchTokenMetadata } from './radar/metadata';
+import { getTokenSymbol, getTokenName } from './radar/registry';
 
 dotenv.config();
 
 const app = express();
+const server = createServer(app);
 const port = process.env.PORT || 3001;
 
 app.use(cors());
@@ -93,7 +98,8 @@ app.get('/radar', async (req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
         const verifiedOnly = req.query.verifiedOnly === 'true';
-        const sightings = await getWhaleSightings(limit, verifiedOnly);
+        const filter = req.query.filter as string || 'launched';
+        const sightings = await getWhaleSightings(limit, verifiedOnly, filter);
         const scoredSightings = sightings.map((s: any) => ({
             ...s,
             signal: calculateSignalScore(s.reputation_score || 0, s.amount || 0, s.whale_consensus || 1)
@@ -118,11 +124,42 @@ app.get('/radar/positions', async (req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
         const positions = await getOpenPositions(limit);
-        const scoredPositions = positions.map((p: any) => ({
-            ...p,
-            signal: calculateSignalScore(p.reputation_score || 0, p.buy_amount_sol || 0, p.whale_consensus || 1)
+
+        // Enrich with metadata if missing
+        const enrichedPositions = await Promise.all(positions.map(async (p: any) => {
+            let symbol = p.symbol;
+
+            // If symbol is missing or UNKNOWN, try to resolve it
+            if (!symbol || symbol === 'UNKNOWN') {
+                // 1. Check Registry
+                symbol = getTokenSymbol(p.mint);
+                console.log(`[Enrich] Registry check for ${p.mint}: ${symbol}`);
+
+                // 2. Fetch from Pump.fun if still unknown
+                if (symbol === 'UNKNOWN') {
+                    console.log(`[Enrich] Fetching metadata for ${p.mint}...`);
+                    try {
+                        const metadata = await fetchTokenMetadata(p.mint);
+                        if (metadata) {
+                            symbol = metadata.symbol;
+                            console.log(`[Enrich] Resolved: ${symbol}`);
+                        } else {
+                            console.log(`[Enrich] Failed to resolve metadata for ${p.mint}`);
+                        }
+                    } catch (e) {
+                        console.error(`[Enrich] Error fetching metadata:`, e);
+                    }
+                }
+            }
+
+            return {
+                ...p,
+                symbol,
+                signal: calculateSignalScore(p.reputation_score || 0, p.buy_amount_sol || 0, p.whale_consensus || 1)
+            };
         }));
-        res.json(scoredPositions);
+
+        res.json(enrichedPositions);
     } catch (err) {
         res.status(500).send('Error fetching positions');
     }
@@ -133,7 +170,9 @@ app.get('/radar/top-tokens', async (req, res) => {
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
         const hours = req.query.hours ? parseInt(req.query.hours as string) : 24;
         const verifiedOnly = req.query.verifiedOnly !== 'false'; // Default to true for safety
-        const tokens = await getTopWhaleTokens(limit, hours, verifiedOnly);
+        const filter = req.query.filter as string || 'launched';
+
+        const tokens = await getTopWhaleTokens(limit, hours, verifiedOnly, filter);
         res.json(tokens);
     } catch (err) {
         res.status(500).send('Error fetching top tokens');
@@ -141,7 +180,9 @@ app.get('/radar/top-tokens', async (req, res) => {
 });
 
 // Start Server
-app.listen(port, () => {
+// Start Server
+initWebSocketServer(server);
+server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
 

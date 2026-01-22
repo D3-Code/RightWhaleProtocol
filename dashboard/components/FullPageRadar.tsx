@@ -30,6 +30,10 @@ type WhaleSighting = {
         score: number;
         grade: string;
     };
+    song_tag?: string;
+    whale_consensus?: number;
+    market_cap?: number; // Added for filtering
+    pod_reputation_sum?: number;
 };
 
 type TopWhale = {
@@ -41,6 +45,8 @@ type TopWhale = {
     avg_impact_buyers?: number;
     wallet_name?: string;
     twitter_handle?: string;
+    max_win_sol?: number;
+    alpha_score?: number;
 };
 
 export const FullPageRadar = () => {
@@ -49,9 +55,11 @@ export const FullPageRadar = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [onlySmartMoney, setOnlySmartMoney] = useState(false);
     const [verifiedOnly, setVerifiedOnly] = useState(false); // Default: show all whales
+    const [lifecycleFilter, setLifecycleFilter] = useState<'launched' | 'prebond' | 'bonded_low'>('launched');
     const [lastAlertId, setLastAlertId] = useState<number | null>(null);
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
+    const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
 
     const playAlert = (grade: string) => {
         try {
@@ -59,8 +67,12 @@ export const FullPageRadar = () => {
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
-            // Higher pitch for S-grade
-            osc.frequency.setValueAtTime(grade === 'S' ? 880 : 440, ctx.currentTime);
+            // Higher pitch for ALPHA/S-grade
+            let frequency = 440;
+            if (grade === 'S') frequency = 880;
+            if (grade === 'ALPHA') frequency = 1320; // Piercing high for ripples
+
+            osc.frequency.setValueAtTime(frequency, ctx.currentTime);
             osc.type = 'sine';
 
             gain.gain.setValueAtTime(0.1, ctx.currentTime);
@@ -79,7 +91,7 @@ export const FullPageRadar = () => {
     const fetchSightings = async () => {
         try {
             // Fetch live sightings with verified filter
-            const res = await fetch(`${ENGINE_API}/radar?limit=50&verifiedOnly=${verifiedOnly}&t=${Date.now()}`);
+            const res = await fetch(`${ENGINE_API}/radar?limit=50&verifiedOnly=${verifiedOnly}&filter=${lifecycleFilter}&t=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 setSightings(data);
@@ -90,7 +102,12 @@ export const FullPageRadar = () => {
                     const topSighting = data[0];
                     if (topSighting.id !== lastAlertId) {
                         const grade = topSighting.signal?.grade;
-                        if (grade === 'S' || grade === 'A') {
+                        const isAlphaSighting = (topSighting.reputation_score || 0) >= 70 && topSighting.whale_consensus <= 1;
+
+                        if (isAlphaSighting) {
+                            // Salinity Sensor: Special high-pitched alert for early alpha ripples
+                            playAlert('ALPHA');
+                        } else if (grade === 'S' || grade === 'A') {
                             playAlert(grade);
                         }
                         setLastAlertId(topSighting.id);
@@ -106,18 +123,72 @@ export const FullPageRadar = () => {
             }
         } catch (e) {
             console.error("Radar offline");
+        } finally {
+            setIsLoading(false);
         }
     };
 
     useEffect(() => {
+        // Initial Fetch
         fetchSightings();
-        const interval = setInterval(fetchSightings, 2000);
-        return () => clearInterval(interval);
-    }, [verifiedOnly]); // Re-fetch when filter changes
 
-    const filteredSightings = onlySmartMoney
-        ? sightings.filter(s => (s.reputation_score || 0) >= 60 || (s.win_rate || 0) > 50)
-        : sightings;
+        // WebSocket Connection
+        const ws = new WebSocket(WS_URL);
+
+        ws.onopen = () => {
+            console.log('📡 Connected to Radar Stream');
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const payload = JSON.parse(event.data);
+                if (payload.type === 'whale-sighting') {
+                    const newSighting = payload.data;
+
+                    // Play Alert
+                    const grade = newSighting.signal?.grade;
+                    const isAlphaSighting = (newSighting.reputation_score || 0) >= 70 && newSighting.whale_consensus <= 1;
+
+                    if (isAlphaSighting) {
+                        playAlert('ALPHA');
+                    } else if (grade === 'S' || grade === 'A') {
+                        playAlert(grade);
+                    }
+
+                    setSightings(prev => {
+                        // Prevent duplicates
+                        if (prev.find(s => s.id === newSighting.id)) return prev;
+                        return [newSighting, ...prev].slice(0, 50);
+                    });
+                }
+            } catch (e) {
+                console.error('WS Parse Error', e);
+            }
+        };
+
+        return () => {
+            ws.close();
+        };
+    }, []); // Run once on mount
+
+    useEffect(() => {
+        fetchSightings(); // Re-fetch when filter changes
+    }, [verifiedOnly, lifecycleFilter]);
+
+    const filteredSightings = sightings.filter(s => {
+        // 1. Verified Filter
+        if (verifiedOnly && (s.reputation_score || 0) < 60) return false;
+        // 2. Smart Money Filter
+        if (onlySmartMoney && ((s.reputation_score || 0) < 60 && (s.win_rate || 0) <= 50)) return false;
+
+        return true;
+    });
+
+    const FILTER_OPTIONS = [
+        { id: 'launched', label: 'JUST LAUNCHED' },
+        { id: 'prebond', label: 'PRE-BOND' },
+        { id: 'bonded_low', label: 'BONDED < 100K' },
+    ];
 
     return (
         <div className="w-full min-h-screen flex flex-col bg-black text-white font-mono-tech relative">
@@ -141,8 +212,11 @@ export const FullPageRadar = () => {
 
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/5 border border-emerald-500/20 rounded-full">
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <span className="text-xs font-bold text-emerald-500">LIVE FEED CONNECTED</span>
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span className="text-xs font-bold text-emerald-500">REALTIME FEED</span>
                     </div>
                     <div className="text-right hidden md:block">
                         <p className="text-xs text-zinc-500">SYSTEM TIME</p>
@@ -153,7 +227,7 @@ export const FullPageRadar = () => {
 
             {/* Toolbar */}
             <div className="sticky top-[85px] flex items-center justify-between px-6 py-3 border-b border-zinc-800 bg-black/60 backdrop-blur-md z-40">
-                <div className="flex gap-2 max-w-[1800px] mx-auto w-full">
+                <div className="flex gap-2 max-w-[1800px] mx-auto w-full items-center">
                     <button className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs text-zinc-300 transition-colors">
                         <Filter className="w-3 h-3" />
                         <span>Filter: &gt; 1.0 SOL</span>
@@ -178,7 +252,25 @@ export const FullPageRadar = () => {
                         <span>{verifiedOnly ? '🏆' : '👁️'}</span>
                         <span>VERIFIED ONLY</span>
                     </button>
+
                     <div className="h-4 w-[1px] bg-zinc-800 mx-1"></div>
+
+                    {/* Lifecycle Filters */}
+                    <div className="flex gap-1 bg-zinc-800/50 p-0.5 rounded-lg border border-zinc-700/50">
+                        {FILTER_OPTIONS.map((opt) => (
+                            <button
+                                key={opt.id}
+                                onClick={() => setLifecycleFilter(opt.id as any)}
+                                className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition-all ${lifecycleFilter === opt.id
+                                    ? 'bg-zinc-700 text-white shadow-sm ring-1 ring-zinc-600'
+                                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
+                                    }`}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
+
                     <div className="ml-auto text-[10px] text-zinc-600 uppercase tracking-widest">
                         Displaying last 50 sightings
                     </div>
@@ -207,6 +299,9 @@ export const FullPageRadar = () => {
                                         <div className="flex gap-3 text-[9px] font-bold">
                                             <span className="text-emerald-500">{whale.win_rate?.toFixed(0)}% WR</span>
                                             <span className="text-amber-500">+{whale.total_profit_sol?.toFixed(1)} SOL</span>
+                                            {whale.max_win_sol && whale.max_win_sol > 0 && (
+                                                <span className="text-purple-400">🌊 DEPTH: {whale.max_win_sol.toFixed(0)}S</span>
+                                            )}
                                         </div>
                                     </div>
                                     {index < topWhales.length - 1 && <div className="ml-4 w-1 h-1 bg-zinc-800 rounded-full"></div>}
@@ -260,8 +355,13 @@ export const FullPageRadar = () => {
                                                 ? 'bg-emerald-500/[0.015] border-emerald-500/60 hover:bg-emerald-500/[0.04]'
                                                 : 'bg-red-500/[0.015] border-red-500/60 hover:bg-red-500/[0.04]'
                                             } transition-all border-y border-r border-transparent hover:border-white/5 group relative
+                                            ${s.whale_consensus && s.whale_consensus >= 5 ? 'ring-1 ring-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.05)]' : ''}
                                         `}
                                     >
+                                        {/* Pod Pulse Indicator */}
+                                        {s.whale_consensus && s.whale_consensus >= 3 && (
+                                            <div className="absolute -left-[2px] top-0 bottom-0 w-1 bg-emerald-500 animate-pulse z-10 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                                        )}
                                         <div className="col-span-1 text-zinc-500 text-[10px] font-bold font-mono">
                                             {new Date(s.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                         </div>
@@ -307,7 +407,19 @@ export const FullPageRadar = () => {
                                         </div>
 
                                         <div className="col-span-2">
-                                            {(s.avg_impact_buyers || 0) > 0 ? (
+                                            {s.song_tag ? (
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-[10px] font-black text-amber-400/90 animate-pulse tracking-tight whitespace-nowrap">
+                                                        {s.song_tag}
+                                                    </span>
+                                                    {s.whale_consensus && s.whale_consensus >= 3 && (
+                                                        <div className="flex items-center gap-1 text-[8px] font-bold text-emerald-500/80 uppercase">
+                                                            <Activity className="w-2 h-2" />
+                                                            Pod Active
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (s.avg_impact_buyers || 0) > 0 ? (
                                                 <div className="flex items-center gap-3">
                                                     <div className="flex items-center gap-1 text-[10px] font-bold text-purple-400/80">
                                                         <Users className="w-3 h-3" />

@@ -1,8 +1,11 @@
 import WebSocket from 'ws';
-import { initDB, logWhaleSighting, registerTokenCreator } from '../db';
-import { processTrade } from './tracker';
+import { broadcast } from '../server_ws';
+import { calculateSignalScore } from './scoring';
+import { initDB, logWhaleSighting, registerTokenCreator, getWalletStats, getConsensusStats } from '../db';
+import { processTrade, classifyTradeSong } from './tracker';
 import { fetchTokenMetadata } from './metadata';
 import { registerToken, getTokenSymbol, getTokenName } from './registry';
+import { isQualityWhale } from './filters';
 
 /**
  * RightWhale Radar: Real-Time Listener
@@ -23,19 +26,18 @@ export const startRadar = async () => {
     ws.on('open', () => {
         console.log('📡 WRAS Online: Monitoring Pump.fun streams...');
 
-        // Subscribe to New Token Creation (Always available global stream)
-        // This is "Alpha" source #1
+        // 1. Subscribe to New Token Creation (Alpha Source)
         ws.send(JSON.stringify({
             method: "subscribeNewToken"
         }));
 
-        // Subscribe to Trades? 
-        // Note: Global trade stream might be heavy or require specific keys.
-        // We will try to subscribe, but usually you need to specify accounts/mints.
-        // For MVP, tracking "New Token" events is a good proxy for "New Opportunities".
+        // 2. Subscribe to GLOBAL TRADES (The Bonding Curve Program)
+        ws.send(JSON.stringify({
+            method: "subscribeAccountTrade",
+            keys: ["6EF8rrecthR5Dzo7QZCr6dgQC2CHJ9ay98uREy6Bmp"]
+        }));
 
-        // If we want WHALE tracker on specific coins, we'd need to subscribe to them.
-        // Let's try to see if a global trade stream exists or if we settle for New Tokens + specific lists.
+        console.log('   📡 Global Dragnet Deployed: Tracking ALL non-migrated tokens...');
     });
 
     ws.on('message', async (data: WebSocket.Data) => {
@@ -48,12 +50,9 @@ export const startRadar = async () => {
                 console.log(`   Mint: ${event.mint}`);
                 console.log(`   Dev: ${event.traderPublicKey}`);
 
-                // Register token name/symbol for future lookups
                 registerToken(event.mint, event.name, event.symbol);
                 await registerTokenCreator(event.mint, event.traderPublicKey);
 
-                // DYNAMIC DRAGNET: Immediately subscribe to trades for this new token
-                // This allows us to catch the FIRST whales buying in
                 ws.send(JSON.stringify({
                     method: "subscribeTokenTrade",
                     keys: [event.mint]
@@ -66,40 +65,91 @@ export const startRadar = async () => {
             if (event.txType === 'buy' || event.txType === 'sell') {
                 const solAmount = event.solAmount;
                 const isBuy = event.txType === 'buy';
-
-                // Determine if this is a Whale Event (for Visuals/Positions)
                 const isWhale = solAmount >= WHALE_THRESHOLD_SOL;
 
-                // Only log WHALE size trades VISUALLY
+                const walletStats = await getWalletStats(event.traderPublicKey);
+                const reputation = walletStats?.reputation_score || 50;
+                const isVerified = walletStats ? isQualityWhale(walletStats) : false;
+
+                if (reputation < 40) {
+                    await processTrade(event.mint, solAmount, event.traderPublicKey, isBuy, new Date().toISOString(), false);
+                    return;
+                }
+
+                if (!isVerified && solAmount < 2.0 && isWhale) {
+                    await processTrade(event.mint, solAmount, event.traderPublicKey, isBuy, new Date().toISOString(), false);
+                    return;
+                }
+
+                let tokenName = getTokenName(event.mint);
+                let tokenSymbol = getTokenSymbol(event.mint);
+                let imageUri = '';
+
+                if (tokenSymbol === 'UNKNOWN') {
+                    const metadata = await fetchTokenMetadata(event.mint);
+                    if (metadata) {
+                        tokenName = metadata.name;
+                        tokenSymbol = metadata.symbol;
+                        imageUri = metadata.image_uri || '';
+                        registerToken(event.mint, tokenName, tokenSymbol);
+                    }
+                }
+
+                // CLASSIFY TRADE SONG
+                const songTag = await classifyTradeSong(event.traderPublicKey, event.mint, solAmount, isBuy);
+
                 if (isWhale) {
                     const type = isBuy ? '🟢 BUY' : '🔴 SELL';
+                    const songLabel = songTag ? ` [${songTag}]` : '';
+                    const marketCap = event.marketCapSol || 0;
 
-                    // Get token name from registry (from create event)
-                    const tokenName = getTokenName(event.mint);
-                    const tokenSymbol = getTokenSymbol(event.mint);
+                    console.log(`🐋 [WHALE ALERT]${songLabel} ${type} ${solAmount.toFixed(2)} SOL on ${tokenName} ($${tokenSymbol}) | MC: ${marketCap.toFixed(0)} SOL`);
 
-                    console.log(`🐋 [WHALE ALERT] ${type} ${solAmount.toFixed(2)} SOL on ${tokenName} ($${tokenSymbol})`);
-                    console.log(`   Wallet: ${event.traderPublicKey}`);
+                    if (!imageUri) {
+                        const metadata = await fetchTokenMetadata(event.mint);
+                        imageUri = metadata?.image_uri || '';
+                    }
 
-                    // Fetch token metadata (includes image) - fallback if not in registry
-                    const metadata = await fetchTokenMetadata(event.mint);
-                    const imageUri = metadata?.image_uri || '';
-                    const symbol = tokenSymbol !== 'UNKNOWN' ? tokenSymbol : (metadata?.symbol || event.symbol || 'UNKNOWN');
-
-                    // Log to Database (Visual Feed)
-                    await logWhaleSighting(
+                    const result = await logWhaleSighting(
                         event.mint,
-                        symbol,
+                        tokenSymbol,
                         imageUri,
                         solAmount,
                         event.tokenAmount || event.vTokens || 0,
                         event.traderPublicKey,
-                        isBuy
+                        isBuy,
+                        songTag,
+                        marketCap
                     );
+
+                    if (result && result.id) {
+                        const { whale_consensus, pod_reputation_sum } = await getConsensusStats(event.mint);
+                        const signal = calculateSignalScore(reputation, solAmount, whale_consensus);
+
+                        broadcast('whale-sighting', {
+                            id: result.id,
+                            mint: event.mint,
+                            symbol: tokenSymbol,
+                            image_uri: imageUri,
+                            amount: solAmount,
+                            token_amount: event.tokenAmount || event.vTokens || 0,
+                            wallet: event.traderPublicKey,
+                            isBuy,
+                            timestamp: new Date().toISOString(),
+                            is_dev: result.isDev,
+                            signal,
+                            song_tag: songTag,
+                            whale_consensus,
+                            pod_reputation_sum,
+                            reputation_score: reputation,
+                            wallet_name: walletStats?.wallet_name,
+                            twitter_handle: walletStats?.twitter_handle,
+                            avg_impact_volume: walletStats?.avg_impact_volume,
+                            avg_impact_buyers: walletStats?.avg_impact_buyers
+                        });
+                    }
                 }
 
-                // TRACKER: Process ALL trades for Smart Money Grading & Impact Analytics
-                // (Follower trades contribute to the "Impact" score of open whale positions)
                 await processTrade(
                     event.mint,
                     solAmount,
@@ -125,7 +175,6 @@ export const startRadar = async () => {
     });
 };
 
-// Run standalone if called directly
 if (require.main === module) {
     startRadar();
 }

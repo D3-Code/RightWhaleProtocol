@@ -45,8 +45,8 @@ export const calculateSignalScore = (
     const totalScore = Math.floor(reputationFactor + volumeFactor + momentumFactor);
 
     let grade: SignalGrade = 'D';
-    // S-GRADE ELITE CONSENSUS: Requires at least 2 verified whales and 85+ score
-    if (totalScore >= 85 && recentWhaleCount > 1) grade = 'S';
+    // S-GRADE ELITE CONSENSUS: Requires total score 85+, at least 2 whales, AND lead whale must be high-reputation (70+)
+    if (totalScore >= 85 && recentWhaleCount > 1 && reputation >= 70) grade = 'S';
     else if (totalScore >= 75) grade = 'A';
     else if (totalScore >= 55) grade = 'B';
     else if (totalScore >= 35) grade = 'C';
