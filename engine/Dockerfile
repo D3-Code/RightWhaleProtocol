@@ -17,7 +17,11 @@ RUN npm run build
 # Create directory for persistent data
 RUN mkdir -p /app/data
 
-# Expose port (Railway will override this with $PORT env var)
+# Default Environment Variables
+ENV DB_PATH=/app/data/database.sqlite
+ENV PORT=3001
+
+# Expose port
 EXPOSE 3001
 
 # Start the application
