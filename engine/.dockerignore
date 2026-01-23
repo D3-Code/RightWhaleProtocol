@@ -1,5 +1,5 @@
 node_modules
 dist
-database.sqlite
+# database.sqlite (Uncommented to allow seeding)
 .env
 backups

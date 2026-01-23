@@ -1,6 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { open, Database } from 'sqlite';
 import path from 'path';
+import fs from 'fs';
 
 let db: Database | null = null;
 
@@ -8,6 +9,24 @@ export const initDB = async () => {
     try {
         const dbPath = process.env.DB_PATH || path.join(__dirname, '../database.sqlite');
         console.log(`📂 Using database at: ${dbPath}`);
+
+        // Auto-Seed: Copy local DB to volume if volume DB doesn't exist
+        if (process.env.DB_PATH && !fs.existsSync(dbPath)) {
+            try {
+                const seedPath = path.join(__dirname, '../database.sqlite');
+                if (fs.existsSync(seedPath)) {
+                    console.log('🌱 Seeding database from local image...');
+                    // Ensure directory exists
+                    const dir = path.dirname(dbPath);
+                    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+                    fs.copyFileSync(seedPath, dbPath);
+                    console.log('✅ Database seeded successfully!');
+                }
+            } catch (e) {
+                console.error('⚠️ Failed to seed database:', e);
+            }
+        }
 
         db = await open({
             filename: dbPath,
