@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Radar, ExternalLink, Target, Filter, Clock, ArrowUpRight, Search, Trophy, TrendingUp, Users, Activity, Home, Wifi, Shield } from "lucide-react";
-import { ActivePositionsCard } from "./ActivePositionsCard";
+import { Radar, ExternalLink, Target, Filter, Clock, ArrowUpRight, Search, Trophy, TrendingUp, Users, Activity, Home, Wifi, Shield, X } from "lucide-react";
+
 import { TopWhaleTokensCard } from "./TopWhaleTokensCard";
 
 type WhaleSighting = {
@@ -62,6 +62,7 @@ export const FullPageRadar = () => {
     const [radarStats, setRadarStats] = useState({ total_volume_24h: 0, alerts_count_24h: 0, active_whales_count: 0 });
     const [latency, setLatency] = useState(24);
     const [solPrice, setSolPrice] = useState(150);
+    const [isMounted, setIsMounted] = useState(false);
 
     const ENGINE_API = process.env.NEXT_PUBLIC_ENGINE_API || "http://localhost:3001";
     const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
@@ -155,6 +156,7 @@ export const FullPageRadar = () => {
     };
 
     useEffect(() => {
+        setIsMounted(true);
         const interval = setInterval(() => {
             setLatency(Math.floor(Math.random() * (35 - 18 + 1)) + 18);
         }, 3000);
@@ -250,7 +252,7 @@ export const FullPageRadar = () => {
                     </div>
                     <div className="text-right hidden md:block">
                         <p className="text-xs text-zinc-500 uppercase tracking-tighter">System Clock</p>
-                        <p className="text-sm font-black text-white tracking-widest">{new Date().toLocaleTimeString()}</p>
+                        <p className="text-sm font-black text-white tracking-widest">{isMounted ? new Date().toLocaleTimeString() : '--:--:--'}</p>
                     </div>
                 </div>
             </header>
@@ -389,7 +391,11 @@ export const FullPageRadar = () => {
                                 <span className="text-xs font-black text-white uppercase tracking-widest whitespace-nowrap">Elite Leaderboard</span>
                             </div>
                             {topWhales.map((whale, index) => (
-                                <div key={whale.address} className="flex items-center gap-4 group">
+                                <div
+                                    key={whale.address}
+                                    className="flex items-center gap-4 group px-2 py-1 rounded-lg transition-colors"
+
+                                >
                                     <span className="text-lg font-black text-zinc-600 group-hover:text-amber-500 transition-colors">0{index + 1}</span>
                                     <div className="flex flex-col">
                                         <div className="text-xs font-bold text-white uppercase flex items-center gap-1.5 min-w-[120px]">
@@ -428,8 +434,8 @@ export const FullPageRadar = () => {
                         </div>
                     </div>
 
-                    {/* Center Column: Live Whale Feed (Column Span 6) */}
-                    <div className="lg:col-span-6 flex flex-col h-full border border-zinc-800 bg-black/40 rounded-xl overflow-hidden shadow-2xl backdrop-blur-sm relative group">
+                    {/* Center Column: Live Whale Feed (Column Span 9) */}
+                    <div className="lg:col-span-9 flex flex-col h-full border border-zinc-800 bg-black/40 rounded-xl overflow-hidden shadow-2xl backdrop-blur-sm relative group">
                         {/* Table Header (Pinned) */}
                         <div className="grid grid-cols-12 gap-3 px-6 py-4 text-[11px] font-black text-zinc-500 uppercase tracking-[0.2em] border-b border-white/5 bg-zinc-900/80 sticky top-0 z-20 backdrop-blur-md">
                             <div className="col-span-1">Time</div>
@@ -455,11 +461,11 @@ export const FullPageRadar = () => {
                                                 ? 'bg-emerald-500/[0.015] border-emerald-500/60 hover:bg-emerald-500/[0.04]'
                                                 : 'bg-red-500/[0.015] border-red-500/60 hover:bg-red-500/[0.04]'
                                             } transition-all border-y border-r border-transparent hover:border-white/5 group relative
-                                            ${s.whale_consensus && s.whale_consensus >= 5 ? 'ring-1 ring-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.05)]' : ''}
+                                            {Number(s.whale_consensus) >= 5 ? 'ring-1 ring-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.05)]' : ''}
                                         `}
                                     >
                                         {/* Pod Pulse Indicator */}
-                                        {s.whale_consensus && s.whale_consensus >= 3 && (
+                                        {Number(s.whale_consensus) >= 3 && (
                                             <div className="absolute -left-[2px] top-0 bottom-0 w-1 bg-emerald-500 animate-pulse z-10 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
                                         )}
                                         <div className="col-span-1 text-zinc-500 text-[10px] font-bold font-mono">
@@ -508,10 +514,13 @@ export const FullPageRadar = () => {
 
                                         <div className="col-span-3 flex items-center gap-2 min-w-0">
                                             <div className="truncate flex-1 flex items-center gap-1.5">
-                                                <span className="text-[11px] font-bold text-zinc-400 truncate block">
+                                                <span
+                                                    className="text-[11px] font-bold text-zinc-400 truncate block transition-colors"
+
+                                                >
                                                     {s.wallet_name || `${s.wallet.slice(0, 4)}...${s.wallet.slice(-4)}`}
                                                 </span>
-                                                {s.is_dev && (
+                                                {!!s.is_dev && (
                                                     <span
                                                         className="px-1 py-0.5 bg-red-500/10 border border-red-500/20 rounded text-[8px] font-black text-red-500 uppercase tracking-tighter shrink-0 cursor-pointer hover:bg-red-500/20 transition-colors"
                                                         onClick={(e) => { e.stopPropagation(); setShowSignalGuide(true); }}
@@ -520,7 +529,7 @@ export const FullPageRadar = () => {
                                                     </span>
                                                 )}
                                             </div>
-                                            {(s.reputation_score || 0) >= 60 && (
+                                            {Number(s.reputation_score) >= 60 && (
                                                 <Trophy className="w-3.5 h-3.5 text-amber-500/80 shrink-0" />
                                             )}
                                         </div>
@@ -534,7 +543,7 @@ export const FullPageRadar = () => {
                                                     <span className="text-[10px] font-black text-amber-400/90 animate-pulse tracking-tight whitespace-nowrap group-hover/tag:text-amber-300 transition-colors">
                                                         {s.song_tag}
                                                     </span>
-                                                    {s.whale_consensus && s.whale_consensus >= 3 && (
+                                                    {Number(s.whale_consensus) >= 3 && (
                                                         <div className="flex items-center gap-1 text-[8px] font-bold text-emerald-500/80 uppercase">
                                                             <Activity className="w-2 h-2" />
                                                             Pod Active
@@ -545,11 +554,11 @@ export const FullPageRadar = () => {
                                                 <div className="flex flex-col gap-0.5">
                                                     <div className="flex items-center gap-1 text-[10px] font-bold text-purple-400/80">
                                                         <Users className="w-2.5 h-2.5" />
-                                                        {s.avg_impact_buyers}
+                                                        {Math.round(s.avg_impact_buyers || 0)}
                                                     </div>
                                                     <div className="flex items-center gap-1 text-[10px] font-bold text-blue-400/80">
                                                         <Activity className="w-2.5 h-2.5" />
-                                                        {s.avg_impact_volume?.toFixed(1)} SOL
+                                                        {(s.avg_impact_volume || 0).toFixed(1)} SOL
                                                     </div>
                                                 </div>
                                             ) : (
@@ -578,22 +587,7 @@ export const FullPageRadar = () => {
                         </div>
                     </div>
 
-                    {/* Right Column: Active Whale Positions (Column Span 3) */}
-                    <div className="lg:col-span-3 flex flex-col h-full bg-zinc-900/30 border border-zinc-800/50 rounded-xl overflow-hidden shadow-xl backdrop-blur-sm">
-                        <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900/60 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-emerald-500" />
-                                <h3 className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.2em]">Live Smart Positions</h3>
-                            </div>
-                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20">
-                                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                <span className="text-[9px] font-bold text-emerald-500 uppercase">ACTIVE</span>
-                            </div>
-                        </div>
-                        <div className="flex-1 overflow-y-auto no-scrollbar">
-                            <ActivePositionsCard />
-                        </div>
-                    </div>
+
                 </div>
             </main >
 
@@ -708,6 +702,7 @@ export const FullPageRadar = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
         </div>
     );
 };

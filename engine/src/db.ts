@@ -90,6 +90,16 @@ export const initDB = async () => {
             );
         `);
 
+        // Watchlist table
+        await db.exec(`
+            CREATE TABLE IF NOT EXISTS watchlist (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                wallet_address TEXT NOT NULL UNIQUE,
+                added_at TEXT NOT NULL,
+                notes TEXT
+            );
+        `);
+
         console.log('✅ SQLite Database initialized');
     } catch (error) {
         console.error('❌ Failed to init DB:', error);
@@ -280,6 +290,7 @@ export const getTopWhaleTokens = async (limit = 10, timeframeHours = 24, verifie
                 SUM(CASE WHEN ws.isBuy = 1 THEN ws.token_amount ELSE 0 END) as total_tokens_acquired,
                 SUM(COALESCE(tw.reputation_score, 50)) as elite_consensus_score,
                 MAX(ws.timestamp) as last_active,
+                MAX(CASE WHEN ws.isBuy = 1 THEN ws.timestamp END) as last_buy,
                 MAX(ws.market_cap) as market_cap,
                 (SELECT COUNT(DISTINCT wallet) FROM positions WHERE mint = ws.mint AND status = 'OPEN') as holders_count
             FROM whale_sightings ws
@@ -294,6 +305,8 @@ export const getTopWhaleTokens = async (limit = 10, timeframeHours = 24, verifie
             HAVING whale_count > 0 
             AND buy_volume > sell_volume -- Positive Trend: Net buying
             AND buy_volume > 0.1 -- Good Volume: At least 0.1 SOL bought
+            AND datetime(last_buy) >= datetime('now', '-1 hours') -- Active: Recent buy within last hour
+            AND market_cap >= 10000 -- Established: Market cap at least 10K SOL
             ORDER BY elite_consensus_score DESC, total_volume_sol DESC
             LIMIT ?
         `;
@@ -452,3 +465,122 @@ export const closePosition = async (wallet: string, mint: string, sellAmountSol:
     }
     return 0;
 };
+
+export const getWalletTradeHistory = async (address: string, limit = 20) => {
+    if (!db) return [];
+    try {
+        return await db.all(`
+            SELECT 
+                p.*,
+                ws.symbol,
+                ws.image_uri,
+                ws.market_cap,
+                (julianday(COALESCE(p.sell_timestamp, 'now')) - julianday(p.buy_timestamp)) * 24 * 60 AS hold_minutes,
+                CASE 
+                    WHEN p.status = 'CLOSED' THEN p.pnl_sol
+                    ELSE NULL
+                END as realized_pnl
+            FROM positions p
+            LEFT JOIN (
+                SELECT DISTINCT mint, symbol, image_uri, market_cap
+                FROM whale_sightings 
+                WHERE symbol IS NOT NULL AND symbol != 'UNKNOWN'
+                ORDER BY timestamp DESC
+            ) ws ON p.mint = ws.mint
+            WHERE p.wallet = ?
+            ORDER BY p.buy_timestamp DESC
+            LIMIT ?
+        `, address, limit);
+    } catch (error) {
+        console.error('Failed to fetch wallet trade history:', error);
+        return [];
+    }
+};
+
+export const getWalletDetailedStats = async (address: string) => {
+    if (!db) return null;
+    try {
+        const stats = await db.get(`
+            SELECT 
+                tw.*,
+                COUNT(CASE WHEN p.status = 'CLOSED' THEN 1 END) as total_closed_trades,
+                COUNT(CASE WHEN p.status = 'OPEN' THEN 1 END) as total_open_positions,
+                COUNT(CASE WHEN p.status = 'CLOSED' AND p.pnl_sol > 0 THEN 1 END) as winning_trades,
+                COUNT(CASE WHEN p.status = 'CLOSED' AND p.pnl_sol <= 0 THEN 1 END) as losing_trades,
+                SUM(CASE WHEN p.status = 'CLOSED' AND p.pnl_sol > 0 THEN p.pnl_sol ELSE 0 END) as total_wins_sol,
+                SUM(CASE WHEN p.status = 'CLOSED' AND p.pnl_sol <= 0 THEN ABS(p.pnl_sol) ELSE 0 END) as total_losses_sol,
+                AVG(CASE WHEN p.status = 'CLOSED' THEN (julianday(p.sell_timestamp) - julianday(p.buy_timestamp)) * 24 * 60 END) as avg_hold_minutes
+            FROM tracked_wallets tw
+            LEFT JOIN positions p ON tw.address = p.wallet
+            WHERE tw.address = ?
+            GROUP BY tw.address
+        `, address);
+
+        return stats;
+    } catch (error) {
+        console.error('Failed to fetch wallet detailed stats:', error);
+        return null;
+    }
+};
+
+// Watchlist functions
+export const addToWatchlist = async (address: string, notes?: string) => {
+    if (!db) return false;
+    try {
+        await db.run(
+            'INSERT OR REPLACE INTO watchlist (wallet_address, added_at, notes) VALUES (?, ?, ?)',
+            address, new Date().toISOString(), notes || null
+        );
+        console.log(`⭐ Added to watchlist: ${address.slice(0, 8)}`);
+        return true;
+    } catch (error) {
+        console.error('Failed to add to watchlist:', error);
+        return false;
+    }
+};
+
+export const removeFromWatchlist = async (address: string) => {
+    if (!db) return false;
+    try {
+        await db.run('DELETE FROM watchlist WHERE wallet_address = ?', address);
+        console.log(`❌ Removed from watchlist: ${address.slice(0, 8)}`);
+        return true;
+    } catch (error) {
+        console.error('Failed to remove from watchlist:', error);
+        return false;
+    }
+};
+
+export const getWatchlist = async () => {
+    if (!db) return [];
+    try {
+        const watchlist = await db.all(`
+            SELECT 
+                w.*,
+                tw.wallet_name,
+                tw.twitter_handle,
+                tw.reputation_score,
+                tw.win_rate,
+                tw.total_profit_sol
+            FROM watchlist w
+            LEFT JOIN tracked_wallets tw ON w.wallet_address = tw.address
+            ORDER BY w.added_at DESC
+        `);
+        return watchlist;
+    } catch (error) {
+        console.error('Failed to fetch watchlist:', error);
+        return [];
+    }
+};
+
+export const isInWatchlist = async (address: string) => {
+    if (!db) return false;
+    try {
+        const result = await db.get('SELECT 1 FROM watchlist WHERE wallet_address = ?', address);
+        return !!result;
+    } catch (error) {
+        console.error('Failed to check watchlist:', error);
+        return false;
+    }
+};
+

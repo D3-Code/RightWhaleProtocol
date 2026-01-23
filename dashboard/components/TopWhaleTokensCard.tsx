@@ -102,7 +102,7 @@ export const TopWhaleTokensCard = () => {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
                                             <div className="font-bold text-white text-sm truncate">${token.symbol}</div>
-                                            {token.market_cap > 0 && (
+                                            {Number(token.market_cap) > 0 && (
                                                 <div className="text-[9px] font-bold px-1.5 py-0.5 bg-zinc-800 text-zinc-400 rounded shrink-0">
                                                     MC: {Math.round(token.market_cap).toLocaleString()} S
                                                 </div>

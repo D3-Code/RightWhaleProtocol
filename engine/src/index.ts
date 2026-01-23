@@ -11,7 +11,7 @@ export const globalStats = {
 };
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { loadWallet } from './wallet';
-import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets, getOpenPositions, getTopWhaleTokens, getRadarStats } from './db';
+import { initDB, getLogs, getVirtualPots, getWhaleSightings, getTopWallets, getOpenPositions, getTopWhaleTokens, getRadarStats, getWalletTradeHistory, getWalletDetailedStats, addToWatchlist, removeFromWatchlist, getWatchlist, isInWatchlist } from './db';
 import dotenv from 'dotenv';
 import { setupBot } from './bot';
 import { startMonitor } from './monitor';
@@ -20,6 +20,8 @@ import { startMarketMonitor } from './market';
 import { lastAiDecision } from './ai_trader';
 import { fetchTokenMetadata } from './radar/metadata';
 import { getTokenSymbol, getTokenName } from './radar/registry';
+import { backupDatabase } from './backup';
+import { convertToCSV } from './export';
 
 dotenv.config();
 
@@ -189,6 +191,97 @@ app.get('/radar/stats', async (req, res) => {
     }
 });
 
+app.get('/radar/wallet/:address', async (req, res) => {
+    try {
+        const { address } = req.params;
+        const [stats, tradeHistory] = await Promise.all([
+            getWalletDetailedStats(address),
+            getWalletTradeHistory(address, 20)
+        ]);
+
+        if (!stats) {
+            return res.status(404).json({ error: 'Wallet not found' });
+        }
+
+        res.json({
+            ...stats,
+            trade_history: tradeHistory
+        });
+    } catch (err) {
+        console.error('Error fetching wallet details:', err);
+        res.status(500).send('Error fetching wallet details');
+    }
+});
+
+// Watchlist endpoints
+app.post('/radar/watchlist', async (req, res) => {
+    try {
+        const { address, notes } = req.body;
+        if (!address) {
+            return res.status(400).json({ error: 'Wallet address is required' });
+        }
+        const success = await addToWatchlist(address, notes);
+        res.json({ success });
+    } catch (err) {
+        console.error('Error adding to watchlist:', err);
+        res.status(500).send('Error adding to watchlist');
+    }
+});
+
+app.delete('/radar/watchlist/:address', async (req, res) => {
+    try {
+        const { address } = req.params;
+        const success = await removeFromWatchlist(address);
+        res.json({ success });
+    } catch (err) {
+        console.error('Error removing from watchlist:', err);
+        res.status(500).send('Error removing from watchlist');
+    }
+});
+
+app.get('/radar/watchlist', async (req, res) => {
+    try {
+        const watchlist = await getWatchlist();
+        res.json(watchlist);
+    } catch (err) {
+        console.error('Error fetching watchlist:', err);
+        res.status(500).send('Error fetching watchlist');
+    }
+});
+
+app.get('/radar/watchlist/check/:address', async (req, res) => {
+    try {
+        const { address } = req.params;
+        const inWatchlist = await isInWatchlist(address);
+        res.json({ inWatchlist });
+    } catch (err) {
+        console.error('Error checking watchlist:', err);
+        res.status(500).send('Error checking watchlist');
+    }
+});
+
+// Export endpoint
+app.get('/radar/wallet/:address/export', async (req, res) => {
+    try {
+        const { address } = req.params;
+        const format = req.query.format || 'csv';
+        const trades = await getWalletTradeHistory(address, 1000);
+
+        if (format === 'csv') {
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', `attachment; filename="wallet_${address.slice(0, 8)}_trades.csv"`);
+            res.send(convertToCSV(trades));
+        } else {
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Content-Disposition', `attachment; filename="wallet_${address.slice(0, 8)}_trades.json"`);
+            res.json(trades);
+        }
+    } catch (err) {
+        console.error('Error exporting wallet data:', err);
+        res.status(500).send('Error exporting wallet data');
+    }
+});
+
 // Start Server
 // Start Server
 initWebSocketServer(server);
@@ -200,6 +293,11 @@ server.listen(port, () => {
 setupBot();
 startMonitor();
 startMarketMonitor();
+
+// Initialize backup system
+backupDatabase(); // Initial backup on startup
+setInterval(backupDatabase, 24 * 60 * 60 * 1000); // Daily backups
+console.log('💾 Backup system initialized (daily at startup + 24h intervals)');
 
 // Start RightWhale Radar (Whale Tracker)
 import { startRadar } from './radar/listener';
