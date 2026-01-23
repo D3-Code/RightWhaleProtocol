@@ -1,21 +1,24 @@
-# Use Node.js LTS (Long Term Support)
-FROM node:20-alpine
+FROM node:18-alpine
 
-# Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# Copy package files
 COPY package*.json ./
 
-# Install dependencies (only production)
+# Install dependencies
 RUN npm install
 
-# Bundle app source
+# Copy source code
 COPY . .
 
-# Build TypeScript
+# Build the project
 RUN npm run build
 
-# Start the bot
-CMD [ "npm", "start" ]
+# Create directory for persistent data
+RUN mkdir -p /app/data
+
+# Expose port (Railway will override this with $PORT env var)
+EXPOSE 3001
+
+# Start the application
+CMD ["npm", "start"]
